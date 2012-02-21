@@ -1,0 +1,15 @@
+Source: xivo-upgrade
+Section: admin
+Priority: extra
+Maintainer: Nicolas HICHER (atarakt) <nhicher@proformatique.com>
+Build-Depends: debhelper (>= 7.0.50~)
+Standards-Version: 3.8.4
+Homepage: http://wiki.xivo.fr
+#Vcs-Git: git://git.xivo.fr/official/xivo-upgrade.git
+
+Package: xivo-upgrade
+Architecture: any
+Replaces: pf-xivo-base-config ( <= 13:1.2.1-1)
+Depends: ${misc:Depends}, pf-xivo, monit
+Description: XiVO upgrade tools
+ This package provide XiVO upgrading tools

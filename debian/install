@@ -1,0 +1,3 @@
+bin/ usr/
+post-upgrade.d/ usr/share/xivo-upgrade
+pre-upgrade.d/ usr/share/xivo-upgrade

@@ -4,6 +4,7 @@ monit_default="/etc/default/monit"
 fai="pf-fai-xivo-1.2-skaro"
 services="postgresql dahdi xivo-confgend pf-xivo-agid asterisk xivo-ctid"
 upgrading_tool="apt-get"
+lib_directory="/usr/sharo/xivo-upgrade"
 
 stop_monit() {
     sed -i 's/startup=1/startup=0/' $monit_default
@@ -63,6 +64,14 @@ proposed_upgrade() {
     fi
 }
 
+differed_action() {
+    local state=$1
+    local dir="$lib_directory/$state-upgrade.d"
+    echo "execute $state upgrade action"
+    for script in $(ls $dir/*); do
+        bash $script
+    done
+}
 upgrading_xivo() {
     upgrading_version
     proposed_upgrade
@@ -71,10 +80,12 @@ upgrading_xivo() {
 	if [ $answer != 'y' ]; then
 		exit
 	fi
+    differed_action pre
     echo "upgrading xivo"
     $upgrading_tool dist-upgrade -y
     restart_xivo
     return_xivo_states
+    differed_action post
 }
 
 upgrading_system() {
