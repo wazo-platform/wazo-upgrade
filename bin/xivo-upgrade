@@ -4,7 +4,7 @@ monit_default="/etc/default/monit"
 fai="pf-fai-xivo-1.2-skaro"
 services="postgresql dahdi xivo-confgend pf-xivo-agid asterisk xivo-ctid"
 upgrading_tool="apt-get"
-lib_directory="/usr/sharo/xivo-upgrade"
+lib_directory="/usr/share/xivo-upgrade"
 
 stop_monit() {
     sed -i 's/startup=1/startup=0/' $monit_default
@@ -50,17 +50,20 @@ upgrading_version() {
 }
 
 proposed_upgrade() {
+    local upgrade=$1
     echo "updating packages list"
     $upgrading_tool update > /dev/null
     xivo_candidate=$(apt-cache policy pf-xivo | grep Candidate | grep -oE 1.[2-9].[0-9]\{1,2\})
     xivo_installed=$(apt-cache policy pf-xivo | grep Installed | grep -oE 1.[2-9].[0-9]\{1,2\})
 	echo "installed version : $xivo_installed"
 	echo "proposed update   : $xivo_candidate"
-    if [ $xivo_candidate = $xivo_installed ]; then
-        echo "You're systeme is up-to-date, nothing to do."
-	    exit
-    else
-        echo "Upgrades are available, use $(basename $0) -a upgrade to install them"
+    if [ $upgrade != 'upgrade' ]; then
+        if [ $xivo_candidate = $xivo_installed ]; then
+            echo "You're systeme is up-to-date, nothing to do."
+	        exit
+        else
+            echo "Upgrades are available, use $(basename $0) -a upgrade to install them"
+        fi
     fi
 }
 
@@ -72,14 +75,17 @@ differed_action() {
         bash $script
     done
 }
+
 upgrading_xivo() {
     upgrading_version
-    proposed_upgrade
-	echo "Would you like to upgrade your system ? y/n"
-	read answer
-	if [ $answer != 'y' ]; then
-		exit
-	fi
+    proposed_upgrade upgrade
+    if [ $force = 'no' ]; then
+	    echo "Would you like to upgrade your system ? y/n"
+	    read answer
+	    if [ $answer != 'y' ]; then
+	        exit
+	    fi
+    fi
     differed_action pre
     echo "upgrading xivo"
     $upgrading_tool dist-upgrade -y
@@ -104,10 +110,11 @@ usage() {
 EOF
 }
 
-while getopts :a:v: opt
+while getopts :a:v:f opt
 do
   case ${opt} in
     a)   action=${OPTARG};;
+    f)   force="yes";;
     v)   version=${OPTARG};;
     '?') echo "${0} : option ${OPTARG} is not valid" >&2
          usage
@@ -115,7 +122,9 @@ do
   esac
 done
 
+force="${force:-"no"}"
 version="${version:-""}"
+action="${action:-"upgrade"}"
 
 case $action in
     'upgrade')  upgrading_xivo;;
