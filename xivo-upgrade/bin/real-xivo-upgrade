@@ -55,7 +55,7 @@ upgrading_system() {
     echo "Would you like to upgrade your system ? y/n"
     echo "/!\ All services will be restarted"
     read answer
-    if [ $answer != 'y' ]; then
+    if [ "$answer" != 'y' ]; then
         exit
     fi
     differed_action pre
