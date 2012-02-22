@@ -46,18 +46,18 @@ differed_action() {
 get_version() {
     xivo_candidate=$(apt-cache policy pf-xivo | grep Candidate | grep -oE 1.[2-9].[0-9]\{1,2\})
     xivo_installed=$(apt-cache policy pf-xivo | grep Installed | grep -oE 1.[2-9].[0-9]\{1,2\})
-	echo "installed version : $xivo_installed"
-	echo "proposed update   : $xivo_candidate"
+    echo "installed version : $xivo_installed"
+    echo "proposed update   : $xivo_candidate"
 }
 
 upgrading_system() {
     get_version
-	echo "Would you like to upgrade your system ? y/n"
+    echo "Would you like to upgrade your system ? y/n"
     echo "/!\ All services will be restarted"
-	read answer
-	if [ $answer != 'y' ]; then
-	    exit
-	fi
+    read answer
+    if [ $answer != 'y' ]; then
+        exit
+    fi
     differed_action pre
     echo "upgrading xivo"
     $upgrading_tool dist-upgrade -y
