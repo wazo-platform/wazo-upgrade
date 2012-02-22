@@ -1,26 +1,11 @@
 #!/bin/bash
-fai="pf-fai-xivo-1.2-skaro"
 upgrading_tool="apt-get"
 
-upgrading_version() {
+upgrade_xivo() {
     echo "Upgrading xivo-upgrade" 
     $upgrading_tool update > /dev/null
     $upgrading_tool install xivo-upgrade > /dev/null
-    if [ ! -z $version ]; then
-        if [ $version = 'rc' ] || [ $version = 'dev' ]; then
-            echo "Updating sources.list files to install skaro-$version"
-            $upgrading_tool install $fai-$version -y > /dev/null
-        else
-            echo "This version of xivo does't exist"
-            exit
-        fi
-        $upgrading_tool update > /dev/null
-    fi
+    /usr/bin/real-xivo-upgrade
 }
 
-upgrading_xivo() {
-    upgrading_version
-    bash /usr/bin/real-xivo-upgrade
-}
-
-upgrading_xivo
+upgrade_xivo
