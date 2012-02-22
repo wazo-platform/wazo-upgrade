@@ -1,5 +1,4 @@
 #!/bin/bash
-set -e
 fai="pf-fai-xivo-1.2-skaro"
 upgrading_tool="apt-get"
 
@@ -19,57 +18,9 @@ upgrading_version() {
     fi
 }
 
-proposed_upgrade() {
-    local upgrade=$1
-    echo "updating packages list"
-    $upgrading_tool update > /dev/null
-    xivo_candidate=$(apt-cache policy pf-xivo | grep Candidate | grep -oE 1.[2-9].[0-9]\{1,2\})
-    xivo_installed=$(apt-cache policy pf-xivo | grep Installed | grep -oE 1.[2-9].[0-9]\{1,2\})
-	echo "installed version : $xivo_installed"
-	echo "proposed update   : $xivo_candidate"
-    if [ $upgrade != 'upgrade' ]; then
-        if [ $xivo_candidate = $xivo_installed ]; then
-            echo "You're systeme is up-to-date, nothing to do."
-	        exit
-        else
-            echo "Upgrades are available, use $(basename $0) -a upgrade to install them"
-        fi
-    fi
-}
-
 upgrading_xivo() {
     upgrading_version
-    bash /usr/bin/real-xivo-upgrade 
+    bash /usr/bin/real-xivo-upgrade
 }
 
-usage() {
-    cat << EOF
-    This tool is designed to automatically upgrade XiVO
-    usage:
-    $(basename $0) -a action [-v version]
-        action:  proposed or upgrade
-        version: rc or dev (for devel purpose, do not use in production)
-EOF
-}
-
-while getopts :a:v:f opt
-do
-  case ${opt} in
-    a)   action=${OPTARG};;
-    f)   force="yes";;
-    v)   version=${OPTARG};;
-    '?') echo "${0} : option ${OPTARG} is not valid" >&2
-         usage
-    ;;
-  esac
-done
-
-force="${force:-"no"}"
-version="${version:-""}"
-action="${action:-"upgrade"}"
-
-case $action in
-    'upgrade')  upgrading_xivo;;
-    'proposed') proposed_upgrade;;
-    *) echo "error: action not available"; usage;;
-esac
+upgrading_xivo
