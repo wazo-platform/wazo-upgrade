@@ -1,0 +1,67 @@
+#!/bin/bash
+set -e
+source /usr/bin/xivo-upgrade
+monit_default="/etc/default/monit"
+services="postgresql dahdi xivo-confgend pf-xivo-agid asterisk xivo-ctid"
+lib_directory="/usr/share/xivo-upgrade"
+
+stop_monit() {
+    sed -i 's/startup=1/startup=0/' $monit_default
+    invoke-rc.d monit stop > /dev/null
+}
+
+start_monit() {
+    sed -i 's/startup=0/startup=1/' $monit_default
+    invoke-rc.d monit start > /dev/null
+}
+
+restart_xivo() {
+    echo "Restarting xivo"
+    for service in $services; do
+        invoke-rc.d $service stop > /dev/null
+        invoke-rc.d $service start > /dev/null
+    done
+}
+
+return_xivo_states() {
+    echo "checking services"
+    for service in $services; do
+        /etc/init.d/$service status &> /dev/null
+        if [ $? -eq 0 ]; then
+            echo -e "\tOK\t$service"
+        else
+            echo -e "\tNOK\t$service"
+        fi
+    done
+}
+
+differed_action() {
+    local state=$1
+    local dir="$lib_directory/$state-upgrade.d"
+    echo "execute $state upgrade action"
+    for script in $(ls $dir/*); do
+        bash $script
+    done
+}
+
+upgrading_system() {
+    proposed_upgrade upgrade
+    if [ $force = 'no' ]; then
+	    echo "Would you like to upgrade your system ? y/n"
+	    read answer
+	    if [ $answer != 'y' ]; then
+	        exit
+	    fi
+    fi
+    differed_action pre
+    echo "upgrading xivo"
+    $upgrading_tool dist-upgrade -y
+    differed_action post
+    restart_xivo
+    return_xivo_states
+}
+
+stop_monit
+upgrading_system
+start_monit
+
