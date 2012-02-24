@@ -1,6 +1,6 @@
 #!/bin/bash
 monit_default="/etc/default/monit"
-services="postgresql dahdi xivo-confgend pf-xivo-agid asterisk xivo-ctid"
+services="postgresql dahdi xivo-confgend pf-xivo-agid asterisk xivo-ctid nginx"
 lib_directory="/usr/share/xivo-upgrade"
 upgrading_tool="apt-get"
 
