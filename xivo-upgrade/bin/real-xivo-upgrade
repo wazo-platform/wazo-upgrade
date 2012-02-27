@@ -44,8 +44,8 @@ differed_action() {
 }
 
 get_version() {
-    xivo_candidate=$(apt-cache policy pf-xivo | grep Candidate | grep -oE 1.[2-9].[0-9]\{1,2\})
-    xivo_installed=$(apt-cache policy pf-xivo | grep Installed | grep -oE 1.[2-9].[0-9]\{1,2\})
+    xivo_candidate=$(apt-cache policy pf-xivo | grep Candidate | grep -oE '1\.[2-9]\.[0-9]{1,2}')
+    xivo_installed=$(apt-cache policy pf-xivo | grep Installed | grep -oE '1\.[2-9]\.[0-9]{1,2}')
     echo "installed version : $xivo_installed"
     echo "proposed update   : $xivo_candidate"
 }
