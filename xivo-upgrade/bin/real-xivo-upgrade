@@ -66,6 +66,12 @@ upgrading_system() {
     return_xivo_states
 }
 
+
+if [ ! -f /etc/pf-xivo/web-interface/xivo.ini ]; then
+    echo "Warning You should run the wizard before using xivo-upgrade"
+    exit 1
+fi
+
 stop_monit
 upgrading_system
 start_monit
