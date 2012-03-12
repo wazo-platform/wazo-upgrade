@@ -52,10 +52,9 @@ get_version() {
 
 upgrading_system() {
     get_version
-    echo "Would you like to upgrade your system ? y/n"
-    echo "/!\ All services will be restarted"
-    read answer
-    if [ "$answer" != 'y' ]; then
+    read -p 'Would you like to upgrade your system (all services will be restarted) [Y/n]? ' answer
+    answer="${answer:-Y}"
+    if [ "$answer" != 'y' -a "$answer" != 'Y' ]; then
         exit
     fi
     differed_action pre
