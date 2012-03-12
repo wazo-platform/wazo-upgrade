@@ -52,10 +52,12 @@ get_version() {
 
 upgrading_system() {
     get_version
-    read -p 'Would you like to upgrade your system (all services will be restarted) [Y/n]? ' answer
-    answer="${answer:-Y}"
-    if [ "$answer" != 'y' -a "$answer" != 'Y' ]; then
-        exit
+    if [ $force -eq 0 ]; then
+        read -p 'Would you like to upgrade your system (all services will be restarted) [Y/n]? ' answer
+        answer="${answer:-Y}"
+        if [ "$answer" != 'y' -a "$answer" != 'Y' ]; then
+            exit
+        fi
     fi
     differed_action pre
     echo "upgrading xivo"
@@ -71,7 +73,12 @@ if [ ! -f /etc/pf-xivo/web-interface/xivo.ini ]; then
     exit 1
 fi
 
-stop_monit
-upgrading_system
-start_monit
-
+download_only=$1
+force=$2
+if [ $download_only -eq 0 ]; then
+    stop_monit
+    upgrading_system
+    start_monit
+else
+    $upgrading_tool -y -d dist-upgrade
+fi

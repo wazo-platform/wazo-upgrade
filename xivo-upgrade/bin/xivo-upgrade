@@ -1,11 +1,33 @@
 #!/bin/bash
 upgrading_tool="apt-get"
 
-upgrade_xivo() {
-    echo "Upgrading xivo-upgrade" 
-    $upgrading_tool update > /dev/null
-    $upgrading_tool install xivo-upgrade > /dev/null
-    /usr/bin/real-xivo-upgrade
+usage() {
+    cat << EOF
+    Usage: $0 [-d] [-f]
+        -d: only download packages
+        -f: force yes
+EOF
 }
 
+upgrade_xivo() {
+    echo "Upgrading xivo-upgrade"
+    $upgrading_tool update > /dev/null
+    $upgrading_tool install xivo-upgrade > /dev/null
+    /usr/bin/real-xivo-upgrade $download_only $force
+}
+
+while getopts :df opt
+do
+  case ${opt} in
+    d) download_only=1;;
+    h) usage;;
+    f) force=1;;
+    '?')  echo "${0} : option ${OPTARG} is not valid" >&2
+          usage
+          exit -1
+    ;;
+  esac
+done
+download_only="${download:-"0"}"
+force="${force:-"0"}"
 upgrade_xivo
