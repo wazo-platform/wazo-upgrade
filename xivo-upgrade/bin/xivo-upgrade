@@ -28,6 +28,6 @@ do
     ;;
   esac
 done
-download_only="${download:-"0"}"
+download_only="${download_only:-"0"}"
 force="${force:-"0"}"
 upgrade_xivo
