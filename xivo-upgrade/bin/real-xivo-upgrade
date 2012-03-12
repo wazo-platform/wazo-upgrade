@@ -37,7 +37,7 @@ return_xivo_states() {
 differed_action() {
     local state=$1
     local dir="$lib_directory/$state-upgrade.d"
-    echo "execute $state upgrade action"
+    echo "executing $state upgrade action"
     for script in $(ls $dir/*); do
         bash $script
     done
