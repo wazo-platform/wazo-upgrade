@@ -85,7 +85,6 @@ while getopts :df opt
 do
   case ${opt} in
     d) download_only=1;;
-    h) usage;;
     f) force=1;;
     '?')  echo "${0} : option ${OPTARG} is not valid" >&2
           usage
