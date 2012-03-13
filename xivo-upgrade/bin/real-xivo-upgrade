@@ -73,8 +73,29 @@ if [ ! -f /etc/pf-xivo/web-interface/xivo.ini ]; then
     exit 1
 fi
 
-download_only=$1
-force=$2
+usage() {
+    cat << EOF
+    Usage: xivo-upgrade [-d] [-f]
+        -d: only download packages
+        -f: force yes
+EOF
+}
+
+while getopts :df opt
+do
+  case ${opt} in
+    d) download_only=1;;
+    h) usage;;
+    f) force=1;;
+    '?')  echo "${0} : option ${OPTARG} is not valid" >&2
+          usage
+          exit -1
+    ;;
+  esac
+done
+download_only="${download_only:-"0"}"
+force="${force:-"0"}"
+
 if [ $download_only -eq 0 ]; then
     stop_monit
     upgrading_system
