@@ -5,7 +5,7 @@ upgrade_xivo() {
     echo "Upgrading xivo-upgrade"
     $upgrading_tool update > /dev/null
     $upgrading_tool install xivo-upgrade > /dev/null
-    /usr/bin/real-xivo-upgrade "$@"
 }
 
 upgrade_xivo
+/usr/bin/real-xivo-upgrade "$@"
