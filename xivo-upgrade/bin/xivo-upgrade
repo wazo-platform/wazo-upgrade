@@ -4,7 +4,7 @@ upgrading_tool="apt-get"
 upgrade_xivo() {
     echo "Upgrading xivo-upgrade"
     $upgrading_tool update > /dev/null
-    $upgrading_tool install xivo-upgrade > /dev/null
+    $upgrading_tool install -y xivo-upgrade
 }
 
 upgrade_xivo
