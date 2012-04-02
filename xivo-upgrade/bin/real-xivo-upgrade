@@ -44,6 +44,7 @@ differed_action() {
 }
 
 get_version() {
+    LANG="en_US.UTF-8"
     xivo_candidate=$(apt-cache policy pf-xivo | grep Candidate | grep -oE '1\.[2-9]\.[0-9]{1,2}')
     xivo_installed=$(apt-cache policy pf-xivo | grep Installed | grep -oE '1\.[2-9]\.[0-9]{1,2}')
     echo "installed version : $xivo_installed"
