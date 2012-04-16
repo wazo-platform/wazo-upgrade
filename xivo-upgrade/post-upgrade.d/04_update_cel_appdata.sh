@@ -9,4 +9,4 @@ else
 fi
 
 /etc/init.d/postgresql restart > /dev/null
-su - -c 'psql -c "ALTER TABLE cel ALTER COLUMN appdata TYPE varchar(256);" asterisk > /dev/null' postgres
+su - -c 'psql -c "ALTER TABLE cel ALTER COLUMN appdata TYPE varchar(512);" asterisk > /dev/null' postgres
