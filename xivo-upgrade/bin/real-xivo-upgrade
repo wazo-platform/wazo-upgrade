@@ -1,9 +1,8 @@
 #!/bin/bash
 monit_default="/etc/default/monit"
-services="postgresql dahdi xivo-confgend pf-xivo-provd pf-xivo-agid asterisk xivo-ctid nginx"
-reversed_services=$(echo $services | tac -s' ')
 lib_directory="/usr/share/xivo-upgrade"
 upgrading_tool="apt-get"
+xivo_service="/usr/sbin/xivo-service"
 
 stop_monit() {
     sed -i 's/startup=1/startup=0/' $monit_default
@@ -13,28 +12,6 @@ stop_monit() {
 start_monit() {
     sed -i 's/startup=0/startup=1/' $monit_default
     invoke-rc.d monit start > /dev/null
-}
-
-restart_xivo() {
-    echo "Restarting xivo"
-    for service in $reversed_services; do
-        invoke-rc.d $service stop > /dev/null
-    done
-    for service in $services; do
-        invoke-rc.d $service start > /dev/null
-    done
-}
-
-return_xivo_states() {
-    echo "checking services"
-    for service in $services; do
-        /etc/init.d/$service status &> /dev/null
-        if [ $? -eq 0 ]; then
-            echo -e "\tOK\t$service"
-        else
-            echo -e "\tNOK\t$service"
-        fi
-    done
 }
 
 differed_action() {
@@ -64,12 +41,12 @@ upgrading_system() {
         fi
     fi
     /sbin/iptables -I INPUT 1 -p udp --dport 5060 -j DROP
+    $xivo_service stop
     differed_action pre
     echo "upgrading xivo"
     $upgrading_tool dist-upgrade -y
     differed_action post
-    restart_xivo
-    return_xivo_states
+    $xivo_service restart
     /sbin/iptables -D INPUT -p udp --dport 5060 -j DROP
 }
 
@@ -105,6 +82,7 @@ if [ $download_only -eq 0 ]; then
     stop_monit
     upgrading_system
     start_monit
+    $xivo_service status
 else
     $upgrading_tool -y -d dist-upgrade
 fi
