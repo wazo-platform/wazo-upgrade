@@ -65,10 +65,10 @@ xivo_start() {
             /usr/sbin/invoke-rc.d $service start
         fi
     done
-    status=$(asterisk -rx 'core waitfullybooted')
 
     wait_ctid_initialization
 
+    status=$(asterisk -rx 'core waitfullybooted')
     while [ "$status" != "Asterisk has fully booted." ]; do
         sleep 1
         status=$(asterisk -rx 'core waitfullybooted')
