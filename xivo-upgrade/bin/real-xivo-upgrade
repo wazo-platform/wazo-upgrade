@@ -19,7 +19,7 @@ pre_upgrade() {
 }
 
 post_upgrade() {
-    $xivo_service restart > /dev/null
+    $xivo_service restart all > /dev/null
     differed_action post
 }
 
@@ -42,11 +42,11 @@ upgrading_system() {
     fi
     /sbin/iptables -I INPUT 1 -p udp --dport 5060 -j DROP
     pre_upgrade
-    $xivo_service stop
+    $xivo_service stop all
     echo "upgrading xivo"
     $upgrading_tool dist-upgrade -y
     post_upgrade
-    $xivo_service restart
+    $xivo_service restart all
     /sbin/iptables -D INPUT -p udp --dport 5060 -j DROP
 }
 

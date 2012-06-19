@@ -1,8 +1,14 @@
 #!/bin/bash
 action=$1
-services="postgresql dahdi xivo-confgend pf-xivo-provd pf-xivo-agid asterisk xivo-ctid nginx monit"
-reversed_services=$(echo $services | tac -s' ')
+all_services=$2
+services="dahdi xivo-confgend pf-xivo-provd pf-xivo-agid asterisk xivo-ctid monit"
 monit_default="/etc/default/monit"
+
+if [ "$all_services" = "all" ]; then
+    services="postgresql $services nginx"
+fi
+
+reversed_services=$(echo $services | tac -s' ')
 
 usage() {
     cat << EOF
