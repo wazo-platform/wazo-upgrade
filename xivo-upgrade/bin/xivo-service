@@ -32,7 +32,7 @@ xivo_status() {
 xivo_start() {
     /sbin/iptables -I INPUT 1 -p udp --dport 5060 -j DROP
     for service in $services; do
-        if [ -f /etc/init.d/$service]; then
+        if [ -f /etc/init.d/$service ]; then
             /usr/sbin/invoke-rc.d $service start
         fi
     done
@@ -47,7 +47,7 @@ xivo_start() {
 xivo_stop() {
     /sbin/iptables -I INPUT 1 -p udp --dport 5060 -j DROP
     for service in $reversed_services; do
-        if [ -f /etc/init.d/$service]; then
+        if [ -f /etc/init.d/$service ]; then
             /usr/sbin/invoke-rc.d $service stop
         fi
     done
