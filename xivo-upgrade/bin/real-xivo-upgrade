@@ -2,7 +2,7 @@
 monit_default="/etc/default/monit"
 lib_directory="/usr/share/xivo-upgrade"
 upgrading_tool="apt-get"
-xivo_service="/usr/sbin/xivo-service"
+xivo_service="/usr/bin/xivo-service"
 
 stop_monit() {
     sed -i 's/startup=1/startup=0/' $monit_default
