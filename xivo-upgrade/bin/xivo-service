@@ -40,6 +40,17 @@ enable_monit() {
     sed -i 's/startup=0/startup=1/' $monit_default
 }
 
+wait_ctid_initialization() {
+    cti_initialization=15
+
+    echo "Waiting $cti_initialization seconds before opening port 5060"
+    for i in $(seq 1 $cti_initialization); do
+        sleep 1
+        echo -n '.'
+    done
+    echo
+}
+
 xivo_start() {
     /sbin/iptables -I INPUT 1 -p udp --dport 5060 -j DROP
     enable_monit
@@ -49,6 +60,9 @@ xivo_start() {
         fi
     done
     status=$(asterisk -rx 'core waitfullybooted')
+
+    wait_ctid_initialization
+
     while [ "$status" != "Asterisk has fully booted." ]; do
         sleep 1
         status=$(asterisk -rx 'core waitfullybooted')
