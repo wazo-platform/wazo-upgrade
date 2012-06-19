@@ -2,6 +2,7 @@
 action=$1
 services="postgresql dahdi xivo-confgend pf-xivo-provd pf-xivo-agid asterisk xivo-ctid nginx monit"
 reversed_services=$(echo $services | tac -s' ')
+monit_default="/etc/default/monit"
 
 usage() {
     cat << EOF
@@ -20,17 +21,28 @@ EOF
 xivo_status() {
     echo "checking services"
     for service in $services; do
-        /etc/init.d/$service status &> /dev/null
-        if [ $? -eq 0 ]; then
-            echo -e "\tOK\t$service"
-        else
-            echo -e "\tNOK\t$service"
+        if [ $service != "monit" ] ; then
+            /etc/init.d/$service status &> /dev/null
+            if [ $? -eq 0 ]; then
+                echo -e "\tOK\t$service"
+            else
+                echo -e "\tNOK\t$service"
+            fi
         fi
     done
 }
 
+disable_monit() {
+    sed -i 's/startup=1/startup=0/' $monit_default
+}
+
+enable_monit() {
+    sed -i 's/startup=0/startup=1/' $monit_default
+}
+
 xivo_start() {
     /sbin/iptables -I INPUT 1 -p udp --dport 5060 -j DROP
+    enable_monit
     for service in $services; do
         if [ -f /etc/init.d/$service ]; then
             /usr/sbin/invoke-rc.d $service start
@@ -46,6 +58,7 @@ xivo_start() {
 
 xivo_stop() {
     /sbin/iptables -I INPUT 1 -p udp --dport 5060 -j DROP
+    disable_monit
     for service in $reversed_services; do
         if [ -f /etc/init.d/$service ]; then
             /usr/sbin/invoke-rc.d $service stop

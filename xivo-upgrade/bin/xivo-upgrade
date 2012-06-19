@@ -1,4 +1,5 @@
 #!/bin/bash
+
 upgrading_tool="apt-get"
 
 upgrade_xivo() {
