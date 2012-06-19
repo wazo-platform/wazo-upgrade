@@ -32,7 +32,9 @@ xivo_status() {
 xivo_start() {
     /sbin/iptables -I INPUT 1 -p udp --dport 5060 -j DROP
     for service in $services; do
-        /usr/sbin/invoke-rc.d $service start
+        if [ -f /etc/init.d/$service]; then
+            /usr/sbin/invoke-rc.d $service start
+        fi
     done
     status=$(asterisk -rx 'core waitfullybooted')
     while [ "$status" != "Asterisk has fully booted." ]; do
@@ -45,7 +47,9 @@ xivo_start() {
 xivo_stop() {
     /sbin/iptables -I INPUT 1 -p udp --dport 5060 -j DROP
     for service in $reversed_services; do
-        /usr/sbin/invoke-rc.d $service stop
+        if [ -f /etc/init.d/$service]; then
+            /usr/sbin/invoke-rc.d $service stop
+        fi
     done
     /sbin/iptables -D INPUT -p udp --dport 5060 -j DROP
 }
