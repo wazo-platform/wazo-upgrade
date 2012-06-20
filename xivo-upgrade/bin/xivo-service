@@ -25,6 +25,7 @@ EOF
 }
 
 xivo_status() {
+    xivo-check-db
     echo "checking services"
     for service in $services; do
         if [ $service != "monit" ] ; then

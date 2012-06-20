@@ -10,6 +10,7 @@ STATE_DIR = '/var/lib/xivo-update-db'
 
 
 def main():
+    print 'checking databases'
     for db_name in DB_NAMES:
         latest_executed = get_latest_executed(db_name)
         latest_available = get_latest_available(db_name)
@@ -18,7 +19,7 @@ def main():
         else:
             status_msg = 'NOK (last is %s, should be %s)' % (
                     latest_executed, latest_available)
-        print '%-12s\t%s' % (db_name + ' db', status_msg)
+        print '\t%s\t%s' % (status_msg, db_name + ' db')
 
 
 def get_latest_executed(db_name):
