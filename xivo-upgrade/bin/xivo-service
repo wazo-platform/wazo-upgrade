@@ -3,6 +3,7 @@ action=$1
 all_services=$2
 services="dahdi xivo-confgend pf-xivo-provd pf-xivo-agid asterisk xivo-ctid monit"
 monit_default="/etc/default/monit"
+PATH=/bin:/usr/bin:/sbin:/usr/sbin
 
 if [ "$all_services" = "all" ]; then
     services="postgresql $services nginx"
