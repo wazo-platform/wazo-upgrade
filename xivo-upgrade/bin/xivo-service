@@ -1,24 +1,34 @@
 #!/bin/bash
 action=$1
-all_services=$2
+services_filter=$2
 services="dahdi xivo-confgend pf-xivo-provd pf-xivo-agid asterisk xivo-ctid monit"
 monit_default="/etc/default/monit"
+no_monit=1
 PATH=/bin:/usr/bin:/sbin:/usr/sbin
 
-if [ "$all_services" = "all" ]; then
+if [ "$services_filter" = "all" ]; then
     services="postgresql nginx $services"
 fi
 
-reversed_services=$(echo $services | tac -s' ')
+if [ "$services_filter" = "no_monit" ]; then
+    services=$(/bin/echo $services | sed 's/monit//')
+    no_monit=0
+fi
+
+reversed_services=$(/bin/echo $services | tac -s' ')
 
 usage() {
     cat << EOF
-    usage : $0 action
+    usage : $0 action [services_filter]
     availables actions :
         status  : print status of all xivo services
         restart : restart all xivo services
         stop    : stop all xivo services
         start   : start all xivo services
+
+    availables services_filter :
+        all      : add postgres and nginx to managed services
+        no_monit : do not include monit
 
     impacted services : $services
 EOF
@@ -41,11 +51,15 @@ xivo_status() {
 }
 
 disable_monit() {
-    sed -i 's/startup=1/startup=0/' $monit_default
+    if [ $no_monit -eq 1 ]; then
+        sed -i 's/startup=1/startup=0/' $monit_default
+    fi
 }
 
 enable_monit() {
-    sed -i 's/startup=0/startup=1/' $monit_default
+    if [ $no_monit -eq 1 ]; then
+        sed -i 's/startup=0/startup=1/' $monit_default
+    fi
 }
 
 wait_ctid_initialization() {
