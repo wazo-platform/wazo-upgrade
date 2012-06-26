@@ -11,7 +11,7 @@ if [ "$services_filter" = "all" ]; then
 fi
 
 if [ "$services_filter" = "no_monit" ]; then
-    services="dahdi xivo-confgend pf-xivo-provd pf-xivo-agid asterisk xivo-ctid"
+    services=$(/bin/echo $services | sed 's/monit//')
     no_monit=0
 fi
 
