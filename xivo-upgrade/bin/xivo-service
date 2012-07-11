@@ -65,12 +65,26 @@ enable_monit() {
 wait_ctid_initialization() {
     cti_initialization=15
 
-    echo "Waiting $cti_initialization seconds before opening port 5060"
-    for i in $(seq 1 $cti_initialization); do
-        sleep 1
-        echo -n '.'
-    done
-    echo
+    grep -q "startup=yes" /etc/default/xivo-ctid
+    if [ $? -eq 0 ]; then
+        echo "Waiting $cti_initialization seconds before opening port 5060"
+        for i in $(seq 1 $cti_initialization); do
+            sleep 1
+            echo -n '.'
+        done
+        echo
+    fi
+}
+
+wait_asterisk_initialization() {
+    grep -q RUNASTERISK=yes /etc/default/asterisk
+    if [ $? -eq 0 ]; then
+        status=$(asterisk -rx 'core waitfullybooted')
+        while [ "$status" != "Asterisk has fully booted." ]; do
+            sleep 1
+            status=$(asterisk -rx 'core waitfullybooted')
+        done
+    fi
 }
 
 xivo_start() {
@@ -84,11 +98,8 @@ xivo_start() {
 
     wait_ctid_initialization
 
-    status=$(asterisk -rx 'core waitfullybooted')
-    while [ "$status" != "Asterisk has fully booted." ]; do
-        sleep 1
-        status=$(asterisk -rx 'core waitfullybooted')
-    done
+    wait_asterisk_initialization
+
     /sbin/iptables -D INPUT -p udp --dport 5060 -j DROP
 }
 
