@@ -1,10 +1,10 @@
 #!/bin/bash
 
+PATH=/bin:/usr/bin:/sbin:/usr/sbin
 monit_default="/etc/default/monit"
 lib_directory="/usr/share/xivo-upgrade"
 upgrading_tool="apt-get"
 xivo_service="/usr/bin/xivo-service"
-PATH=/bin:/usr/bin:/sbin:/usr/sbin
 
 differed_action() {
     local state=$1

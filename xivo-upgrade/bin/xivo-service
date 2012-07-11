@@ -1,10 +1,11 @@
 #!/bin/bash
+
+PATH=/bin:/usr/bin:/sbin:/usr/sbin
 action=$1
 services_filter=$2
 services="dahdi xivo-confgend pf-xivo-provd pf-xivo-agid asterisk xivo-ctid monit"
 monit_default="/etc/default/monit"
 no_monit=1
-PATH=/bin:/usr/bin:/sbin:/usr/sbin
 
 if [ "$services_filter" = "all" ]; then
     services="postgresql nginx $services"
