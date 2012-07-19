@@ -26,8 +26,8 @@ post_upgrade() {
 
 get_version() {
     LANG="C"
-    xivo_candidate=$(apt-cache policy pf-xivo | grep Candidate | grep -oE '1\.[2-9]\.[0-9]{1,2}')
-    xivo_installed=$(apt-cache policy pf-xivo | grep Installed | grep -oE '1\.[2-9]\.[0-9]{1,2}')
+    xivo_candidate=$(apt-cache policy pf-xivo | grep Candidate | grep -oE '([0-9]{2}\.[0-9]+|1\.2\.[0-9]{1,2})' | head -n1)
+    xivo_installed=$(apt-cache policy pf-xivo | grep Installed | grep -oE '([0-9]{2}\.[0-9]+|1\.2\.[0-9]{1,2})' | head -n1)
     echo "installed version : $xivo_installed"
     echo "proposed update   : $xivo_candidate"
 }
