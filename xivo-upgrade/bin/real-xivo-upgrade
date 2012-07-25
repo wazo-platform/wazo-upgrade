@@ -1,5 +1,4 @@
 #!/bin/bash
-
 PATH=/bin:/usr/bin:/sbin:/usr/sbin
 monit_default="/etc/default/monit"
 lib_directory="/usr/share/xivo-upgrade"
@@ -41,6 +40,7 @@ upgrading_system() {
             exit
         fi
     fi
+    upgrade_fai
     /sbin/iptables -I INPUT 1 -p udp --dport 5060 -j DROP
     pre_upgrade
     $xivo_service stop
@@ -51,11 +51,27 @@ upgrading_system() {
     /sbin/iptables -D INPUT -p udp --dport 5060 -j DROP
 }
 
-
 if [ ! -f /etc/pf-xivo/web-interface/xivo.ini ]; then
     echo "Warning You should run the wizard before using xivo-upgrade"
     exit 1
 fi
+upgrade_fai() {
+    echo "upgrade fai if needed"
+    old_packages=$(aptitude search pf-fai | grep ^i | grep -oE 'pf-fai.* ' | awk '{print $1}')
+    if [ "$old_packages" != "" ]; then
+        new_packages=""
+        for package in $old_packages; do
+            case $package in
+                "pf-fai") new_packages="$new_packages xivo-fai";;
+                "pf-fai-dev") new_packages="$new_packages xivo-fai-dev";;
+                "pf-fai-xivo-1.2-skaro") new_packages="$new_packages xivo-fai-skaro";;
+                "pf-fai-xivo-1.2-skaro-rc") new_packages="$new_packages xivo-fai-skaro-rc";;
+                "pf-fai-xivo-1.2-skaro-dev") new_packages="$new_packages xivo-fai-skaro-dev";;
+            esac
+        done
+        apt-get install -y $new_packages > /dev/null
+    fi
+}
 
 usage() {
     cat << EOF
