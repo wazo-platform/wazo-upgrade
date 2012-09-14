@@ -1,7 +1,10 @@
 #!/bin/bash
-package="pf-xivo-agid"
-dpkg -l $package | grep -q '^ii'
-if [ $? = 0 ]; then
-    apt-get remove --purge $package
-fi
-dpkg --list |grep "^rc" | grep $package | cut -d " " -f 3 | xargs sudo dpkg --purge
+old_fai=" pf-fai pf-fai-dev pf-fai-xivo-1.2-skaro pf-fai-xivo-1.2-skaro-dev"
+renamed_packages="pf-xivo-agid"
+for package in $renamed_packages; do
+    dpkg -l $package | grep -q '^ii'
+    if [ $? = 0 ]; then
+        apt-get purge $package
+    fi
+done
+dpkg --purge $old_fai
