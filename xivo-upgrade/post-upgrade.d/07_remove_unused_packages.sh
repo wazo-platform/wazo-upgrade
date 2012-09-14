@@ -8,7 +8,7 @@ for package in $renamed_packages; do
     fi
 done
 
-$all_packages+=$old_fais
+all_packages+=$old_fais
 for old_fai in $all_packages; do
     dpkg -l $package | grep -q '^rc'
     if [ $? = 0 ]; then
