@@ -1,8 +1,8 @@
 #!/bin/bash
 old_fais="pf-fai pf-fai-dev pf-fai-xivo-1.2-skaro pf-fai-xivo-1.2-skaro-dev"
-renamed_packages="pf-xivo-agid"
+renamed_packages="pf-xivo-agid pf-xivo-base-config"
 for package in $renamed_packages; do
-    dpkg -l $package | grep -q '^ii'
+    dpkg -l $package 2> /dev/null | grep -q '^ii'
     if [ $? = 0 ]; then
         apt-get purge $package > /dev/null
     fi
@@ -10,14 +10,14 @@ done
 
 all_packages+="$renamed_packages $old_fais"
 for old_fai in $all_packages; do
-    dpkg -l $old_fai | grep -q '^rc'
+    dpkg -l $old_fai 2> /dev/null | grep -q '^rc'
     if [ $? = 0 ]; then
         dpkg --purge $old_fai > /dev/null
     fi
 done
 
 extra="pf-xivo-web-interface-config"
-dpkg -l $extra | grep -q '^rc'
+dpkg -l $extra 2> /dev/null | grep -q '^rc'
 if [ $? = 0 ]; then
     rsync -av /etc/pf-xivo/web-interface /tmp/ > /dev/null
     dpkg --purge $extra > /dev/null
