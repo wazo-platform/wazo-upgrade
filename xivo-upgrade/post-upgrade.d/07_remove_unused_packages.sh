@@ -3,7 +3,10 @@ old_fais="pf-fai pf-fai-dev pf-fai-xivo-1.2-skaro pf-fai-xivo-1.2-skaro-dev"
 renamed_packages="pf-xivo-agid pf-xivo-base-config"
 
 # cleanup pf-xivo-base-config.postrm file to allow package purge
-sed -i 's/.*dpkg-divert.*//' /var/lib/dpkg/info/pf-xivo-base-config.postrm
+base_config_postrm="/var/lib/dpkg/info/pf-xivo-base-config.postrm"
+sed -i '23 i\\t\tdpkg-divert --list | grep -E " by pf-xivo-base-config$"' $base_config_postrm
+sed -i '24 i\\t\tif [ $? -eq 0]; then' $base_config_postrm
+sed -i '26 i\\t\tfi' $base_config_postrm
 
 for package in $renamed_packages; do
     dpkg -l $package 2> /dev/null | grep -q '^ii'
