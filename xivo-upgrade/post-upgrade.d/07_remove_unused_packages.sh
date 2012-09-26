@@ -1,6 +1,7 @@
 #!/bin/bash
 old_fais="pf-fai pf-fai-dev pf-fai-xivo-1.2-skaro pf-fai-xivo-1.2-skaro-dev"
-renamed_packages="pf-xivo-agid pf-xivo-base-config"
+renamed_packages="pf-xivo-agid"
+#renamed_packages="pf-xivo-agid pf-xivo-base-config"
 for package in $renamed_packages; do
     dpkg -l $package 2> /dev/null | grep -q '^ii'
     if [ $? = 0 ]; then
