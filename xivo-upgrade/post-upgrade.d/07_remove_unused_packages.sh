@@ -4,9 +4,11 @@ renamed_packages="pf-xivo-agid pf-xivo-base-config"
 
 # cleanup pf-xivo-base-config.postrm file to allow package purge
 base_config_postrm="/var/lib/dpkg/info/pf-xivo-base-config.postrm"
-sed -i '23 i\\t\tdpkg-divert --list | grep -E " by pf-xivo-base-config$"' $base_config_postrm
-sed -i '24 i\\t\tif [ $? -eq 0]; then' $base_config_postrm
-sed -i '26 i\\t\tfi' $base_config_postrm
+xivo_config_postrm="/var/lib/dpkg/info/xivo-config.postrm"
+if [ -f $base_config_postrm ]; then
+    cp $xivo_config_postrm $base_config_postrm
+    sed -i 's/xivo-config/pf-xivo-base-config/' $base_config_postrm
+fi
 
 for package in $renamed_packages; do
     dpkg -l $package 2> /dev/null | grep -q '^ii'
