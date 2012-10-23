@@ -1,12 +1,20 @@
 #!/bin/sh
 
-XIVO_WEBI_LIB_PATH=" /var/lib/pf-xivo-web-interface"
+LIST_DIR_TOCLEAN="/var/lib/pf-xivo-web-interface"
 
-LIST_TOCLEAN="${XIVO_WEBI_LIB_PATH}/statistics
-		${XIVO_WEBI_LIB_PATH}/pchart"
+LIST_FILE_TOCLEAN="/etc/pf-xivo/web-interface/location.ini
+                   /etc/pf-xivo/web-interface/report.ini
+                   /etc/pf-xivo/web-interface/template.ini
+                   /etc/cron.d/pf-xivo-web-interface"
 
-for TOCLEANUP in ${LIST_TOCLEAN}; do
-    if [ -d "${TOCLEANUP}" ]; then
-	    rm -rf "${TOCLEANUP}"
+for DIR in ${LIST_DIR_TOCLEAN}; do
+    if [ -d "${DIR}" ]; then
+	    rm -rf "${DIR}"
+    fi
+done
+
+for FILE in ${LIST_FILE_TOCLEAN}; do
+    if [ -f "${FILE}" ]; then
+	    rm -f "${FILE}"
     fi
 done
