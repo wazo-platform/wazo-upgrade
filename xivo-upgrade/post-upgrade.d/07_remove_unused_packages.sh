@@ -30,7 +30,7 @@ dpkg -l $extra 2> /dev/null | grep -q '^rc'
 if [ $? = 0 ]; then
     rsync -av /etc/pf-xivo/web-interface /tmp/ > /dev/null
     dpkg --purge $extra > /dev/null
+    apt-get install --reinstall pf-xivo-web-interface > /dev/null
     rsync -av /tmp/web-interface/ /etc/pf-xivo/web-interface/ > /dev/null
     rm -rf /tmp/web-interface > /dev/null
-    apt-get install --reinstall pf-xivo-web-interface > /dev/null
 fi
