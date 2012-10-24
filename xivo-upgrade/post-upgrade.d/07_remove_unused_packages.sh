@@ -7,6 +7,7 @@ dpkg -l $extra 2> /dev/null | grep -q '^rc'
 if [ $? = 0 ]; then
     rsync -av /etc/pf-xivo/web-interface /tmp/ > /dev/null
     dpkg --purge $extra > /dev/null
+    reinstall_webi=0
 fi
 # cleanup pf-xivo-base-config.postrm file to allow package purge
 base_config_postrm="/var/lib/dpkg/info/pf-xivo-base-config.postrm"
@@ -31,8 +32,7 @@ for old_fai in $all_packages; do
     fi
 done
 
-dpkg -l $extra 2> /dev/null | grep -q '^rc'
-if [ $? = 0 ]; then
+if [ $reinstall_webi = 0 ]; then
     apt-get install --reinstall pf-xivo-web-interface > /dev/null
     rsync -av /tmp/web-interface/ /etc/pf-xivo/web-interface/ > /dev/null
     rm -rf /tmp/web-interface > /dev/null
