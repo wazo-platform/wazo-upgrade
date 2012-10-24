@@ -2,6 +2,12 @@
 old_fais="pf-fai pf-fai-dev pf-fai-xivo-1.2-skaro pf-fai-xivo-1.2-skaro-dev"
 renamed_packages="pf-xivo-agid pf-xivo-base-config pf-xivo-fetchfw"
 
+extra="pf-xivo-web-interface-config"
+dpkg -l $extra 2> /dev/null | grep -q '^rc'
+if [ $? = 0 ]; then
+    rsync -av /etc/pf-xivo/web-interface /tmp/ > /dev/null
+    dpkg --purge $extra > /dev/null
+fi
 # cleanup pf-xivo-base-config.postrm file to allow package purge
 base_config_postrm="/var/lib/dpkg/info/pf-xivo-base-config.postrm"
 xivo_config_postrm="/var/lib/dpkg/info/xivo-config.postrm"
@@ -25,11 +31,8 @@ for old_fai in $all_packages; do
     fi
 done
 
-extra="pf-xivo-web-interface-config"
 dpkg -l $extra 2> /dev/null | grep -q '^rc'
 if [ $? = 0 ]; then
-    rsync -av /etc/pf-xivo/web-interface /tmp/ > /dev/null
-    dpkg --purge $extra > /dev/null
     apt-get install --reinstall pf-xivo-web-interface > /dev/null
     rsync -av /tmp/web-interface/ /etc/pf-xivo/web-interface/ > /dev/null
     rm -rf /tmp/web-interface > /dev/null
