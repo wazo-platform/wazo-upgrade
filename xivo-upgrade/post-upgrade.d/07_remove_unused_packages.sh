@@ -1,26 +1,17 @@
 #!/bin/bash
-set -x
 old_fais="pf-fai pf-fai-dev pf-fai-xivo-1.2-skaro pf-fai-xivo-1.2-skaro-dev"
 renamed_packages="pf-xivo-agid pf-xivo-base-config pf-xivo-fetchfw pf-xivo-web-interface-config"
-reinstall_webi=0
-
 postrm_webi_config="/var/lib/dpkg/info/pf-xivo-web-interface-config.postrm"
-if [ -f $postrm_webi_config ]; then
-    rm $postrm_webi_config
-fi
 
-#extra="pf-xivo-web-interface-config"
-#dpkg -l $extra 2> /dev/null | grep -q '^rc'
-#if [ $? = 0 ]; then
-#    #rsync -av /etc/pf-xivo/web-interface /tmp/ > /dev/null
-#    dpkg --purge $extra > /dev/null
-#fi
+echo "cleanup outdated config files"
+if [ -f $postrm_webi_config ]; then
+    rm $postrm_webi_config > /dev/null
+fi
 
 # cleanup pf-xivo-base-config.postrm file to allow package purge
 base_config_postrm="/var/lib/dpkg/info/pf-xivo-base-config.postrm"
 xivo_config_postrm="/var/lib/dpkg/info/xivo-config.postrm"
 if [ -f $base_config_postrm ]; then
-    rsync -av /etc/pf-xivo/web-interface /tmp/ > /dev/null
     cp $xivo_config_postrm $base_config_postrm
     sed -i 's/xivo-config/pf-xivo-base-config/' $base_config_postrm
 fi
@@ -39,8 +30,3 @@ for old_fai in $all_packages; do
         dpkg --purge $old_fai > /dev/null
     fi
 done
-
-#if [ -d /tmp/web-interface ]; then
-#    rsync -av /tmp/web-interface/ /etc/pf-xivo/web-interface/ > /dev/null
-#    rm -rf /tmp/web-interface > /dev/null
-#fi
