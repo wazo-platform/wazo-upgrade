@@ -5,6 +5,7 @@ postrm_webi_config="/var/lib/dpkg/info/pf-xivo-web-interface-config.postrm"
 
 echo "cleanup outdated config files"
 if [ -f $postrm_webi_config ]; then
+    rsync -av /etc/pf-xivo/web-interface /tmp/ > /dev/null
     rm $postrm_webi_config > /dev/null
 fi
 
@@ -12,6 +13,7 @@ fi
 base_config_postrm="/var/lib/dpkg/info/pf-xivo-base-config.postrm"
 xivo_config_postrm="/var/lib/dpkg/info/xivo-config.postrm"
 if [ -f $base_config_postrm ]; then
+    rsync -av /etc/pf-xivo/web-interface /tmp/ > /dev/null
     cp $xivo_config_postrm $base_config_postrm
     sed -i 's/xivo-config/pf-xivo-base-config/' $base_config_postrm
 fi
@@ -30,3 +32,8 @@ for old_fai in $all_packages; do
         dpkg --purge $old_fai > /dev/null
     fi
 done
+
+if [ -d /tmp/web-interface ]; then
+    rsync -av /tmp/web-interface/ /etc/pf-xivo/web-interface/ > /dev/null
+    rm -rf /tmp/web-interface > /dev/null
+fi
