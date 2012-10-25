@@ -1,15 +1,20 @@
 #!/bin/bash
+set -x
 old_fais="pf-fai pf-fai-dev pf-fai-xivo-1.2-skaro pf-fai-xivo-1.2-skaro-dev"
-renamed_packages="pf-xivo-agid pf-xivo-base-config pf-xivo-fetchfw"
+renamed_packages="pf-xivo-agid pf-xivo-base-config pf-xivo-fetchfw pf-xivo-web-interface-config"
 reinstall_webi=0
 
-extra="pf-xivo-web-interface-config"
-dpkg -l $extra 2> /dev/null | grep -q '^rc'
-if [ $? = 0 ]; then
-    rsync -av /etc/pf-xivo/web-interface /tmp/ > /dev/null
-    dpkg --purge $extra > /dev/null
-    reinstall_webi=1
+postrm_webi_config="/var/lib/dpkg/info/pf-xivo-web-interface-config.postrm"
+if [ -f $postrm_webi_config ]; then
+    rm $postrm_webi_config
 fi
+
+#extra="pf-xivo-web-interface-config"
+#dpkg -l $extra 2> /dev/null | grep -q '^rc'
+#if [ $? = 0 ]; then
+#    #rsync -av /etc/pf-xivo/web-interface /tmp/ > /dev/null
+#    dpkg --purge $extra > /dev/null
+#fi
 
 # cleanup pf-xivo-base-config.postrm file to allow package purge
 base_config_postrm="/var/lib/dpkg/info/pf-xivo-base-config.postrm"
@@ -35,11 +40,7 @@ for old_fai in $all_packages; do
     fi
 done
 
-if [ $reinstall_webi = 1 ]; then
-    apt-get install --reinstall pf-xivo-web-interface > /dev/null
-fi
-
-if [ -d /tmp/web-interface ]; then
-    rsync -av /tmp/web-interface/ /etc/pf-xivo/web-interface/ > /dev/null
-    rm -rf /tmp/web-interface > /dev/null
-fi
+#if [ -d /tmp/web-interface ]; then
+#    rsync -av /tmp/web-interface/ /etc/pf-xivo/web-interface/ > /dev/null
+#    rm -rf /tmp/web-interface > /dev/null
+#fi
