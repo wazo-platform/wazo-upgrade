@@ -80,10 +80,8 @@ wait_ctid_initialization() {
 wait_asterisk_initialization() {
     grep -q RUNASTERISK=yes /etc/default/asterisk
     if [ $? -eq 0 ]; then
-        status=$(asterisk -rx 'core waitfullybooted')
-        while [ "$status" != "Asterisk has fully booted." ]; do
+        while ! asterisk -rx 'core waitfullybooted' > /dev/null; do
             sleep 1
-            status=$(asterisk -rx 'core waitfullybooted')
         done
     fi
 }
