@@ -1,6 +1,6 @@
 #!/bin/bash
 old_fais="pf-fai pf-fai-dev pf-fai-xivo-1.2-skaro pf-fai-xivo-1.2-skaro-dev"
-renamed_packages="pf-xivo-agid pf-xivo-base-config pf-xivo-fetchfw pf-xivo-web-interface-config"
+renamed_packages="pf-xivo-agid pf-xivo-base-config pf-xivo-fetchfw pf-xivo-web-interface-config pf-xivo-provisioning"
 postrm_webi_config="/var/lib/dpkg/info/pf-xivo-web-interface-config.postrm"
 
 echo "cleanup outdated config files"
@@ -16,6 +16,12 @@ if [ -f $base_config_postrm ]; then
     rsync -av /etc/pf-xivo/web-interface /tmp/ > /dev/null
     cp $xivo_config_postrm $base_config_postrm
     sed -i 's/xivo-config/pf-xivo-base-config/' $base_config_postrm
+fi
+
+# sync old pf-xivo-provd data
+old_provd_directory="/var/lib/pf-xivo-provd"
+if [ -d $old_provd_directory ]; then
+    rsync -av $old_provd_directory/ /var/lib/xivo-provd/ > /dev/null
 fi
 
 for package in $renamed_packages; do
