@@ -49,7 +49,6 @@ xivo_status() {
             fi
         fi
     done
-    supervisorctl status xivo-agentd
 }
 
 disable_monit() {
@@ -95,7 +94,6 @@ xivo_start() {
             /usr/sbin/invoke-rc.d $service start
         fi
     done
-    supervisorctl start xivo-agentd
 
     wait_ctid_initialization
 
@@ -107,7 +105,6 @@ xivo_start() {
 xivo_stop() {
     /sbin/iptables -I INPUT 1 -p udp --dport 5060 -j DROP
     disable_monit
-    supervisorctl stop xivo-agentd
     for service in $reversed_services; do
         if [ -f /etc/init.d/$service ]; then
             /usr/sbin/invoke-rc.d $service stop
