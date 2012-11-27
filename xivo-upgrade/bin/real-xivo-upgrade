@@ -45,7 +45,7 @@ upgrading_system() {
     pre_upgrade
     $xivo_service stop
     echo "upgrading xivo"
-    $upgrading_tool install pf-xivo -y
+    $upgrading_tool install pf-xivo xivo-ctid -y
     $upgrading_tool dist-upgrade -y
     post_upgrade
     $xivo_service restart all
