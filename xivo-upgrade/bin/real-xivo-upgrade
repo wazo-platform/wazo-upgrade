@@ -31,6 +31,16 @@ get_version() {
     echo "proposed update   : $xivo_candidate"
 }
 
+execute() {
+    cmd=$*
+    $cmd
+    if [ $? -ne 0 ]; then
+        /sbin/iptables -D INPUT -p udp --dport 5060 -j DROP
+        $xivo_service restart all
+        exit -1
+    fi
+}
+
 upgrading_system() {
     get_version
     if [ $force -eq 0 ]; then
@@ -45,8 +55,8 @@ upgrading_system() {
     pre_upgrade
     $xivo_service stop
     echo "upgrading xivo"
-    $upgrading_tool install pf-xivo xivo-ctid -y
-    $upgrading_tool dist-upgrade -y
+    execute $upgrading_tool install pf-xivo xivo-ctid -y
+    execute $upgrading_tool dist-upgrade -y
     post_upgrade
     $xivo_service restart all
     /sbin/iptables -D INPUT -p udp --dport 5060 -j DROP
@@ -56,6 +66,7 @@ if [ ! -f /etc/pf-xivo/web-interface/xivo.ini ]; then
     echo "Warning You should run the wizard before using xivo-upgrade"
     exit 1
 fi
+
 upgrade_fai() {
     echo "upgrade fai if needed"
     old_packages=$(aptitude search pf-fai | grep ^i | grep -oE 'pf-fai.* ' | awk '{print $1}')
