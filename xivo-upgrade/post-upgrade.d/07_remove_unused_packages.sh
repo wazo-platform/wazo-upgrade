@@ -22,6 +22,8 @@ fi
 old_provd_directory="/var/lib/pf-xivo-provd"
 if [ -d $old_provd_directory ]; then
     rsync -av $old_provd_directory/ /var/lib/xivo-provd/ > /dev/null
+    rm -rf $old_provd_directory
+    /etc/init.d/xivo-provd restart
 fi
 
 for package in $renamed_packages; do
