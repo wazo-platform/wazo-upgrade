@@ -15,5 +15,5 @@ then
         /usr/sbin/asterisk -rx "agent logoff Agent/${i}"
     done
     
-    asterisk -rx "database deltree Queue/PersistentMembers"
+    /usr/sbin/asterisk -rx "database deltree Queue/PersistentMembers"
 fi
