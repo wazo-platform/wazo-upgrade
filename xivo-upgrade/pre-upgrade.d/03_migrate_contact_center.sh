@@ -10,9 +10,6 @@ fi
 
 if [ $version \< '12.24' ]
 then
-    /usr/sbin/asterisk -rx "module unload app_queue.so"
-    /usr/sbin/asterisk -rx "database deltree Queue/PersistentMembers"
-
     for i in  `asterisk -rx "agent show" | grep available | awk '{print $1}'`
     do
         /usr/sbin/asterisk -rx "agent logoff Agent/${i}"
