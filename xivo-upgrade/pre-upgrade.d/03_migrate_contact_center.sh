@@ -14,14 +14,6 @@ then
 
     sleep 5
 
-    /etc/init.d/asterisk stop
-    /etc/init.d/asterisk start
-
-    while ! asterisk -rx 'core waitfullybooted' > /dev/null; do
-        sleep 1
-    done
-
-
     for i in  `asterisk -rx "agent show" | grep available | awk '{print $1}'`
     do
         /usr/sbin/asterisk -rx "agent logoff Agent/${i}"
