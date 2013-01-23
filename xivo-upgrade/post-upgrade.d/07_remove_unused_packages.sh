@@ -1,6 +1,6 @@
 #!/bin/bash
 old_fais="pf-fai pf-fai-dev pf-fai-xivo-1.2-skaro pf-fai-xivo-1.2-skaro-dev"
-renamed_packages="pf-xivo-agid pf-xivo-base-config pf-xivo-fetchfw pf-xivo-web-interface-config pf-xivo-provd pf-xivo-dxtora pf-xivo-dhcpd-update"
+renamed_packages="pf-xivo-agid pf-xivo-base-config pf-xivo-fetchfw pf-xivo-web-interface-config pf-xivo-provd pf-xivo-dxtora pf-xivo-dhcpd-update pf-xivo-monitoring"
 postrm_webi_config="/var/lib/dpkg/info/pf-xivo-web-interface-config.postrm"
 
 echo "cleanup outdated config files"
