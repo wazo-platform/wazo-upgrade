@@ -10,5 +10,5 @@ fi
 
 if [ $version \< '13.03' ]
 then
-	curl -s http://localhost/xivo/configuration/json.php/private/provisioning/configregistrar/?act=sync_devices
+	curl -s http://localhost/xivo/configuration/json.php/private/provisioning/configregistrar/?act=sync_bsfilter_devices
 fi
