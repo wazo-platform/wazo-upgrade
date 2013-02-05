@@ -5,6 +5,7 @@ action=$1
 services_filter=$2
 services="dahdi rabbitmq-server pf-xivo-sysconfd xivo-confgend xivo-provd xivo-agid asterisk xivo-agent xivo-ctid xivo-restapi monit"
 monit_default="/etc/default/monit"
+XIVO_DEFAULT_FILE="/etc/default/xivo"
 no_monit=1
 
 if [ "$services_filter" = "all" ]; then
@@ -73,14 +74,20 @@ wait_asterisk_initialization() {
 }
 
 xivo_start() {
+    grep -q startup=no $XIVO_DEFAULT_FILE
+    if [ $? -eq 0 ]; then
+        echo "XiVO startup is disabled in $XIVO_DEFAULT_FILE"
+        exit 0
+    fi
+
     /sbin/iptables -I INPUT 1 -p udp --dport 5060 -j DROP
     enable_monit
 
     echo "Waiting for services to start successfully before opening port 5060."
-    
+
     for service in $services; do
         if [ -f /etc/init.d/$service ]; then
-            /usr/sbin/invoke-rc.d $service start
+            /usr/sbin/invoke-rc.d $service start 1> /dev/null
         fi
     done
 
@@ -92,9 +99,12 @@ xivo_start() {
 xivo_stop() {
     /sbin/iptables -I INPUT 1 -p udp --dport 5060 -j DROP
     disable_monit
+
+    echo "Waiting for services to stop successfully."
+
     for service in $reversed_services; do
         if [ -f /etc/init.d/$service ]; then
-            /usr/sbin/invoke-rc.d $service stop
+            /usr/sbin/invoke-rc.d $service stop 1> /dev/null
         fi
     done
     /sbin/iptables -D INPUT -p udp --dport 5060 -j DROP
