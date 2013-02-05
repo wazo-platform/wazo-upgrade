@@ -43,9 +43,7 @@ execute() {
 }
 
 disable_init_xivo() {
-    if [ -f $XIVO_DEFAULT_FILE ]; then
-        echo startup=no > $XIVO_DEFAULT_FILE
-    fi
+    echo startup=no > $XIVO_DEFAULT_FILE
 }
 
 enable_init_xivo() {
