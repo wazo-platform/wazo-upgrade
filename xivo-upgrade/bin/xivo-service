@@ -63,20 +63,6 @@ enable_monit() {
     fi
 }
 
-wait_ctid_initialization() {
-    cti_initialization=15
-
-    grep -q "startup=yes" /etc/default/xivo-ctid
-    if [ $? -eq 0 ]; then
-        echo "Waiting $cti_initialization seconds before opening port 5060"
-        for i in $(seq 1 $cti_initialization); do
-            sleep 1
-            echo -n '.'
-        done
-        echo
-    fi
-}
-
 wait_asterisk_initialization() {
     grep -q RUNASTERISK=yes /etc/default/asterisk
     if [ $? -eq 0 ]; then
@@ -94,8 +80,6 @@ xivo_start() {
             /usr/sbin/invoke-rc.d $service start
         fi
     done
-
-    wait_ctid_initialization
 
     wait_asterisk_initialization
 
