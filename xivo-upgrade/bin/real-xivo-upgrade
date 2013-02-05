@@ -4,6 +4,7 @@ monit_default="/etc/default/monit"
 lib_directory="/usr/share/xivo-upgrade"
 upgrading_tool="apt-get"
 xivo_service="/usr/bin/xivo-service"
+XIVO_DEFAULT_FILE="/etc/default/xivo"
 
 differed_action() {
     local state=$1
@@ -42,11 +43,13 @@ execute() {
 }
 
 disable_init_xivo() {
-    echo startup=no > /etc/default/xivo
+    if [ -f $XIVO_DEFAULT_FILE ]; then
+        echo startup=no > $XIVO_DEFAULT_FILE
+    fi
 }
 
 enable_init_xivo() {
-    echo startup=yes > /etc/default/xivo
+    echo startup=yes > $XIVO_DEFAULT_FILE
 }
 
 upgrading_system() {
