@@ -99,7 +99,7 @@ xivo_start() {
 
     for service in $services; do
         if [ -f /etc/init.d/$service ]; then
-            /usr/sbin/invoke-rc.d $service start 1> /dev/null
+            /usr/sbin/invoke-rc.d $service start > /dev/null
         fi
     done
 
@@ -115,7 +115,7 @@ xivo_stop() {
 
     for service in $reversed_services; do
         if [ -f /etc/init.d/$service ]; then
-            /usr/sbin/invoke-rc.d $service stop 1> /dev/null
+            /usr/sbin/invoke-rc.d $service stop > /dev/null
         fi
     done
 }

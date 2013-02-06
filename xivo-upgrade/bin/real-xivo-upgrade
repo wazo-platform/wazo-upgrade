@@ -53,8 +53,8 @@ start_xivo() {
 upgrade() {
     shutdown_xivo
     echo "Upgrading xivo..."
-    execute $upgrading_tool install pf-xivo xivo-libdao xivo-ctid -y 1> /dev/null
-    execute $upgrading_tool dist-upgrade -y 1> /dev/null
+    execute $upgrading_tool install pf-xivo xivo-libdao xivo-ctid -y
+    execute $upgrading_tool dist-upgrade -y
     start_xivo
 }
 
