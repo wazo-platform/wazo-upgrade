@@ -39,7 +39,7 @@ EOF
 
 xivo_status() {
     xivo-check-db
-    echo "checking services"
+    echo "Checking services..."
     for service in $services; do
         if [ $service != "monit" ] ; then
             /etc/init.d/$service status &> /dev/null

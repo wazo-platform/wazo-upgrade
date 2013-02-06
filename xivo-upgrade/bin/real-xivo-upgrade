@@ -9,7 +9,7 @@ XIVO_DEFAULT_FILE="/etc/default/xivo"
 differed_action() {
     local state=$1
     local dir="$lib_directory/$state-upgrade.d"
-    echo "executing $state upgrade action"
+    echo "Executing $state upgrade action."
     for script in $(ls $dir/*); do
         bash $script
     done
@@ -53,8 +53,8 @@ start_xivo() {
 
 upgrade() {
     /sbin/iptables -I INPUT 1 -p udp --dport 5060 -j DROP
-    echo "upgrading xivo"
     shutdown_xivo
+    echo "Upgrading xivo..."
     execute $upgrading_tool install pf-xivo xivo-libdao xivo-ctid -y 1> /dev/null
     execute $upgrading_tool dist-upgrade -y 1> /dev/null
     start_xivo
