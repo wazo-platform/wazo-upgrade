@@ -3,7 +3,7 @@
 PATH=/bin:/usr/bin:/sbin:/usr/sbin
 action=$1
 services_filter=$2
-services="dahdi rabbitmq-server pf-xivo-sysconfd xivo-confgend xivo-provd xivo-agid asterisk xivo-agent xivo-ctid xivo-restapi monit"
+services="dahdi rabbitmq-server pf-xivo-sysconfd xivo-confgend xivo-dxtora xivo-provd xivo-agid asterisk xivo-agent xivo-ctid xivo-restapi monit"
 monit_default="/etc/default/monit"
 XIVO_DEFAULT_FILE="/etc/default/xivo"
 no_monit=1
