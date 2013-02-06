@@ -64,6 +64,19 @@ enable_monit() {
     fi
 }
 
+close_sip_port() {
+    echo "Closing port 5060."
+    iptables -n --list | grep -q '^DROP.*5060'
+    if [ $? -eq 1 ]; then
+        /sbin/iptables -I INPUT 1 -p udp --dport 5060 -j DROP
+    fi
+}
+
+open_sip_port() {
+    echo "Opening port 5060."
+    /sbin/iptables -D INPUT -p udp --dport 5060 -j DROP
+}
+
 wait_asterisk_initialization() {
     grep -q RUNASTERISK=yes /etc/default/asterisk
     if [ $? -eq 0 ]; then
@@ -80,10 +93,9 @@ xivo_start() {
         exit 0
     fi
 
-    /sbin/iptables -I INPUT 1 -p udp --dport 5060 -j DROP
     enable_monit
 
-    echo "Waiting for services to start successfully before opening port 5060."
+    echo "Waiting for services to start successfully."
 
     for service in $services; do
         if [ -f /etc/init.d/$service ]; then
@@ -92,12 +104,11 @@ xivo_start() {
     done
 
     wait_asterisk_initialization
-
-    /sbin/iptables -D INPUT -p udp --dport 5060 -j DROP
+    open_sip_port
 }
 
 xivo_stop() {
-    /sbin/iptables -I INPUT 1 -p udp --dport 5060 -j DROP
+    close_sip_port
     disable_monit
 
     echo "Waiting for services to stop successfully."
@@ -107,7 +118,6 @@ xivo_stop() {
             /usr/sbin/invoke-rc.d $service stop 1> /dev/null
         fi
     done
-    /sbin/iptables -D INPUT -p udp --dport 5060 -j DROP
 }
 
 xivo_restart() {
