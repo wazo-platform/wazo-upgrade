@@ -35,19 +35,30 @@ execute() {
     cmd=$*
     $cmd
     if [ $? -ne 0 ]; then
-        enable_init_xivo
         /sbin/iptables -D INPUT -p udp --dport 5060 -j DROP
-        $xivo_service restart all
+        start_xivo
         exit -1
     fi
 }
 
-disable_init_xivo() {
+shutdown_xivo() {
+    $xivo_service stop
     echo startup=no > $XIVO_DEFAULT_FILE
 }
 
-enable_init_xivo() {
+start_xivo() {
     echo startup=yes > $XIVO_DEFAULT_FILE
+    $xivo_service start all
+}
+
+upgrade() {
+    /sbin/iptables -I INPUT 1 -p udp --dport 5060 -j DROP
+    echo "upgrading xivo"
+    shutdown_xivo
+    execute $upgrading_tool install pf-xivo xivo-libdao xivo-ctid -y 1> /dev/null
+    execute $upgrading_tool dist-upgrade -y 1> /dev/null
+    start_xivo
+    /sbin/iptables -D INPUT -p udp --dport 5060 -j DROP
 }
 
 upgrading_system() {
@@ -60,17 +71,9 @@ upgrading_system() {
         fi
     fi
     upgrade_fai
-    /sbin/iptables -I INPUT 1 -p udp --dport 5060 -j DROP
     pre_upgrade
-    $xivo_service stop
-    echo "upgrading xivo"
-    disable_init_xivo
-    execute $upgrading_tool install pf-xivo xivo-libdao xivo-ctid -y
-    execute $upgrading_tool dist-upgrade -y
-    enable_init_xivo
-    $xivo_service start all
+    upgrade
     post_upgrade
-    /sbin/iptables -D INPUT -p udp --dport 5060 -j DROP
 }
 
 if [ ! -f /etc/pf-xivo/web-interface/xivo.ini ]; then
