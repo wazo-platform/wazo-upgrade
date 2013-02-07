@@ -52,6 +52,17 @@ xivo_status() {
     done
 }
 
+
+xivo_enable() {
+    echo "Enable XiVO services..."
+    echo startup=yes > $XIVO_DEFAULT_FILE
+}
+
+xivo_disable() {
+    echo "Disable XiVO services..."
+    echo startup=no > $XIVO_DEFAULT_FILE
+}
+
 disable_monit() {
     if [ $no_monit -eq 1 ]; then
         sed -i 's/startup=1/startup=0/' $monit_default
@@ -130,5 +141,7 @@ case $action in
     restart) xivo_restart;;
     start)   xivo_start;;
     stop)    xivo_stop;;
+    enable)  xivo_enable;;
+    disable) xivo_disable;;
     *) usage;;
 esac
