@@ -85,7 +85,10 @@ close_sip_port() {
 
 open_sip_port() {
     echo "Opening port 5060."
-    /sbin/iptables -D INPUT -p udp --dport 5060 -j DROP
+    iptables -n --list | grep -q '^DROP.*5060'
+    if [ $? -eq 0 ]; then
+        /sbin/iptables -D INPUT -p udp --dport 5060 -j DROP
+    fi
 }
 
 wait_asterisk_initialization() {
@@ -113,13 +116,16 @@ xivo_start() {
         if [[ "$xivo_startup" -eq 0 && "$service" == *xivo-* ]]; then
             continue
         fi
-        
+
         if [ -f /etc/init.d/$service ]; then
             /usr/sbin/invoke-rc.d $service start > /dev/null
         fi
     done
 
-    wait_asterisk_initialization
+    if [[ "$xivo_startup" -eq 1 ]]; then
+        wait_asterisk_initialization
+    fi
+
     open_sip_port
 }
 
