@@ -72,7 +72,7 @@ upgrading_system() {
     post_upgrade
 }
 
-if [ ! -f /etc/pf-xivo/web-interface/xivo.ini ]; then
+if [ ! -f /var/lib/pf-xivo/configured ]; then
     echo "Warning You should run the wizard before using xivo-upgrade"
     exit 1
 fi
