@@ -54,12 +54,12 @@ xivo_status() {
 
 
 xivo_enable() {
-    echo "Enable XiVO services..."
+    echo "Enabling XiVO services..."
     echo startup=yes > $XIVO_DEFAULT_FILE
 }
 
 xivo_disable() {
-    echo "Disable XiVO services..."
+    echo "Disabling XiVO services..."
     echo startup=no > $XIVO_DEFAULT_FILE
 }
 
