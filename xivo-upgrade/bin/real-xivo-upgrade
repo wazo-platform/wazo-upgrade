@@ -40,13 +40,13 @@ execute() {
 }
 
 shutdown_xivo() {
-    xivo_service stop
-    xivo_service disable
+    xivo-service stop
+    xivo-service disable
 }
 
 start_xivo() {
-    xivo_service enable
-    xivo_service start all
+    xivo-service enable
+    xivo-service start all
 }
 
 upgrade() {
@@ -124,7 +124,7 @@ force="${force:-"0"}"
 
 if [ $download_only -eq 0 ]; then
     upgrading_system
-    xivo_service status
+    xivo-service status
 else
     $upgrading_tool -y -d dist-upgrade
 fi
