@@ -1,5 +1,6 @@
 #!/bin/bash
 PATH=/bin:/usr/bin:/sbin:/usr/sbin
+version=$(cat /usr/share/pf-xivo/XIVO-VERSION)
 monit_default="/etc/default/monit"
 lib_directory="/usr/share/xivo-upgrade"
 upgrading_tool="apt-get"
@@ -71,6 +72,11 @@ upgrading_system() {
     upgrade
     post_upgrade
 }
+
+if [[ $version < '13.04' && -f "/etc/pf-xivo/web-interface/xivo.ini" ]]; then
+    touch /var/lib/pf-xivo/configured
+    chmod 664 /var/lib/pf-xivo/configured
+fi
 
 if [ ! -f /var/lib/pf-xivo/configured ]; then
     echo "Warning You should run the wizard before using xivo-upgrade"

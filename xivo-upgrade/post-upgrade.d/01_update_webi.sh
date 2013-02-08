@@ -8,11 +8,6 @@ if [ $version \< '13.04' ]; then
     for file in xivo ipbx cti; do
         mv ${webi_config_path}/${file}.ini.old ${webi_config_path}/${file}.ini
     done
-
-    if [ -f "$xivo_ini_path" ]; then
-        touch /var/lib/pf-xivo/configured
-        chmod 664 /var/lib/pf-xivo/configured
-    fi
 fi
 
 if [ -f "$xivo_ini_path" ]; then
