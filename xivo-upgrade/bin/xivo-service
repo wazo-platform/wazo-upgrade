@@ -117,7 +117,7 @@ xivo_start() {
         fi
     done
 
-    if [[ "$xivo_startup" -eq 1 ]]; then
+    if [ "$xivo_startup" -eq 1 ]; then
         wait_asterisk_initialization
     fi
 
