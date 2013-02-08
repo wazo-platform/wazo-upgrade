@@ -99,9 +99,10 @@ wait_asterisk_initialization() {
 
 xivo_start() {
     grep -q startup=no $XIVO_DEFAULT_FILE
+    xivo_startup=1
     if [ $? -eq 0 ]; then
-        echo "XiVO startup is disabled in $XIVO_DEFAULT_FILE"
-        exit 0
+        xivo_startup=0
+        echo "XiVO services startup is disabled in $XIVO_DEFAULT_FILE"
     fi
 
     enable_monit
@@ -109,6 +110,10 @@ xivo_start() {
     echo "Waiting for services to start successfully."
 
     for service in $services; do
+        if [[ "$xivo_startup" -eq 0 && "$service" == *xivo-* ]]; then
+            continue
+        fi
+        
         if [ -f /etc/init.d/$service ]; then
             /usr/sbin/invoke-rc.d $service start > /dev/null
         fi
