@@ -46,7 +46,7 @@ shutdown_xivo() {
 
 start_xivo() {
     xivo-service enable
-    xivo-service start all
+    xivo-service restart
 }
 
 upgrade() {
