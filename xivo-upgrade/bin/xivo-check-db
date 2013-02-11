@@ -5,8 +5,8 @@ import os
 import sys
 
 DB_NAMES = ['asterisk', 'xivo']
-MIGRATION_DIR = '/usr/share/xivo-config/migration'
-STATE_DIR = '/var/lib/xivo-update-db'
+MIGRATION_DIR = '/usr/share/xivo-upgrade/migration'
+STATE_DIR = '/var/lib/xivo-upgrade/update-db'
 
 
 def main():
