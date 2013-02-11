@@ -18,6 +18,10 @@ pre_stop() {
     differed_action pre-stop
 }
 
+pre_start() {
+    differed_action pre-start
+}
+
 post_start() {
     differed_action post-start
 }
@@ -50,11 +54,14 @@ start_xivo() {
 }
 
 upgrade() {
+    pre_stop
     stop_xivo
     echo "Upgrading xivo..."
     execute $upgrading_tool install pf-xivo xivo-libdao xivo-ctid -y
     execute $upgrading_tool dist-upgrade -y
+    pre_start
     start_xivo
+    post_start
 }
 
 upgrading_system() {
@@ -67,9 +74,7 @@ upgrading_system() {
         fi
     fi
     upgrade_fai
-    pre_stop
     upgrade
-    post_start
 }
 
 if [[ $version < '13.04' && -f "/etc/pf-xivo/web-interface/xivo.ini" ]]; then
