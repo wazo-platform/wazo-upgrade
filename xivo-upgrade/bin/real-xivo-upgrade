@@ -39,7 +39,7 @@ execute() {
     fi
 }
 
-shutdown_xivo() {
+stop_xivo() {
     xivo-service stop
     xivo-service disable
 }
@@ -50,7 +50,7 @@ start_xivo() {
 }
 
 upgrade() {
-    shutdown_xivo
+    stop_xivo
     echo "Upgrading xivo..."
     execute $upgrading_tool install pf-xivo xivo-libdao xivo-ctid -y
     execute $upgrading_tool dist-upgrade -y
