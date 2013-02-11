@@ -7,19 +7,19 @@ upgrading_tool="apt-get"
 
 differed_action() {
     local state=$1
-    local dir="$lib_directory/$state-upgrade.d"
+    local dir="$lib_directory/$state.d"
     echo "Executing $state upgrade action."
     for script in $(ls $dir/*); do
         bash $script
     done
 }
 
-pre_upgrade() {
-    differed_action pre
+pre_stop() {
+    differed_action pre-stop
 }
 
-post_upgrade() {
-    differed_action post
+post_start() {
+    differed_action post-start
 }
 
 get_version() {
@@ -67,9 +67,9 @@ upgrading_system() {
         fi
     fi
     upgrade_fai
-    pre_upgrade
+    pre_stop
     upgrade
-    post_upgrade
+    post_start
 }
 
 if [[ $version < '13.04' && -f "/etc/pf-xivo/web-interface/xivo.ini" ]]; then
