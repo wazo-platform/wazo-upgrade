@@ -11,12 +11,12 @@ LIST_FILE_TOCLEAN="/etc/pf-xivo/web-interface/location.ini
 
 for DIR in ${LIST_DIR_TOCLEAN}; do
     if [ -d "${DIR}" ]; then
-	rm -rf "${DIR}"
+        rm -rf "${DIR}"
     fi
 done
 
 for FILE in ${LIST_FILE_TOCLEAN}; do
     if [ -f "${FILE}" ]; then
-	rm -f "${FILE}"
+        rm -f "${FILE}"
     fi
 done
