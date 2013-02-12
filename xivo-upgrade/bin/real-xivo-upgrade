@@ -129,7 +129,7 @@ force="${force:-"0"}"
 
 if [ $download_only -eq 0 ]; then
     upgrading_system
-    xivo-service status
+    xivo-check-db
 else
     $upgrading_tool -y -d dist-upgrade
 fi

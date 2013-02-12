@@ -6,6 +6,7 @@ services_filter=$2
 services="dahdi rabbitmq-server pf-xivo-sysconfd xivo-confgend xivo-dxtora xivo-provd xivo-agid asterisk xivo-agent xivo-ctid xivo-restapi monit"
 monit_default="/etc/default/monit"
 XIVO_DEFAULT_FILE="/etc/default/xivo"
+MAX_RETRY_SERVICE=10
 no_monit=1
 
 if [ "$services_filter" = "all" ]; then
@@ -93,50 +94,59 @@ open_sip_port() {
     fi
 }
 
-wait_asterisk_initialization() {
-    grep -q RUNASTERISK=yes /etc/default/asterisk
-    if [ $? -eq 0 ]; then
-        while ! asterisk -rx 'core waitfullybooted' > /dev/null; do
-            sleep 1
-        done
+check_last_service() {
+    sleep 1 && echo -e ".\c"
+    _x=$(( $_x + 1 ))
+    if [[ $_x -eq $MAX_RETRY_SERVICE ]]; then
+        echo " NOK"
+        echo "ERR: Stop after $_x retry."
+        exit 1
     fi
 }
 
-xivo_start() {
-    xivo_startup=1
-    grep -q startup=no $XIVO_DEFAULT_FILE
-    if [ $? -eq 0 ]; then
-        xivo_startup=0
-    fi
-
-    enable_monit
-
-    echo "Waiting for services to start successfully."
-
-    for service in $services; do
-        if [ -f /etc/init.d/$service ]; then
-            /usr/sbin/invoke-rc.d $service start > /dev/null
+start_services() {
+    local _services=$1
+    for srv in $_services; do
+        if [[ $srv != "monit" && -f /etc/init.d/$srv ]]; then
+            /usr/sbin/invoke-rc.d $srv start > /dev/null
+            echo -e "\tstarting $srv ...\c"
+            _x=0
+            while ! /etc/init.d/$srv status &> /dev/null; do
+                check_last_service
+            done
+            echo " OK"
         fi
     done
+}
 
-    if [ "$xivo_startup" -eq 1 ]; then
-        wait_asterisk_initialization
-    fi
+stop_services() {
+    local _services=$1
+    for srv in $_services; do
+        if [[ $srv != "monit" && -f /etc/init.d/$srv ]]; then
+            /usr/sbin/invoke-rc.d $srv stop > /dev/null
+            #echo -e "\tstopping $srv ...\c"
+            _x=0
+            while /etc/init.d/$srv status &> /dev/null; do
+                check_last_service
+            done
+            #echo " OK"
+        fi
+    done
+}
 
+xivo_start() {
+    enable_monit
+    echo "Waiting for services to start successfully."
+    start_services "$services"
     open_sip_port
+    echo "XiVO fully booted !! Amazing !! :-)"
 }
 
 xivo_stop() {
     close_sip_port
     disable_monit
-
     echo "Waiting for services to stop successfully."
-
-    for service in $reversed_services; do
-        if [ -f /etc/init.d/$service ]; then
-            /usr/sbin/invoke-rc.d $service stop > /dev/null
-        fi
-    done
+    stop_services "$reversed_services"
 }
 
 xivo_restart() {
