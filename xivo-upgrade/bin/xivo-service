@@ -14,7 +14,7 @@ if [ "$services_filter" = "all" ]; then
 fi
 
 if [ "$services_filter" != "no_monit" ]; then
-    services="$services monit"
+    #services="$services monit"
     no_monit=1
 fi
 
@@ -44,13 +44,11 @@ xivo_status() {
     xivo-check-db
     echo "Checking services..."
     for service in $services; do
-        if [ $service != "monit" ] ; then
-            /etc/init.d/$service status &> /dev/null
-            if [ $? -eq 0 ]; then
-                echo -e "\tOK\t$service"
-            else
-                echo -e "\tNOK\t$service"
-            fi
+        /etc/init.d/$service status &> /dev/null
+        if [ $? -eq 0 ]; then
+            echo -e "\tOK\t$service"
+        else
+            echo -e "\tNOK\t$service"
         fi
     done
 }
@@ -69,12 +67,14 @@ xivo_disable() {
 disable_monit() {
     if [ $no_monit -eq 1 ]; then
         sed -i 's/startup=1/startup=0/' $monit_default
+        /etc/init.d/monit stop > /dev/null
     fi
 }
 
 enable_monit() {
     if [ $no_monit -eq 1 ]; then
         sed -i 's/startup=0/startup=1/' $monit_default
+        /etc/init.d/monit start > /dev/null
     fi
 }
 
@@ -94,7 +94,7 @@ open_sip_port() {
     fi
 }
 
-check_last_service() {
+wait_for_service() {
     sleep 1 && echo -e ".\c"
     _x=$(( $_x + 1 ))
     if [[ $_x -eq $MAX_RETRY_SERVICE ]]; then
@@ -107,12 +107,12 @@ check_last_service() {
 start_services() {
     local _services=$1
     for srv in $_services; do
-        if [[ $srv != "monit" && -f /etc/init.d/$srv ]]; then
+        if [ -f /etc/init.d/$srv ]; then
             /usr/sbin/invoke-rc.d $srv start > /dev/null
             echo -e "\tstarting $srv ...\c"
             _x=0
             while ! /etc/init.d/$srv status &> /dev/null; do
-                check_last_service
+                wait_for_service
             done
             echo " OK"
         fi
@@ -122,14 +122,8 @@ start_services() {
 stop_services() {
     local _services=$1
     for srv in $_services; do
-        if [[ $srv != "monit" && -f /etc/init.d/$srv ]]; then
+        if [  -f /etc/init.d/$srv ]; then
             /usr/sbin/invoke-rc.d $srv stop > /dev/null
-            #echo -e "\tstopping $srv ...\c"
-            _x=0
-            while /etc/init.d/$srv status &> /dev/null; do
-                check_last_service
-            done
-            #echo " OK"
         fi
     done
 }
