@@ -3,19 +3,19 @@
 PATH=/bin:/usr/bin:/sbin:/usr/sbin
 action=$1
 services_filter=$2
-services="dahdi rabbitmq-server pf-xivo-sysconfd xivo-confgend xivo-dxtora xivo-provd xivo-agid asterisk xivo-agent xivo-ctid xivo-restapi monit"
+services="dahdi rabbitmq-server pf-xivo-sysconfd xivo-confgend xivo-dxtora xivo-provd xivo-agid asterisk xivo-agent xivo-ctid xivo-restapi"
 monit_default="/etc/default/monit"
 XIVO_DEFAULT_FILE="/etc/default/xivo"
 MAX_RETRY_SERVICE=10
-no_monit=1
+no_monit=0
 
 if [ "$services_filter" = "all" ]; then
     services="postgresql nginx $services"
 fi
 
-if [ "$services_filter" = "no_monit" ]; then
-    services=$(/bin/echo $services | sed 's/monit//')
-    no_monit=0
+if [ "$services_filter" != "no_monit" ]; then
+    services="$services monit"
+    no_monit=1
 fi
 
 reversed_services=$(/bin/echo $services | tac -s' ')
@@ -136,7 +136,8 @@ stop_services() {
 
 xivo_start() {
     enable_monit
-    echo "Waiting for services to start successfully."
+    /usr/sbin/invoke-rc.d asterisk stop > /dev/null
+    echo "Waiting for services to start successfully..."
     start_services "$services"
     open_sip_port
     echo "XiVO fully booted !! Amazing !! :-)"
@@ -145,7 +146,7 @@ xivo_start() {
 xivo_stop() {
     close_sip_port
     disable_monit
-    echo "Waiting for services to stop successfully."
+    echo "Waiting for services to stop successfully..."
     stop_services "$reversed_services"
 }
 

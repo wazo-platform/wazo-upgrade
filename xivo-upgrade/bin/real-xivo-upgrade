@@ -1,14 +1,13 @@
 #!/bin/bash
 PATH=/bin:/usr/bin:/sbin:/usr/sbin
 version=$(cat /usr/share/pf-xivo/XIVO-VERSION)
-monit_default="/etc/default/monit"
 lib_directory="/usr/share/xivo-upgrade"
 upgrading_tool="apt-get"
 
 differed_action() {
     local state=$1
     local dir="$lib_directory/$state.d"
-    echo "Executing $state upgrade action."
+    echo "Executing $state upgrade action..."
     for script in $(ls $dir/*); do
         bash $script
     done
@@ -50,7 +49,7 @@ stop_xivo() {
 
 start_xivo() {
     xivo-service enable
-    xivo-service restart
+    xivo-service start
 }
 
 upgrade() {
@@ -60,6 +59,7 @@ upgrade() {
     execute $upgrading_tool install pf-xivo xivo-libdao xivo-ctid -y
     execute $upgrading_tool dist-upgrade -y
     pre_start
+    xivo-check-db
     start_xivo
     post_start
 }
@@ -129,7 +129,6 @@ force="${force:-"0"}"
 
 if [ $download_only -eq 0 ]; then
     upgrading_system
-    xivo-check-db
 else
     $upgrading_tool -y -d dist-upgrade
 fi
