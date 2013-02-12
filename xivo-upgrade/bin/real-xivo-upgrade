@@ -77,7 +77,7 @@ upgrading_system() {
     upgrade
 }
 
-if [[ $version < '13.04' && -f "/etc/pf-xivo/web-interface/xivo.ini" ]]; then
+if [[ $version < '13.03' && -f "/etc/pf-xivo/web-interface/xivo.ini" ]]; then
     touch /var/lib/pf-xivo/configured
     chmod 664 /var/lib/pf-xivo/configured
 fi
