@@ -82,7 +82,7 @@ close_sip_port() {
     echo "Closing port 5060."
     iptables -n --list | grep -q '^DROP.*5060'
     if [ $? -eq 1 ]; then
-        /sbin/iptables -I INPUT 1 -p udp --dport 5060 -j DROP
+        iptables -I INPUT 1 -p udp --dport 5060 -j DROP
     fi
 }
 
@@ -90,7 +90,7 @@ open_sip_port() {
     echo "Opening port 5060."
     iptables -n --list | grep -q '^DROP.*5060'
     if [ $? -eq 0 ]; then
-        /sbin/iptables -D INPUT -p udp --dport 5060 -j DROP
+        iptables -D INPUT -p udp --dport 5060 -j DROP
     fi
 }
 
@@ -109,7 +109,7 @@ start_services() {
     local _services=$1
     for srv in $_services; do
         if [ -f /etc/init.d/$srv ]; then
-            /usr/sbin/invoke-rc.d $srv start > /dev/null
+            invoke-rc.d $srv start > /dev/null
             echo -en "\tstarting $srv ..."
             _x=0
             while ! /etc/init.d/$srv status &> /dev/null; do
@@ -124,7 +124,7 @@ stop_services() {
     local _services=$1
     for srv in $_services; do
         if [  -f /etc/init.d/$srv ]; then
-            /usr/sbin/invoke-rc.d $srv stop > /dev/null
+            invoke-rc.d $srv stop > /dev/null
         fi
     done
 }
