@@ -95,9 +95,10 @@ open_sip_port() {
 }
 
 wait_for_service() {
-    sleep 2 && echo -e ".\c"
+    sleep 1
+    echo -n "."
     _x=$(( $_x + 1 ))
-    if [[ $_x -eq $MAX_RETRY_SERVICE ]]; then
+    if [ $_x -eq $MAX_RETRY_SERVICE ]; then
         echo " NOK"
         echo "ERR: Stop after $_x retry."
         exit 1
@@ -109,7 +110,7 @@ start_services() {
     for srv in $_services; do
         if [ -f /etc/init.d/$srv ]; then
             /usr/sbin/invoke-rc.d $srv start > /dev/null
-            echo -e "\tstarting $srv ...\c"
+            echo -en "\tstarting $srv ..."
             _x=0
             while ! /etc/init.d/$srv status &> /dev/null; do
                 wait_for_service
