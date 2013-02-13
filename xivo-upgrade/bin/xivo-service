@@ -130,7 +130,6 @@ stop_services() {
 
 xivo_start() {
     enable_monit
-    /usr/sbin/invoke-rc.d asterisk stop > /dev/null
     echo "Waiting for services to start successfully..."
     start_services "$services"
     open_sip_port

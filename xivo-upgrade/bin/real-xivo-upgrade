@@ -60,6 +60,8 @@ upgrade() {
     execute $upgrading_tool dist-upgrade -y
     pre_start
     xivo-check-db
+    # stop asterisk before start xivo to refresh configuration
+    /usr/sbin/invoke-rc.d asterisk stop > /dev/null
     start_xivo
     post_start
 }
