@@ -6,7 +6,7 @@ services_filter=$2
 services="dahdi rabbitmq-server pf-xivo-sysconfd xivo-confgend xivo-dxtora xivo-provd xivo-agid asterisk xivo-agent xivo-ctid xivo-restapi"
 monit_default="/etc/default/monit"
 XIVO_DEFAULT_FILE="/etc/default/xivo"
-MAX_RETRY_SERVICE=10
+MAX_RETRY_SERVICE=30
 no_monit=0
 
 if [ "$services_filter" = "all" ]; then
@@ -95,7 +95,7 @@ open_sip_port() {
 }
 
 wait_for_service() {
-    sleep 1 && echo -e ".\c"
+    sleep 2 && echo -e ".\c"
     _x=$(( $_x + 1 ))
     if [[ $_x -eq $MAX_RETRY_SERVICE ]]; then
         echo " NOK"
@@ -134,7 +134,7 @@ xivo_start() {
     echo "Waiting for services to start successfully..."
     start_services "$services"
     open_sip_port
-    echo "XiVO fully booted !! Amazing !! :-)"
+    echo "XiVO fully booted"
 }
 
 xivo_stop() {
