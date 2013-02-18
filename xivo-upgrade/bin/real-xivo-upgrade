@@ -56,6 +56,7 @@ upgrade() {
     pre_stop
     stop_xivo
     echo "Upgrading xivo..."
+    execute $upgrading_tool install -o Dpkg::Options::="--force-confmiss" xivo-config
     execute $upgrading_tool install pf-xivo xivo-libdao xivo-ctid -y
     execute $upgrading_tool dist-upgrade -y
     pre_start
