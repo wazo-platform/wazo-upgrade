@@ -5,7 +5,7 @@ xivo_ini_path="/etc/pf-xivo/web-interface/xivo.ini"
 ipbx_config_file="/etc/pf-xivo/web-interface/ipbx.ini"
 WEBI_CONFIG="/etc/pf-xivo/web-interface"
 
-if [ $version \< '13.04' ]; then
+if [ $version \< '13.05' ]; then
     for file in xivo ipbx cti; do
         ini_file="${WEBI_CONFIG}/${file}.ini"
         if [ -f ${ini_file}.old ]; then
