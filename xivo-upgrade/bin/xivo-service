@@ -64,14 +64,14 @@ xivo_disable() {
 }
 
 disable_monit() {
-    if [ $no_monit -eq 1 ]; then
+    if [ $no_monit -eq 0 ]; then
         sed -i 's/startup=1/startup=0/' $monit_default
         /etc/init.d/monit stop > /dev/null
     fi
 }
 
 enable_monit() {
-    if [ $no_monit -eq 1 ]; then
+    if [ $no_monit -eq 0 ]; then
         sed -i 's/startup=0/startup=1/' $monit_default
         /etc/init.d/monit start > /dev/null
     fi
