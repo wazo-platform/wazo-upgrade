@@ -1,13 +1,9 @@
 #!/bin/bash
 
 PATH=/bin:/usr/bin:/sbin:/usr/sbin
-upgrading_tool="apt-get"
 
-upgrade_xivo() {
-    echo "Upgrading xivo-upgrade"
-    $upgrading_tool update > /dev/null
-    $upgrading_tool install -y xivo-upgrade
-}
+echo "Upgrading xivo-upgrade"
+apt-get update > /dev/null
+apt-get install -y xivo-upgrade
 
-upgrade_xivo
 /usr/bin/real-xivo-upgrade "$@"

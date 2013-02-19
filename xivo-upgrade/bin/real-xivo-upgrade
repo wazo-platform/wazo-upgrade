@@ -2,7 +2,6 @@
 PATH=/bin:/usr/bin:/sbin:/usr/sbin
 version=$(cat /usr/share/pf-xivo/XIVO-VERSION)
 lib_directory="/usr/share/xivo-upgrade"
-upgrading_tool="apt-get"
 
 differed_action() {
     local state=$1
@@ -56,9 +55,9 @@ upgrade() {
     pre_stop
     stop_xivo
     echo "Upgrading xivo..."
-    execute $upgrading_tool install -o Dpkg::Options::="--force-confnew" xivo-config
-    execute $upgrading_tool install pf-xivo xivo-libdao xivo-ctid -y
-    execute $upgrading_tool dist-upgrade -y
+    execute apt-get install -o Dpkg::Options::="--force-confnew" xivo-config
+    execute apt-get install pf-xivo xivo-libdao xivo-ctid -y
+    execute apt-get dist-upgrade -y
     pre_start
     xivo-check-db
     # stop asterisk before start xivo to refresh configuration
@@ -133,5 +132,5 @@ force="${force:-"0"}"
 if [ $download_only -eq 0 ]; then
     upgrading_system
 else
-    $upgrading_tool -y -d dist-upgrade
+    apt-get -y -d dist-upgrade
 fi
