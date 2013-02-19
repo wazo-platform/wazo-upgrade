@@ -7,15 +7,14 @@ services="dahdi rabbitmq-server pf-xivo-sysconfd xivo-confgend xivo-dxtora xivo-
 monit_default="/etc/default/monit"
 XIVO_DEFAULT_FILE="/etc/default/xivo"
 MAX_RETRY_SERVICE=30
-no_monit=0
+no_monit=1
 
 if [ "$services_filter" = "all" ]; then
     services="postgresql nginx $services"
 fi
 
 if [ "$services_filter" != "no_monit" ]; then
-    #services="$services monit"
-    no_monit=1
+    no_monit=0
 fi
 
 reversed_services=$(/bin/echo $services | tac -s' ')
