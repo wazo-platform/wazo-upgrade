@@ -1,6 +1,5 @@
 #!/bin/sh
 
-version=$(cat /usr/share/pf-xivo/XIVO-VERSION)
 xivo_ini_path="/etc/pf-xivo/web-interface/xivo.ini"
 ipbx_config_file="/etc/pf-xivo/web-interface/ipbx.ini"
 WEBI_CONFIG="/etc/pf-xivo/web-interface"
