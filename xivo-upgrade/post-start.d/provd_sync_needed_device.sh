@@ -8,7 +8,4 @@ else
     touch "$is_executed_file"
 fi
 
-if [ $version \< '13.03' ]
-then
-	curl -s http://localhost/xivo/configuration/json.php/private/provisioning/configregistrar/?act=sync_bsfilter_devices
-fi
+curl -s http://localhost/xivo/configuration/json.php/private/provisioning/configregistrar/?act=sync_bsfilter_devices
