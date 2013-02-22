@@ -46,6 +46,8 @@ xivo_status() {
         /etc/init.d/$service status &> /dev/null
         if [ $? -eq 0 ]; then
             echo -e "\tOK\t$service"
+        elif [ $? -eq 3 ]; then
+            echo -e "\tStopped\t$service"
         else
             echo -e "\tNOK\t$service"
         fi
@@ -105,13 +107,13 @@ wait_for_service() {
 }
 
 start_services() {
-    local _services=$1
-    for srv in $_services; do
-        if [ -f /etc/init.d/$srv ]; then
-            invoke-rc.d $srv start > /dev/null
-            echo -en "\tstarting $srv ..."
+    local services=$1
+    for service in $services; do
+        if [ -f /etc/init.d/$service ]; then
+            invoke-rc.d $service start > /dev/null
+            echo -en "\tstarting $service ..."
             _x=0
-            while ! /etc/init.d/$srv status &> /dev/null; do
+            while ! /etc/init.d/$service status &> /dev/null; do
                 wait_for_service
             done
             echo " OK"
@@ -120,10 +122,10 @@ start_services() {
 }
 
 stop_services() {
-    local _services=$1
-    for srv in $_services; do
-        if [  -f /etc/init.d/$srv ]; then
-            invoke-rc.d $srv stop > /dev/null
+    local services=$1
+    for service in $services; do
+        if [  -f /etc/init.d/$service ]; then
+            invoke-rc.d $service stop > /dev/null
         fi
     done
 }
