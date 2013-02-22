@@ -44,16 +44,16 @@ xivo_status() {
     echo "Checking services..."
     for service in $services; do
         /etc/init.d/$service status &> /dev/null
-        if [ $? -eq 0 ]; then
-            echo -e "\tOK\t$service"
-        elif [ $? -eq 3 ]; then
-            echo -e "\tStopped\t$service"
+        status=$?
+        if [ $status -eq 0 ]; then
+            echo -e "\trunning\t\t$service"
+        elif [ $status -eq 3 ]; then
+            echo -e "\tstopped\t\t$service"
         else
-            echo -e "\tNOK\t$service"
+            echo -e "\tfailed\t\t$service"
         fi
     done
 }
-
 
 xivo_enable() {
     echo "Enabling XiVO services..."
@@ -107,17 +107,46 @@ wait_for_service() {
     fi
 }
 
+is_enabled() {
+    local service=$1
+    if [ $service = "asterisk" ]; then
+        grep -q 'RUNASTERISK=yes' /etc/default/$service
+        enabled=$?
+    else
+        grep -q 'startup=yes' $XIVO_DEFAULT_FILE
+        enabled=$?
+    fi
+    echo $enabled
+}
+
+is_running() {
+    local service=$1
+    /etc/init.d/$service status > /dev/null
+    if [ $? -eq 0 ]; then
+        running=0
+    else
+        running=1
+    fi
+    echo $running
+}
+
 start_services() {
     local services=$1
     for service in $services; do
-        if [ -f /etc/init.d/$service ]; then
-            invoke-rc.d $service start > /dev/null
-            echo -en "\tstarting $service ..."
-            _x=0
-            while ! /etc/init.d/$service status &> /dev/null; do
-                wait_for_service
-            done
-            echo " OK"
+	enabled=$(is_enabled $service)
+	running=$(is_running $service)
+        if [ $enabled -eq 0 ] && [ $running -ne 0 ] ; then
+            if [ -f /etc/init.d/$service ]; then
+                invoke-rc.d $service start > /dev/null
+                echo -en "\tstarting $service ..."
+                _x=0
+                while ! /etc/init.d/$service status &> /dev/null; do
+                    wait_for_service
+                done
+                echo " OK"
+            fi
+	elif [ $enabled -ne 0 ]; then
+            echo -e "\t$service is disabled"
         fi
     done
 }
@@ -125,10 +154,14 @@ start_services() {
 stop_services() {
     local services=$1
     for service in $services; do
-        if [  -f /etc/init.d/$service ]; then
-            invoke-rc.d $service stop > /dev/null
+        /etc/init.d/$service status &> /dev/null
+        if [ $? -eq 0 ]; then
+            if [  -f /etc/init.d/$service ]; then
+                invoke-rc.d $service stop > /dev/null
+            fi
         fi
     done
+    xivo_status
 }
 
 xivo_start() {
