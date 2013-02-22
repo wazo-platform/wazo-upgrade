@@ -3,7 +3,8 @@
 PATH=/bin:/usr/bin:/sbin:/usr/sbin
 action=$1
 services_filter=$2
-services="dahdi rabbitmq-server pf-xivo-sysconfd xivo-confgend xivo-dxtora xivo-provd xivo-agid asterisk xivo-agent xivo-ctid xivo-restapi"
+xivo_services="xivo-confgend xivo-dxtora xivo-provd xivo-agid asterisk xivo-agent xivo-ctid xivo-restapi"
+services="dahdi rabbitmq-server pf-xivo-sysconfd $xivo_services"
 monit_default="/etc/default/monit"
 XIVO_DEFAULT_FILE="/etc/default/xivo"
 MAX_RETRY_SERVICE=30
@@ -109,13 +110,19 @@ wait_for_service() {
 
 is_enabled() {
     local service=$1
+    enabled=0
     if [ $service = "asterisk" ]; then
         grep -q 'RUNASTERISK=yes' /etc/default/$service
         enabled=$?
-    else
-        grep -q 'startup=yes' $XIVO_DEFAULT_FILE
-        enabled=$?
     fi
+    for srv in $xivo_services; do
+        if [ $srv != "asterisk" ]; then
+            if [ $srv = $service ]; then
+                grep -q 'startup=yes' $XIVO_DEFAULT_FILE
+                enabled=$?
+            fi
+        fi
+    done
     echo $enabled
 }
 
@@ -133,8 +140,8 @@ is_running() {
 start_services() {
     local services=$1
     for service in $services; do
-	enabled=$(is_enabled $service)
-	running=$(is_running $service)
+        enabled=$(is_enabled $service)
+        running=$(is_running $service)
         if [ $enabled -eq 0 ] && [ $running -ne 0 ] ; then
             if [ -f /etc/init.d/$service ]; then
                 invoke-rc.d $service start > /dev/null
@@ -145,7 +152,7 @@ start_services() {
                 done
                 echo " OK"
             fi
-	elif [ $enabled -ne 0 ]; then
+        elif [ $enabled -ne 0 ]; then
             echo -e "\t$service is disabled"
         fi
     done
