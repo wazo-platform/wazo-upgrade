@@ -5,17 +5,11 @@ action=$1
 services_filter=$2
 xivo_services="xivo-confgend xivo-dxtora xivo-provd xivo-agid asterisk xivo-agent xivo-ctid xivo-restapi"
 services="dahdi rabbitmq-server pf-xivo-sysconfd $xivo_services"
-monit_default="/etc/default/monit"
 XIVO_DEFAULT_FILE="/etc/default/xivo"
 MAX_RETRY_SERVICE=30
-no_monit=1
 
 if [ "$services_filter" = "all" ]; then
     services="postgresql nginx $services"
-fi
-
-if [ "$services_filter" != "no_monit" ]; then
-    no_monit=0
 fi
 
 reversed_services=$(/bin/echo $services | tac -s' ')
@@ -33,7 +27,6 @@ usage() {
 
     availables services_filter :
         all      : add postgres and nginx to managed services
-        no_monit : do not include monit
 
     impacted services : $services
 EOF
@@ -66,18 +59,12 @@ xivo_disable() {
     echo startup=no > $XIVO_DEFAULT_FILE
 }
 
-disable_monit() {
-    if [ $no_monit -eq 0 ]; then
-        sed -i 's/startup=1/startup=0/' $monit_default
-        /etc/init.d/monit stop > /dev/null
-    fi
+stop_monit() {
+    /etc/init.d/monit stop > /dev/null
 }
 
-enable_monit() {
-    if [ $no_monit -eq 0 ]; then
-        sed -i 's/startup=0/startup=1/' $monit_default
-        /etc/init.d/monit start > /dev/null
-    fi
+start_monit() {
+    /etc/init.d/monit start > /dev/null
 }
 
 close_sip_port() {
@@ -172,16 +159,16 @@ stop_services() {
 }
 
 xivo_start() {
-    enable_monit
     echo "Waiting for services to start successfully..."
     start_services "$services"
+    start_monit
     open_sip_port
     echo "XiVO fully booted"
 }
 
 xivo_stop() {
     close_sip_port
-    disable_monit
+    stop_monit
     echo "Waiting for services to stop successfully..."
     stop_services "$reversed_services"
 }
