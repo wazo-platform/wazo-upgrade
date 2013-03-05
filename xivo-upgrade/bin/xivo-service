@@ -5,6 +5,8 @@ action=$1
 services_filter=$2
 xivo_services="xivo-confgend xivo-dxtora xivo-provd xivo-agid asterisk xivo-agent xivo-ctid xivo-restapi"
 services="dahdi rabbitmq-server pf-xivo-sysconfd $xivo_services"
+monit_default="/etc/default/monit"
+asterisk_default="/etc/default/asterisk"
 XIVO_DEFAULT_FILE="/etc/default/xivo"
 MAX_RETRY_SERVICE=30
 
@@ -52,15 +54,35 @@ xivo_status() {
 xivo_enable() {
     echo "Enabling XiVO services..."
     echo startup=yes > $XIVO_DEFAULT_FILE
+    enable_asterisk
+    enable_monit
 }
 
 xivo_disable() {
     echo "Disabling XiVO services..."
     echo startup=no > $XIVO_DEFAULT_FILE
+    disable_monit
+    disable_asterisk
+}
+
+disable_asterisk() {
+    sed -i 's/RUNASTERISK=yes/RUNASTERISK=no/' $asterisk_default
+}
+
+enable_asterisk() {
+    sed -i 's/RUNASTERISK=no/RUNASTERISK=yes/' $asterisk_default
+}
+
+disable_monit() {
+    sed -i 's/startup=1/startup=0/' $monit_default
 }
 
 stop_monit() {
     /etc/init.d/monit stop > /dev/null
+}
+
+enable_monit() {
+    sed -i 's/startup=0/startup=1/' $monit_default
 }
 
 start_monit() {
@@ -99,7 +121,7 @@ is_enabled() {
     local service=$1
     enabled=0
     if [ $service = "asterisk" ]; then
-        grep -q 'RUNASTERISK=yes' /etc/default/$service
+        grep -q 'RUNASTERISK=yes' $asterisk_default
         enabled=$?
     fi
     for srv in $xivo_services; do
