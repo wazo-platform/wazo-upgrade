@@ -182,21 +182,31 @@ stop_services() {
     done
 }
 
-xivo_start() {
+xivo_start_and_open() {
+    service_list=$1
     echo "Waiting for services to start successfully..."
-    start_services "$services"
+    start_services "$service_list"
     open_sip_port
+}
+
+xivo_close_and_stop() {
+    service_list=$1
+    close_sip_port
+    echo "Waiting for services to stop successfully..."
+    stop_services "$service_list"
+}
+
+xivo_start() {
+    xivo_start_and_open "$services"
     echo "XiVO fully booted"
 }
 
 xivo_stop() {
-    close_sip_port
-    echo "Waiting for services to stop successfully..."
-    stop_services "$reversed_services"
+    xivo_close_and_stop "$services"
 }
 
 xivo_stop_slave() {
-    stop_services "$xivo_services"
+    xivo_close_and_stop "$xivo_services"
 }
 
 xivo_restart() {
