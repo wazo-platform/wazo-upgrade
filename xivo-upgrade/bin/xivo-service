@@ -148,6 +148,7 @@ is_running() {
 }
 
 start_services() {
+    start_monit
     local services=$1
     for service in $services; do
         enabled=$(is_enabled $service)
@@ -169,6 +170,7 @@ start_services() {
 }
 
 stop_services() {
+    stop_monit
     local services=$1
     for service in $services; do
         /etc/init.d/$service status &> /dev/null
@@ -183,14 +185,12 @@ stop_services() {
 xivo_start() {
     echo "Waiting for services to start successfully..."
     start_services "$services"
-    start_monit
     open_sip_port
     echo "XiVO fully booted"
 }
 
 xivo_stop() {
     close_sip_port
-    stop_monit
     echo "Waiting for services to stop successfully..."
     stop_services "$reversed_services"
 }
