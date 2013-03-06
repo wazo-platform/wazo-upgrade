@@ -14,7 +14,13 @@ if [ "$services_filter" = "all" ]; then
     services="postgresql nginx $services"
 fi
 
-reversed_services=$(/bin/echo $services | tac -s' ')
+reverse_list() {
+    local service_list=$1
+    /bin/echo $service_list | tac -s' '
+}
+
+reversed_services=$(reverse_list "$services")
+reversed_xivo_services=$(reverse_list "$xivo_services")
 
 usage() {
     cat << EOF
@@ -202,11 +208,11 @@ xivo_start() {
 }
 
 xivo_stop() {
-    xivo_close_and_stop "$services"
+    xivo_close_and_stop "$reversed_services"
 }
 
 xivo_stop_slave() {
-    xivo_close_and_stop "$xivo_services"
+    xivo_close_and_stop "$reversed_xivo_services"
 }
 
 xivo_restart() {
