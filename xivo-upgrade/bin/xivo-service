@@ -183,14 +183,14 @@ stop_services() {
 }
 
 xivo_start_and_open() {
-    service_list=$1
+    local service_list=$1
     echo "Waiting for services to start successfully..."
     start_services "$service_list"
     open_sip_port
 }
 
 xivo_close_and_stop() {
-    service_list=$1
+    local service_list=$1
     close_sip_port
     echo "Waiting for services to stop successfully..."
     stop_services "$service_list"
