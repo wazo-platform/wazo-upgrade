@@ -178,7 +178,6 @@ stop_services() {
             fi
         fi
     done
-    xivo_status
 }
 
 xivo_start() {
