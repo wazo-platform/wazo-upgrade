@@ -222,7 +222,7 @@ xivo_restart() {
 
 case $action in
     status)  xivo_status;;
-    restart) xivo_restart;;
+    force-reload|restart) xivo_restart;;
     start)   xivo_start;;
     stop)    xivo_stop;;
     enable)  xivo_enable;;
