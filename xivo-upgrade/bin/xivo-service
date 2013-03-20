@@ -43,6 +43,7 @@ EOF
 }
 
 xivo_status() {
+    local global_status=0
     xivo-check-db
     echo "Checking services..."
     for service in $services; do
@@ -52,10 +53,15 @@ xivo_status() {
             echo -e "\trunning\t\t$service"
         elif [ $status -eq 3 ]; then
             echo -e "\tstopped\t\t$service"
+	    if [ $global_status -eq 0 ]; then
+		    global_status=1
+	    fi
         else
             echo -e "\tfailed\t\t$service"
+	    global_status=2
         fi
     done
+    return $global_status
 }
 
 xivo_enable() {
