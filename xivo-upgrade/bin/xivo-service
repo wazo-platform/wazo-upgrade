@@ -27,7 +27,7 @@ MAX_RETRY_SERVICE=30
 
 if [ -z "$services_filter" ] || [ "$services_filter" = default ]; then
     services=$default_services
-if [ "$services_filter" = all ]; then
+elif [ "$services_filter" = all ]; then
     services=$all_services
 elif [ "$services_filter" = xivo ]; then
     services=$xivo_services
