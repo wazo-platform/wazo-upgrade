@@ -24,8 +24,9 @@ MAX_RETRY_SERVICE=30
 
 # Support both argument passing conventions
 [ "$services_filter" ] || services_filter=$OCF_RESKEY_services_filter
+[ "$services_filter" ] || services_filter=default
 
-if [ -z "$services_filter" ] || [ "$services_filter" = default ]; then
+if [ "$services_filter" = default ]; then
     services=$default_services
 elif [ "$services_filter" = all ]; then
     services=$all_services
@@ -33,7 +34,6 @@ elif [ "$services_filter" = xivo ]; then
     services=$xivo_services
 else
     echo "Invalid service filter \"$services_filter\""
-    services_filter=default
     usage
     exit 2 # same as OCF_ERR_ARGS
 fi
