@@ -277,7 +277,7 @@ xivo_restart() {
 }
 
 case $action in
-    status)  xivo_status;;
+    status|monitor)  xivo_status;;
     force-reload|restart) xivo_restart;;
     start)   xivo_start;;
     stop)    xivo_stop;;
