@@ -11,19 +11,28 @@
 # Description:       Controls and starts XiVO and its services
 ### END INIT INFO
 
-
 PATH=/bin:/usr/bin:/sbin:/usr/sbin
 action=$1
 services_filter=$2
 xivo_services="xivo-confgend xivo-dxtora xivo-provd xivo-agid asterisk xivo-agent xivo-ctid xivo-restapi"
-services="dahdi rabbitmq-server pf-xivo-sysconfd $xivo_services"
+default_services="dahdi rabbitmq-server pf-xivo-sysconfd $xivo_services"
+all_services="postgresql nginx $default_services"
 monit_default="/etc/default/monit"
 asterisk_default="/etc/default/asterisk"
 XIVO_DEFAULT_FILE="/etc/default/xivo"
 MAX_RETRY_SERVICE=30
 
-if [ "$services_filter" = "all" ]; then
-    services="postgresql nginx $services"
+if [ -z "$services_filter" ] || [ "$services_filter" = default ]; then
+    services=$default_services
+if [ "$services_filter" = all ]; then
+    services=$all_services
+elif [ "$services_filter" = xivo ]; then
+    services=$xivo_services
+else
+    echo "Invalid service filter \"$services_filter\""
+    services_filter=default
+    usage
+    exit 2 # same as OCF_ERR_ARGS
 fi
 
 reverse_list() {
@@ -32,7 +41,6 @@ reverse_list() {
 }
 
 reversed_services=$(reverse_list "$services")
-reversed_xivo_services=$(reverse_list "$xivo_services")
 
 usage() {
     cat << EOF
@@ -47,9 +55,11 @@ usage() {
         disable    : disable all xivo services
 
     availables services_filter :
-        all        : add postgres and nginx to managed services
+        xivo       : manage services only used on an active XiVO
+        default    : xivo + messaging and configuration
+        all        : default + web and database servers
 
-    impacted services : $services
+    impacted services ($services_filter) : $services
 EOF
     exit 0
 }
@@ -229,10 +239,6 @@ xivo_stop() {
     xivo_close_and_stop "$reversed_services"
 }
 
-xivo_stop_slave() {
-    xivo_close_and_stop "$reversed_xivo_services"
-}
-
 xivo_restart() {
     xivo_stop
     xivo_start
@@ -245,6 +251,5 @@ case $action in
     stop)    xivo_stop;;
     enable)  xivo_enable;;
     disable) xivo_disable;;
-    stop_slave) xivo_stop_slave;;
     *) usage;;
 esac
