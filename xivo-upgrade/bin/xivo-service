@@ -68,7 +68,7 @@ EOF
 }
 
 xivo_meta_data() {
-	echo <<END
+	cat <<END
 <?xml version="1.0"?>
 <!DOCTYPE resource-agent SYSTEM "ra-api-1.dtd">
 <resource-agent name="xivo-service" version="0.1">
