@@ -50,24 +50,25 @@ reverse_list() {
 reversed_services=$(reverse_list "$services")
 
 usage() {
-    cat << EOF
-    usage : $0 action [services_filter]
-    availables actions :
-        status     : print status of all xivo services
-        restart    : restart all xivo services
-        stop       : stop all xivo services
-        stop_slave : stop all xivo services on slave
-        start      : start all xivo services
-        enable     : enable all xivo services
-        disable    : disable all xivo services
+    cat <<-EOF
+	usage : $0 action [services_filter]
+	availables actions :
+	    status     : print status of all xivo services
+	    restart    : restart all xivo services
+	    stop       : stop all xivo services
+	    stop_slave : stop all xivo services on slave
+	    start      : start all xivo services
+	    enable     : enable all xivo services
+	    disable    : disable all xivo services
+	
+	availables services_filter :
+	    xivo       : manage services only used on an active XiVO
+	    default    : xivo + messaging and configuration
+	    all        : default + web and database servers
+	
+	impacted services ($services_filter) : $services
+	EOF
 
-    availables services_filter :
-        xivo       : manage services only used on an active XiVO
-        default    : xivo + messaging and configuration
-        all        : default + web and database servers
-
-    impacted services ($services_filter) : $services
-EOF
     exit 0
 }
 
