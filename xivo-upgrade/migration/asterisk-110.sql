@@ -23,4 +23,6 @@ ALTER TABLE "queuemember"
     DROP COLUMN "skills",
     DROP COLUMN "state_interface";
 
+DROP TABLE "userqueueskill";
+
 COMMIT;
