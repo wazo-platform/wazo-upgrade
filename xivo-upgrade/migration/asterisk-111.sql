@@ -20,4 +20,4 @@ BEGIN;
 
 ALTER TABLE "agentfeatures" DROP COLUMN "commented";
 
-COMMIT
+COMMIT;
