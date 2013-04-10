@@ -29,7 +29,7 @@ END $$;
 DO $$
 BEGIN
   IF NOT EXISTS (SELECT 1 FROM "ctidisplays" WHERE "name" = 'switchboard') THEN
-    INSERT INTO "ctidisplays" VALUES (DEFAULT, 'switchboard', '{ "10": [ "", "status", "", ""],"20": [ "Name", "name", "", "{db-fullname}"],"30": [ "Number", "number_office", "", "{db-phone}"]}', 0, '');
+    INSERT INTO "ctidisplays" VALUES (DEFAULT, 'switchboard', '{ "10": [ "", "status", "", ""],"20": [ "Name", "name", "", "{db-firstname} {db-lastname}"],"30": [ "Number", "number_office", "", "{db-phone}"]}', 0, '');
   END IF;
 END $$;
 
