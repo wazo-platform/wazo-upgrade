@@ -21,7 +21,7 @@ BEGIN;
 DO $$
 BEGIN
   IF NOT EXISTS (SELECT 1 FROM "context" WHERE "name" = '__switchboard_directory') THEN
-    INSERT INTO "context" VALUES ('__switchboard_directory', 'Switchboard', 'xivo_entity', 'internal', 0, '');
+    INSERT INTO "context" VALUES ('__switchboard_directory', 'Switchboard', 'xivo_entity', 'others', 0, '');
   END IF;
 END $$;
 
