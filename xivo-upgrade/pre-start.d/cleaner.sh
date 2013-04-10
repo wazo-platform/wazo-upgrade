@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 LIST_DIR_TOCLEAN="/var/lib/pf-xivo-web-interface"
 

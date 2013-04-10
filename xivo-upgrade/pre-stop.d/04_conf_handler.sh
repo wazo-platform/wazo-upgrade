@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 version=$(cat /usr/share/pf-xivo/XIVO-VERSION)
 webi_config_path='/etc/pf-xivo/web-interface'
