@@ -73,32 +73,32 @@ usage() {
 }
 
 xivo_meta_data() {
-	cat <<END
-<?xml version="1.0"?>
-<!DOCTYPE resource-agent SYSTEM "ra-api-1.dtd">
-<resource-agent name="xivo-service" version="0.1">
-  <version>0.1</version>
-  <longdesc lang="en">
-   This script starts and stop services for the XiVO corporate telephony system.
-  </longdesc>
-  <shortdesc lang="en">XiVO services</shortdesc>
-  <parameters>
-    <parameter name="services_filter" unique="0" required="0">
-      <longdesc lang="en">Filter services managed by this resource agent</longdesc>
-      <shortdesc lang="en">Filter services</shortdesc>
-      <content type="string" />
-    </parameter>
-  </parameters>
-  <actions>
-    <action name="start"        timeout="120" />
-    <action name="stop"         timeout="120" />
-    <action name="monitor"      timeout="120"
-                                interval="60" depth="0" />
-    <action name="reload"       timeout="240" />
-    <action name="meta-data"    timeout="5" />
-  </actions>
-</resource-agent>
-END
+	cat <<-EOF
+	<?xml version="1.0"?>
+	<!DOCTYPE resource-agent SYSTEM "ra-api-1.dtd">
+	<resource-agent name="xivo-service" version="0.1">
+	  <version>0.1</version>
+	  <longdesc lang="en">
+	   This script starts and stop services for the XiVO corporate telephony system.
+	  </longdesc>
+	  <shortdesc lang="en">XiVO services</shortdesc>
+	  <parameters>
+	    <parameter name="services_filter" unique="0" required="0">
+	      <longdesc lang="en">Filter services managed by this resource agent</longdesc>
+	      <shortdesc lang="en">Filter services</shortdesc>
+	      <content type="string" />
+	    </parameter>
+	  </parameters>
+	  <actions>
+	    <action name="start"        timeout="120" />
+	    <action name="stop"         timeout="120" />
+	    <action name="monitor"      timeout="120"
+	                                interval="60" depth="0" />
+	    <action name="reload"       timeout="240" />
+	    <action name="meta-data"    timeout="5" />
+	  </actions>
+	</resource-agent>
+	EOF
 }
 
 xivo_status() {
