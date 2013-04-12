@@ -60,12 +60,12 @@ usage() {
 	    start      : start all xivo services
 	    enable     : enable all xivo services
 	    disable    : disable all xivo services
-	
+
 	availables services_filter :
 	    xivo       : manage services only used on an active XiVO
 	    default    : xivo + messaging and configuration
 	    all        : default + web and database servers
-	
+
 	impacted services ($services_filter) : $services
 	EOF
 
