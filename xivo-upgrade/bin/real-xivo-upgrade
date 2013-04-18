@@ -127,11 +127,11 @@ upgrade_fai() {
 }
 
 usage() {
-    cat << EOF
-    Usage: xivo-upgrade [-d] [-f]
-        -d: only download packages
-        -f: force yes
-EOF
+    cat <<-EOF
+	usage: xivo-upgrade [-d] [-f]
+	    -d: only download packages
+	    -f: force yes
+	EOF
 }
 
 while getopts :df opt
