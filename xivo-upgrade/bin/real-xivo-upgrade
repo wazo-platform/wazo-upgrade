@@ -68,6 +68,7 @@ upgrade() {
 
 upgrading_system() {
     get_version
+    display_ast11_notice
     if [ $force -eq 0 ]; then
         read -p 'Would you like to upgrade your system (all services will be restarted) [Y/n]? ' answer
         answer="${answer:-Y}"
@@ -77,6 +78,24 @@ upgrading_system() {
     fi
     upgrade_fai
     upgrade
+}
+
+display_ast11_notice() {
+    ast_version=$(dpkg-query -W -f '${Version}' asterisk 2>/dev/null)
+    if dpkg --compare-versions "$ast_version" le 8:11-1; then
+        cat <<-EOF
+
+		Asterisk will be upgraded from version 1.8 to 11. You might be impacted if you:
+		* have some custom dialplan
+		* have some custom AGIs
+		* have customized asterisk in some other way
+		If you find yourself in one of these cases, you should make sure that
+		your customizations still work with asterisk 11. Please refer to
+		http://documentation.xivo.fr/production/upgrade/asterisk_11.html for
+		more information.
+
+		EOF
+    fi
 }
 
 if [[ $version < '13.03' && -f "/etc/pf-xivo/web-interface/xivo.ini" ]]; then
