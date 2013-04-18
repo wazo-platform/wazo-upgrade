@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 is_executed_file="/var/lib/xivo-upgrade/$(basename $0)"
 

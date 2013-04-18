@@ -8,7 +8,7 @@ differed_action() {
     local dir="$lib_directory/$state.d"
     echo "Executing $state upgrade action..."
     for script in $(ls $dir/*); do
-        bash $script
+        $script
     done
 }
 

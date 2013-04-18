@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 xivo_ini_path="/etc/pf-xivo/web-interface/xivo.ini"
 ipbx_config_file="/etc/pf-xivo/web-interface/ipbx.ini"
