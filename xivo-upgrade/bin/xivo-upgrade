@@ -2,8 +2,47 @@
 
 PATH=/bin:/usr/bin:/sbin:/usr/sbin
 
-echo "Upgrading xivo-upgrade"
-apt-get update > /dev/null
-apt-get install -y xivo-upgrade
+LOGFILE="/var/log/xivo-upgrade.log"
+DATEFORMAT="%Y-%m-%d_%H:%M:%S"
 
-/usr/bin/real-xivo-upgrade "$@"
+run_upgrade()
+{
+    echo "Upgrading xivo-upgrade"
+    apt-get update > /dev/null
+    apt-get install -y xivo-upgrade
+
+    /usr/bin/real-xivo-upgrade "$@"
+}
+
+append_log_start()
+{
+    logfile=$1
+    cat >> $logfile <<-EOF
+	
+	===========================================
+	xivo-upgrade started at $(date +$DATEFORMAT)
+	===========================================
+	
+	EOF
+}
+
+append_log_end()
+{
+    logfile=$1
+    cat >> $logfile <<-EOF
+	
+	===========================================
+	xivo-upgrade stopped at $(date +$DATEFORMAT)
+	===========================================
+	
+	EOF
+}
+
+log_and_upgrade()
+{
+    append_log_start $LOGFILE
+    run_upgrade |& tee -a $LOGFILE
+    append_log_end $LOGFILE
+}
+
+log_and_upgrade
