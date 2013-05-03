@@ -64,6 +64,7 @@ upgrade() {
     /usr/sbin/invoke-rc.d asterisk stop > /dev/null
     start_xivo
     post_start
+    xivo-check-conffiles
 }
 
 upgrading_system() {
