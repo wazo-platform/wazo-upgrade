@@ -41,12 +41,6 @@ display_warning_msg() {
 	EOF
 }
 
-if [ $XIVO_DEV_TEST ]; then
-    rm() {
-        echo "dev: rm $@" >&2
-    }
-fi
-
 modified_conffiles=$(list_modified_conffiles)
 if [ -n "$modified_conffiles" ]; then
     display_warning_msg "$modified_conffiles"
