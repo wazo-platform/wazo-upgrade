@@ -1,0 +1,53 @@
+#!/bin/bash
+
+DPKG_OLD_SUFFIX=".dpkg-old"
+IGNORE_LIST="\
+1921d42edcaab6d1fd5ccb890f9430bd  /etc/asterisk/extconfig.conf.dpkg-old
+972fb43cc55d66f71e7c6ca4037c81fe  /etc/asterisk/modules.conf.dpkg-old
+a78356b642e25fdf58ebccab535fa874  /etc/asterisk/res_pgsql.conf.dpkg-old
+"
+
+list_modified_conffiles() {
+    for conffile in $(sort /var/lib/dpkg/info/xivo-config.conffiles); do
+        conffile_old="${conffile}${DPKG_OLD_SUFFIX}"
+        if [ -f "$conffile_old" ]; then
+            if is_conffile_old_ignored "$conffile_old"; then
+                rm "$conffile_old"
+            else
+                echo "$conffile"
+            fi
+        fi
+    done
+}
+
+is_conffile_old_ignored() {
+    local conffile_old="$1"
+    grep -qF "$(md5sum $conffile_old)" <<< "$IGNORE_LIST"
+}
+
+display_warning_msg() {
+    local modified_files="$1"
+    cat <<-EOF
+	WARNING: The following files were overwritten during the upgrade process:
+
+	$modified_files
+
+	To finish the upgrade process, you must compare the new version with the old
+	one. For example:
+
+	   vimdiff FILENAME FILENAME${DPKG_OLD_SUFFIX}
+
+	Once this is done, remove the old files and run "xivo-service restart".
+	EOF
+}
+
+if [ $XIVO_DEV_TEST ]; then
+    rm() {
+        echo "dev: rm $@" >&2
+    }
+fi
+
+modified_conffiles=$(list_modified_conffiles)
+if [ -n "$modified_conffiles" ]; then
+    display_warning_msg "$modified_conffiles"
+fi
