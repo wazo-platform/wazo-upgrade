@@ -29,12 +29,8 @@ script = '''\
 $acl = unserialize($argv[1]);
 
 
-if (array_key_exists("acl", $acl)
-   and array_key_exists("service", $acl["acl"])
-   and array_key_exists("cti", $acl["acl"]["service"])
-   and array_key_exists("control_system", $acl["acl"]["service"]["cti"])
-   and array_key_exists("restart", $acl["acl"]["service"]["cti"]["control_system"])
-   and $acl["acl"]["service"]["cti"]["control_system"]["restart"] == 1) {
+if (isset($acl["acl"]["service"]["cti"]["control_system"]["restart"])
+   && $acl["acl"]["service"]["cti"]["control_system"]["restart"] == 1) {
 
     $acl["acl"]["service"]["ipbx"]["control_system"]["cti_restart"] = 1;
 
