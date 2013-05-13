@@ -41,8 +41,8 @@ append_log_end()
 log_and_upgrade()
 {
     append_log_start $LOGFILE
-    run_upgrade |& tee -a $LOGFILE
+    run_upgrade "$@" |& tee -a $LOGFILE
     append_log_end $LOGFILE
 }
 
-log_and_upgrade
+log_and_upgrade "$@"
