@@ -129,17 +129,22 @@ upgrade_fai() {
 
 usage() {
     cat <<-EOF
-	usage: xivo-upgrade [-d] [-f]
+	usage: xivo-upgrade [-d] [-f] [-h]
 	    -d: only download packages
 	    -f: force yes
+	    -h: print usage
 	EOF
 }
 
-while getopts :df opt
+while getopts :dfh opt
 do
   case ${opt} in
     d) download_only=1;;
     f) force=1;;
+    h)
+        usage
+        exit 0
+    ;;
     '?')  echo "${0} : option ${OPTARG} is not valid" >&2
           usage
           exit -1
