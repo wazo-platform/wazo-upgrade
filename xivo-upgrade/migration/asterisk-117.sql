@@ -21,6 +21,7 @@ ALTER TABLE "linefeatures"
     DROP COLUMN IF EXISTS "rules_type",
     DROP COLUMN IF EXISTS "rules_time",
     DROP COLUMN IF EXISTS "rules_order",
-    DROP COLUMN IF EXISTS "rules_group";
+    DROP COLUMN IF EXISTS "rules_group",
+    DROP COLUMN IF EXISTS "line_num";
 
 COMMIT;
