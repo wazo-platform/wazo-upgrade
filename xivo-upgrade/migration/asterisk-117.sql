@@ -18,7 +18,8 @@
 BEGIN;
 
 ALTER TABLE "linefeatures"
-    DROP COLUMN "rules_type",
-    DROP COLUMN "rules_time";
+    DROP COLUMN IF EXISTS "rules_type",
+    DROP COLUMN IF EXISTS "rules_time",
+    DROP COLUMN IF EXISTS "rules_order";
 
 COMMIT;
