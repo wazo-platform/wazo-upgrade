@@ -17,6 +17,6 @@
 
 BEGIN;
 
-DELETE FROM "extenumbers" WHERE "type" = 'featuremap';
+DELETE FROM "extenumbers" WHERE "type" IN ('featuremap', 'generalfeatures');
 
 COMMIT;
