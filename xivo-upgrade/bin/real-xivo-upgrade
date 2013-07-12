@@ -96,6 +96,18 @@ display_ast11_notice() {
 		more information.
 
 		EOF
+
+        if [ -f /usr/lib/asterisk/modules/codec_g729a.so ]; then
+            mv /usr/lib/asterisk/modules/codec_g729a.so /tmp
+            cat <<-EOF
+			WARNING: G729 codec module detected.
+
+			A G729 codec module has been detected on your system. Since it will not work with
+			asterisk 11, it has been moved from /usr/lib/asterisk/modules to /tmp. To continue
+			using the G729 module, you will have to install the asterisk 11 version of the module.
+
+			EOF
+        fi
     fi
 }
 
