@@ -53,4 +53,10 @@ CREATE INDEX "extensions__idx__typeval" ON "extensions"("typeval");
 
 UPDATE "ctidirectoryfields" SET "value" = replace("value", 'extenumbers', 'extensions') WHERE "value" LIKE 'extenumbers.%';
 
+UPDATE "extensions" SET "typeval" = (
+    SELECT "iduserfeatures" FROM "linefeatures" 
+    WHERE CAST("extensions"."typeval"AS INTEGER) = "linefeatures"."id"
+    ) 
+WHERE "extensions"."type" = 'user';
+
 COMMIT;
