@@ -41,6 +41,7 @@ UPDATE "extensions"
 
 DROP TABLE IF EXISTS "extenumbers" CASCADE;
 
+DELETE FROM "extensions" WHERE "type" IS NULL;
 ALTER TABLE "extensions" ALTER COLUMN "type" SET NOT NULL;
 ALTER TABLE "extensions" DROP COLUMN "name";
 
