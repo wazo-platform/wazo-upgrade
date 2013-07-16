@@ -60,4 +60,6 @@ UPDATE "extensions" SET "typeval" = (
     ) 
 WHERE "extensions"."type" = 'user';
 
+CREATE UNIQUE INDEX "extensions__uidx__exten_context" ON "extensions"("exten","context");
+
 COMMIT;
