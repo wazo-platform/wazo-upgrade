@@ -29,4 +29,6 @@ SELECT
   true
 FROM "linefeatures" WHERE "iduserfeatures" <> 0;
 
+ALTER TABLE "linefeatures" DROP COLUMN 'iduserfeatures';
+
 COMMIT;
