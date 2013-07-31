@@ -37,18 +37,19 @@ CREATE TABLE "user_line" (
 
 CREATE UNIQUE INDEX "user_line_extension__uidx__user_id_line_id" ON "user_line"("user_id","line_id");
 
+UPDATE linefeatures SET iduserfeatures = 0 WHERE iduserfeatures <> 0 AND iduserfeatures NOT IN (SELECT id FROM userfeatures);
 
 INSERT INTO "user_line" ("user_id", "line_id", "extension_id", "main_user", "main_line")
 SELECT
   "iduserfeatures" AS "user_id",
   "id" AS "line_id",
   (SELECT "id" FROM "extensions"
-    WHERE "type"='user' 
+    WHERE "type"='user'
     AND CAST ("typeval" AS INTEGER) = "linefeatures"."iduserfeatures"
     AND "exten" = "linefeatures"."number") AS "extension_id",
   true,
   true
-FROM "linefeatures" WHERE "iduserfeatures" <> 0;
+FROM "linefeatures" WHERE "iduserfeatures" <> 0 AND number <> '';
 
 ALTER TABLE "linefeatures" DROP COLUMN "iduserfeatures";
 
