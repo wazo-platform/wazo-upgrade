@@ -34,6 +34,7 @@ CREATE TABLE "user_line" (
  PRIMARY KEY("id", "user_id", "line_id")
 );
 
+
 CREATE UNIQUE INDEX "user_line_extension__uidx__user_id_line_id" ON "user_line"("user_id","line_id");
 
 
@@ -50,5 +51,8 @@ SELECT
 FROM "linefeatures" WHERE "iduserfeatures" <> 0;
 
 ALTER TABLE "linefeatures" DROP COLUMN "iduserfeatures";
+
+GRANT ALL ON "user_line" TO asterisk;
+GRANT ALL ON ALL SEQUENCES IN SCHEMA public to asterisk;
 
 COMMIT;
