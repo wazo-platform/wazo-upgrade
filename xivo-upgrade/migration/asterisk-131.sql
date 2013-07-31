@@ -17,7 +17,7 @@
 
 BEGIN;
 
-DROP TABLE IF EXISTS "user_line" CASCADE;
+DROP VIEW IF EXISTS "user_line" CASCADE;
 CREATE TABLE "user_line" (
     "id" SERIAL,
     "user_id" INTEGER NOT NULL,
@@ -49,6 +49,6 @@ SELECT
   true
 FROM "linefeatures" WHERE "iduserfeatures" <> 0;
 
-ALTER TABLE "linefeatures" DROP COLUMN 'iduserfeatures';
+ALTER TABLE "linefeatures" DROP COLUMN "iduserfeatures";
 
 COMMIT;
