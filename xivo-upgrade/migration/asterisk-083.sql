@@ -91,6 +91,20 @@ INSERT INTO "cti_xlet_layout"("name") VALUES ('dock');
 INSERT INTO "cti_xlet_layout"("name") VALUES ('grid');
 INSERT INTO "cti_xlet_layout"("name") VALUES ('tab');
 
+
+UPDATE "ctiprofiles" SET "presence" = 'xivo' 
+    WHERE (SELECT "ctipresences"."name" 
+           FROM "ctipresences"
+           WHERE "ctiprofiles"."presence" = "ctipresences"."name"
+           ) IS NULL;
+
+UPDATE "ctiprofiles" SET "phonehints" = 'xivo' 
+    WHERE (SELECT "ctiphonehintsgroup"."name" 
+           FROM "ctiphonehintsgroup" 
+           WHERE "ctiprofiles"."phonehints" = "ctiphonehintsgroup"."name"
+           ) IS NULL;
+
+
 DROP TABLE IF EXISTS "cti_profile" CASCADE;
 CREATE TABLE "cti_profile" (
        "id" SERIAL PRIMARY KEY,
