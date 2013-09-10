@@ -17,6 +17,10 @@
 
 BEGIN;
 
-TRUNCATE "call_log", "cel_call_log";
+DROP TABLE "cel_call_log";
+
+TRUNCATE "call_log";
+
+ALTER TABLE "cel" ADD COLUMN "call_log_id" INTEGER REFERENCES "call_log"("id") ON DELETE SET NULL DEFAULT NULL;
 
 COMMIT;
