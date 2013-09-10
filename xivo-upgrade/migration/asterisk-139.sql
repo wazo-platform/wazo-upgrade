@@ -17,6 +17,6 @@
 
 BEGIN;
 
-TRUNCATE "call_log";
+TRUNCATE "call_log", "cel_call_log";
 
 COMMIT;
