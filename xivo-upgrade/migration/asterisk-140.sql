@@ -18,11 +18,16 @@
 BEGIN;
 
 ALTER TABLE ONLY dialaction
+    DROP CONSTRAINT IF EXISTS dialaction_pkey;
+
+ALTER TABLE ONLY dialaction
     ADD CONSTRAINT dialaction_pkey PRIMARY KEY (event, category, categoryval);
+
+DROP INDEX IF EXISTS phonefunckey__idx__typeextenumbersright_typevalextenumbersright;
 
 CREATE INDEX phonefunckey__idx__typeextenumbersright_typevalextenumbersright ON phonefunckey 
     USING btree (typeextenumbersright, typevalextenumbersright);
-    
+
 ALTER TABLE cel ALTER COLUMN appdata TYPE varchar(512);
 
 ALTER TABLE dialaction
@@ -30,6 +35,9 @@ ALTER TABLE dialaction
 
 ALTER TABLE "general"
     ALTER COLUMN exchange_exten SET DEFAULT NULL::character varying;
+
+ALTER TABLE linefeatures
+    ALTER COLUMN protocol SET NOT NULL;
 
 ALTER TABLE trunkfeatures
     ALTER COLUMN protocol SET NOT NULL;
