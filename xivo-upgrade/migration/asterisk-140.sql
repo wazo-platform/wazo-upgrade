@@ -17,79 +17,35 @@
 
 BEGIN;
 
-ALTER TABLE dialaction 
-    DROP CONSTRAINT IF EXISTS dialaction_pkey;
+ALTER TABLE ONLY dialaction
+    ADD CONSTRAINT dialaction_pkey PRIMARY KEY (event, category, categoryval);
 
-DROP INDEX IF EXISTS phonefunckey__idx__typeextenumbersright_typevalextenumbersright;
-
-ALTER TABLE agentfeatures 
-    ALTER COLUMN "group" SET DEFAULT NULL::character varying;
-
-ALTER TABLE cel
-    ALTER COLUMN appdata TYPE character varying(80) /* TYPE change - table: cel original: character varying(512) new: character varying(80) */;
+CREATE INDEX phonefunckey__idx__typeextenumbersright_typevalextenumbersright ON phonefunckey 
+    USING btree (typeextenumbersright, typevalextenumbersright);
+    
+ALTER TABLE cel ALTER COLUMN appdata TYPE varchar(512);
 
 ALTER TABLE dialaction
-    ALTER COLUMN actionarg1 SET DEFAULT NULL::character varying,
-    ALTER COLUMN actionarg2 SET DEFAULT NULL::character varying,
-    ALTER COLUMN event DROP NOT NULL;
+    ALTER COLUMN event SET NOT NULL;
 
 ALTER TABLE "general"
     ALTER COLUMN exchange_exten SET DEFAULT NULL::character varying;
 
-ALTER TABLE linefeatures
-    ALTER COLUMN protocol DROP NOT NULL;
-
-ALTER TABLE paging
-    DROP COLUMN IF EXISTS callnotbusy;
-
-ALTER TABLE parkinglot
-    ALTER COLUMN calltransfers SET DEFAULT NULL::character varying,
-    ALTER COLUMN callreparking SET DEFAULT NULL::character varying,
-    ALTER COLUMN callhangup SET DEFAULT NULL::character varying,
-    ALTER COLUMN callrecording SET DEFAULT NULL::character varying,
-    ALTER COLUMN musicclass SET DEFAULT NULL::character varying;
-
-ALTER TABLE queue
-    ALTER COLUMN defaultrule SET DEFAULT NULL::character varying;
-
-ALTER TABLE recording
-    ALTER COLUMN agent_id SET NOT NULL;
-
-ALTER TABLE schedule
-    ALTER COLUMN timezone SET DEFAULT NULL::character varying,
-    ALTER COLUMN fallback_actionid SET DEFAULT NULL::character varying,
-    ALTER COLUMN fallback_actionargs SET DEFAULT NULL::character varying;
-
-ALTER TABLE schedule_time
-    ALTER COLUMN hours SET DEFAULT NULL::character varying,
-    ALTER COLUMN weekdays SET DEFAULT NULL::character varying,
-    ALTER COLUMN monthdays SET DEFAULT NULL::character varying,
-    ALTER COLUMN months SET DEFAULT NULL::character varying,
-    ALTER COLUMN actionid SET DEFAULT NULL::character varying,
-    ALTER COLUMN actionargs SET DEFAULT NULL::character varying;
-
 ALTER TABLE trunkfeatures
-    ALTER COLUMN protocol DROP NOT NULL;
+    ALTER COLUMN protocol SET NOT NULL;
 
 ALTER TABLE usercustom
-    ALTER COLUMN protocol DROP DEFAULT,
-    ALTER COLUMN protocol DROP NOT NULL;
+    ALTER COLUMN protocol SET DEFAULT 'custom',
+    ALTER COLUMN protocol SET NOT NULL;
 
 ALTER TABLE useriax
-    ALTER COLUMN type DROP NOT NULL,
-    ALTER COLUMN protocol DROP DEFAULT,
-    ALTER COLUMN protocol DROP NOT NULL;
+    ALTER COLUMN type SET NOT NULL,
+    ALTER COLUMN protocol SET DEFAULT 'iax',
+    ALTER COLUMN protocol SET NOT NULL;
 
 ALTER TABLE usersip
-    ALTER COLUMN transport SET DEFAULT NULL::character varying,
-    ALTER COLUMN remotesecret SET DEFAULT NULL::character varying,
-    ALTER COLUMN callbackextension SET DEFAULT NULL::character varying,
-    ALTER COLUMN contactpermit SET DEFAULT NULL::character varying,
-    ALTER COLUMN contactdeny SET DEFAULT NULL::character varying,
-    ALTER COLUMN unsolicited_mailbox SET DEFAULT NULL::character varying,
-    ALTER COLUMN disallowed_methods SET DEFAULT NULL::character varying,
-    ALTER COLUMN type DROP NOT NULL,
-    ALTER COLUMN protocol DROP DEFAULT,
-    ALTER COLUMN protocol DROP NOT NULL;
+    ALTER COLUMN type SET NOT NULL,
+    ALTER COLUMN protocol SET DEFAULT 'sip',
+    ALTER COLUMN protocol SET NOT NULL;
 
 COMMIT;
