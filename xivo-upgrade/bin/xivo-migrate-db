@@ -51,13 +51,13 @@ validate_configuration() {
     local global_status=0
     local versions="9.0 9.1"
     for version in $versions; do
-        pg_port=$(pg_lsclusters | grep "^$version" | awk '{print $3}')
-        pg_status=$(pg_lsclusters | grep "^$version" | awk '{print $4}')
+        local pg_status=$(pg_lsclusters | grep "^$version" | awk '{print $4}')
         if [ $pg_status == 'online' ]; then
+            local pg_port=$(pg_lsclusters | grep "^$version" | awk '{print $3}')
             echo -e "\tpostgresql-$version:\t$pg_status (port: $pg_port)"
-            if [ "$version -eq '9.0'" -a "$pg_port -ne '5432'" ]; then
+            if [ "$version" == "9.0" -a "$pg_port" != "5432" ]; then
                 echo "ERROR: PostgreSQL $version running on bad port: $pg_port"
-            elif [ "$version -eq '9.1'" -a "$pg_port -ne '5433'" ]; then
+            elif [ "$version" == "9.1" -a "$pg_port" != "5433" ]; then
                 echo "ERROR: PostgreSQL $version running on bad port: $pg_port"
             fi
         elif [ $pg_status == 'down' ]; then
@@ -87,7 +87,7 @@ stop_services() {
 
 migrate_db() {
     echo "Migrating database..."
-    sudo -u postgres pg_dumpall -c -p 5432 | sudo -u postgres psql -p 5433 >$MIGRATION_LOG_FILE
+    sudo -u postgres pg_dumpall -p 5432 | sudo -u postgres psql -p 5433 >$MIGRATION_LOG_FILE
     local status=$?
     if [ $status -gt 0 ]; then
         echo "ERROR: migration failed, see $MIGRATION_LOG_FILE for more infos."
