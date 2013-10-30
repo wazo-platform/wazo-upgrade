@@ -23,9 +23,17 @@ dump_infos() {
     ((estimate_time_minute = $total_seconde / 60 ))
     ((estimate_time_seconde = $total_seconde % 60 ))
     cat <<-EOF
+    
+    ***************************************************************************
+
+    PostgreSQL will be upgraded from version 9.0 to 9.1.
+    
     Database size: ${existing_size_mo}Mo
     Free space in /var: ${freespace_size_mo}Mo
     Etimate time for migration: $estimate_time_minute minutes $estimate_time_seconde secondes
+    
+    ***************************************************************************
+    
 EOF
     validate_free_space
 }
@@ -34,7 +42,7 @@ continue_upgrade() {
     read -p 'Would you like to upgrade your database now [y/N]? ' answer
     answer="${answer:-N}"
     if [ "$answer" == 'n' -o "$answer" == 'N' ]; then
-        exit
+        exit 3
     fi
 }
 
