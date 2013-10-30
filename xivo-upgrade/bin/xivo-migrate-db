@@ -11,7 +11,7 @@ validate_free_space() {
     cat <<-EOF
         ERROR: No free space available in /var for migrate database"
         Stopping upgrade...
-    EOF
+EOF
         exit 1
     fi
 }
@@ -22,7 +22,7 @@ dump_infos() {
     ((total_seconde = $existing_size_mo / 8 + 30 ))
     ((estimate_time_minute = $total_seconde / 60 ))
     ((estimate_time_seconde = $total_seconde % 60 ))
-cat <<-EOF
+    cat <<-EOF
     Database size: ${existing_size_mo}Mo
     Free space in /var: ${freespace_size_mo}Mo
     Etimate time for migration: $estimate_time_minute minutes $estimate_time_seconde secondes
