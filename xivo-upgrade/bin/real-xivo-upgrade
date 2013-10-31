@@ -70,6 +70,7 @@ upgrade() {
 upgrading_system() {
     get_version
     display_ast11_notice
+    exec_database_migration
     if [ $force -eq 0 ]; then
         read -p 'Would you like to upgrade your system (all services will be restarted) [Y/n]? ' answer
         answer="${answer:-Y}"
@@ -79,6 +80,16 @@ upgrading_system() {
     fi
     upgrade_fai
     upgrade
+}
+
+exec_database_migration() {
+    if [[ $version < "13.23" ]]; then
+        /usr/bin/xivo-migrate-db
+	    local status=$?
+	    if [[ $status > 0 ]]; then
+	        exit
+	    fi
+	fi
 }
 
 display_ast11_notice() {
