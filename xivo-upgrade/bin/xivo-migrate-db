@@ -30,7 +30,7 @@ dump_infos() {
     
     Database size: ${existing_size_mo}Mo
     Free space in /var: ${freespace_size_mo}Mo
-    Estimated migration time: $estimate_time_minute minutes $estimate_time_seconde secondes
+    Estimated migration time: $estimate_time_minute minutes $estimate_time_seconde seconds
     
     ***************************************************************************
     
@@ -98,7 +98,7 @@ migrate_db() {
     sudo -u postgres pg_dumpall -p 5432 | sudo -u postgres psql -p 5433 >$MIGRATION_LOG_FILE
     local status=$?
     if [ $status -gt 0 ]; then
-        echo "ERROR: migration failed, see $MIGRATION_LOG_FILE for more infos."
+        echo "ERROR: migration failed, see $MIGRATION_LOG_FILE for more info."
         exit 1
     fi
     /etc/init.d/postgresql stop
@@ -138,7 +138,7 @@ start_services
 cat <<-EOF
 
   *********** PostgreSQL successfully migrated from 9.0 to 9.1 ****************
-  The old database was kept for safety reasons.
+  The old database is still conserved on your hard disk for safety reasons.
   You can remove the old database using the following command:
     $ apt-get purge postgresql-9.0 postgresql-client-9.0 postgresql-plpython-9.0
   *****************************************************************************
