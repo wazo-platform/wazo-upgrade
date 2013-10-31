@@ -9,7 +9,7 @@ FREE_SPACE=$(df $POSTGRESQL_DATA_PATH |grep /var | awk '{print $3}')
 validate_free_space() {
     if [ $EXISTING_DB_SIZE -eq $FREE_SPACE ]; then
     cat <<-EOF
-        ERROR: No free space available in /var for migrate database"
+        ERROR: No free space available in /var to upgrade PostgreSQL"
         Stopping upgrade...
 EOF
         exit 1
@@ -30,7 +30,7 @@ dump_infos() {
     
     Database size: ${existing_size_mo}Mo
     Free space in /var: ${freespace_size_mo}Mo
-    Etimate time for migration: $estimate_time_minute minutes $estimate_time_seconde secondes
+    Estimated migration time: $estimate_time_minute minutes $estimate_time_seconde secondes
     
     ***************************************************************************
     
@@ -138,9 +138,8 @@ start_services
 cat <<-EOF
 
   *********** PostgreSQL successfully migrated from 9.0 to 9.1 ****************
-  The old data is still on the system for safety reasons.
-  You must validate the integrity of data using XiVO.
-  For erase the old data, run the following command:
+  The old database was kept for safety reasons.
+  You can remove the old database using the following command:
     $ apt-get purge postgresql-9.0 postgresql-client-9.0 postgresql-plpython-9.0
   *****************************************************************************
 
