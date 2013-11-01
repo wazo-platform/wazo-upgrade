@@ -7,8 +7,8 @@ EXISTING_DB_SIZE=$(du -s $POSTGRESQL_DATA_PATH | awk '{print $1}')
 FREE_SPACE=$(df $POSTGRESQL_DATA_PATH | tail -n1 | awk '{print $4}')
 
 validate_free_space() {
-    if [ $EXISTING_DB_SIZE -eq $FREE_SPACE ]; then
-    cat <<-EOF
+    if [ $EXISTING_DB_SIZE -ge $FREE_SPACE ]; then
+        cat <<EOF
         ERROR: No free space available in /var to upgrade PostgreSQL"
         Stopping upgrade...
 EOF
