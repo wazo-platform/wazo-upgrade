@@ -83,13 +83,14 @@ upgrading_system() {
 }
 
 exec_database_migration() {
-    if [[ $version < "13.23" ]]; then
+    local pg_version=$(pg_lsclusters | grep 'online' | awk '{print $1}')
+    if [[ $pg_version == "9.0" ]]; then
         /usr/bin/xivo-migrate-db
-	    local status=$?
-	    if [[ $status > 0 ]]; then
-	        exit
-	    fi
-	fi
+        local status=$?
+        if [[ $status > 0 ]]; then
+            exit
+        fi
+    fi
 }
 
 display_ast11_notice() {
