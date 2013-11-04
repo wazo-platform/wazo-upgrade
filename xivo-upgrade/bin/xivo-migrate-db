@@ -21,7 +21,9 @@ dump_infos() {
     ((freespace_size_mo = $FREE_SPACE / 1000 ))
     ((total_seconde = $existing_size_mo / 8 + 30 ))
     ((estimate_time_minute = $total_seconde / 60 ))
-    ((estimate_time_seconde = $total_seconde % 60 ))
+    if [ "$estimate_time_minute" -eq 0 ]; then
+        estimate_time_minute=1
+    fi
     cat <<-EOF
     
     ***************************************************************************
@@ -30,7 +32,7 @@ dump_infos() {
     
     Database size: ${existing_size_mo}Mo
     Free space in /var: ${freespace_size_mo}Mo
-    Estimated migration time: $estimate_time_minute minutes $estimate_time_seconde seconds
+    Estimated migration time: $estimate_time_minute minutes
     
     You can backup your database using this following command: 
         $ /usr/sbin/xivo-backup db /var/backups/xivo/pg_migration_90_to_91
