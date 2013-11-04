@@ -133,7 +133,7 @@ start_services() {
 
 purge_old_database() {
     echo "Purging old database..."
-    apt-get purge postgresql-9.0 postgresql-client-9.0 postgresql-plpython-9.0 >$MIGRATION_LOG_FILE
+    apt-get -y purge postgresql-9.0 postgresql-client-9.0 postgresql-plpython-9.0 >$MIGRATION_LOG_FILE
 }
 
 dump_infos
