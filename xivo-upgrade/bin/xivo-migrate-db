@@ -64,7 +64,7 @@ validate_configuration() {
     local versions="9.0 9.1"
     for version in $versions; do
         local pg_status=$(pg_lsclusters | grep "^$version" | awk '{print $4}')
-        if [ $pg_status == 'online' ]; then
+        if [ "$pg_status" == 'online' ]; then
             local pg_port=$(pg_lsclusters | grep "^$version" | awk '{print $3}')
             echo -e "\tpostgresql-$version:\t$pg_status (port: $pg_port)"
             if [ "$version" == "9.0" -a "$pg_port" != "5432" ]; then
@@ -72,7 +72,7 @@ validate_configuration() {
             elif [ "$version" == "9.1" -a "$pg_port" != "5433" ]; then
                 echo "ERROR: PostgreSQL $version running on bad port: $pg_port"
             fi
-        elif [ $pg_status == 'down' ]; then
+        elif [ "$pg_status" == 'down' ]; then
             echo -e "\tpostgresql-$version:\t$pg_status"
             if [ $global_status -eq 0 ]; then
                 global_status=1
