@@ -4,12 +4,18 @@ POSTGRESQL_DATA_PATH="/var/lib/postgresql/9.0/main"
 MIGRATION_LOG_FILE="/var/log/xivo-database-migration.log"
 
 EXISTING_DB_SIZE=$(du -s $POSTGRESQL_DATA_PATH | awk '{print $1}')
+((EXISTING_DB_SIZE_MIB = $EXISTING_DB_SIZE / 1024 ))
 FREE_SPACE=$(df $POSTGRESQL_DATA_PATH | tail -n1 | awk '{print $4}')
 
 validate_free_space() {
     if [ $EXISTING_DB_SIZE -ge $FREE_SPACE ]; then
         cat <<EOF
-        ERROR: No free space available in /var to upgrade PostgreSQL"
+        ERROR: Not enough free space available in /var to upgrade PostgreSQL
+               You need at least ${EXISTING_DB_SIZE_MIB} MiB of free space in /var.
+
+        NOTE:  You can free some disk space by removing old backups from
+               /var/backups/xivo
+
         Stopping upgrade...
 EOF
         exit 1
@@ -17,28 +23,27 @@ EOF
 }
 
 dump_infos() {
-    ((existing_size_mo = $EXISTING_DB_SIZE / 1000 ))
-    ((freespace_size_mo = $FREE_SPACE / 1000 ))
-    ((total_seconde = $existing_size_mo / 8 + 30 ))
-    ((estimate_time_minute = $total_seconde / 60 ))
+    ((freespace_size_mib = $FREE_SPACE / 1024 ))
+    ((estimated_time_second = $EXISTING_DB_SIZE_MIB / 8 + 30 ))
+    ((estimate_time_minute = $estimated_time_second / 60 ))
     if [ "$estimate_time_minute" -eq 0 ]; then
         estimate_time_minute=1
     fi
     cat <<-EOF
-    
+
     ***************************************************************************
 
     PostgreSQL will be upgraded from version 9.0 to 9.1.
-    
-    Database size: ${existing_size_mo}Mo
-    Free space in /var: ${freespace_size_mo}Mo
-    Estimated migration time: $estimate_time_minute minutes
-    
-    You can backup your database using this following command: 
+
+    Database size: ${EXISTING_DB_SIZE_MIB} MiB
+    Free space in /var: ${freespace_size_mib} MiB
+    Estimated migration time: ${estimate_time_minute} minutes
+
+    You can backup your database using this following command:
         $ /usr/sbin/xivo-backup db /var/backups/xivo/pg_migration_90_to_91
-    
+
     ***************************************************************************
-    
+
 EOF
     validate_free_space
 }
@@ -149,7 +154,7 @@ purge_old_database
 
 cat <<-EOF
 
-  *********** PostgreSQL successfully migrated from 9.0 to 9.1 :-) ************
+  *********** PostgreSQL migration from 9.0 to 9.1 successful ************
 
 EOF
 
