@@ -5,6 +5,12 @@ MIGRATION_LOG_FILE="/var/log/xivo-database-migration.log"
 
 export LC_ALL=$LANG
 
+if [ ! -d $POSTGRESQL_DATA_PATH ]; then
+    echo "ERROR: directory $POSTGRESQL_DATA_PATH doesn't exist."
+    echo "PostgreSQL is not installed."
+    exit 1
+fi
+
 EXISTING_DB_SIZE=$(du -s $POSTGRESQL_DATA_PATH | awk '{print $1}')
 ((EXISTING_DB_SIZE_MIB = $EXISTING_DB_SIZE / 1024 ))
 FREE_SPACE=$(df -P $POSTGRESQL_DATA_PATH | tail -n1 | awk '{print $4}')
