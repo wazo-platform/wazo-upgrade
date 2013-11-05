@@ -5,7 +5,7 @@ MIGRATION_LOG_FILE="/var/log/xivo-database-migration.log"
 
 EXISTING_DB_SIZE=$(du -s $POSTGRESQL_DATA_PATH | awk '{print $1}')
 ((EXISTING_DB_SIZE_MIB = $EXISTING_DB_SIZE / 1024 ))
-FREE_SPACE=$(df $POSTGRESQL_DATA_PATH | tail -n1 | awk '{print $4}')
+FREE_SPACE=$(df -P $POSTGRESQL_DATA_PATH | tail -n1 | awk '{print $4}')
 
 validate_free_space() {
     if [ $EXISTING_DB_SIZE -ge $FREE_SPACE ]; then
