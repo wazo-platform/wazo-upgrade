@@ -3,6 +3,8 @@
 POSTGRESQL_DATA_PATH="/var/lib/postgresql/9.0/main"
 MIGRATION_LOG_FILE="/var/log/xivo-database-migration.log"
 
+export LC_ALL=$LANG
+
 EXISTING_DB_SIZE=$(du -s $POSTGRESQL_DATA_PATH | awk '{print $1}')
 ((EXISTING_DB_SIZE_MIB = $EXISTING_DB_SIZE / 1024 ))
 FREE_SPACE=$(df -P $POSTGRESQL_DATA_PATH | tail -n1 | awk '{print $4}')
@@ -62,7 +64,7 @@ prepare_configuration() {
     echo "deb http://mirror.xivo.fr/debian/ postgresql-rc main" >/etc/apt/sources.list.d/postgresql.list
     echo "Downloading and installing postgresql..."
     apt-get update >>$MIGRATION_LOG_FILE
-    LC_ALL="en_US.UTF-8" apt-get install -y postgresql-9.1 postgresql-plpython-9.1 psmisc >>$MIGRATION_LOG_FILE
+    apt-get install -y postgresql-9.1 postgresql-plpython-9.1 psmisc >>$MIGRATION_LOG_FILE
 }
 
 validate_configuration() {
