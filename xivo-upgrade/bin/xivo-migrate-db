@@ -67,7 +67,6 @@ continue_upgrade() {
 prepare_configuration() {
     cd /tmp
     echo "Preparing configuration..."
-    echo "deb http://mirror.xivo.fr/debian/ postgresql-rc main" >/etc/apt/sources.list.d/postgresql.list
     echo "Downloading and installing postgresql..."
     apt-get update >>$MIGRATION_LOG_FILE
     apt-get install -y postgresql-9.1 postgresql-plpython-9.1 psmisc >>$MIGRATION_LOG_FILE
@@ -99,7 +98,6 @@ validate_configuration() {
     done
     if [ $global_status -gt 0 ]; then
         echo "Stopping upgrade..."
-        clean_configuration
         exit 1
     fi
 }
@@ -121,13 +119,6 @@ migrate_db() {
         exit 1
     fi
     /etc/init.d/postgresql stop >>$MIGRATION_LOG_FILE
-}
-
-clean_configuration() {
-    echo "Cleaning configuration..."
-    rm /etc/apt/sources.list.d/postgresql.list >>$MIGRATION_LOG_FILE
-    apt-get clean >>$MIGRATION_LOG_FILE
-    apt-get update >>$MIGRATION_LOG_FILE
 }
 
 update_pg_config() {
@@ -162,7 +153,6 @@ prepare_configuration
 validate_configuration
 stop_services
 migrate_db
-clean_configuration
 update_pg_config
 start_services
 purge_old_database
