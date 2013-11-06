@@ -34,6 +34,12 @@ if [ -d $old_provd_directory ]; then
     /etc/init.d/xivo-provd restart
 fi
 
+# remove old postgresql-common and postgresql-client-common
+pg_common_version=$(LANG=C apt-cache policy postgresql-common | grep Installed | awk '{print $2}')
+if [ "$pg_common_version" = "140+0.xivo-backport-2" ]; then
+    apt-get install -y --force-yes postgresql-common=134wheezy3~bpo60+1+xivo+1 postgresql-client-common=134wheezy3~bpo60+1+xivo+1
+fi
+
 old_web_interface_log_directory="/var/log/pf-xivo-web-interface"
 old_web_interface_config_directory="/etc/pf-xivo/web-interface"
 
