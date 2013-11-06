@@ -149,6 +149,13 @@ purge_old_database() {
     apt-get -y purge postgresql-9.0 postgresql-client-9.0 postgresql-plpython-9.0 >>$MIGRATION_LOG_FILE
 }
 
+update_ha_config() {
+    if [ -f /etc/pf-xivo/ha.conf ]; then
+        echo "Updating configuration for HA..."
+        curl -v -X POST -H "Content-Type: application/json" -d '@/etc/pf-xivo/ha.conf' http://localhost:8668/update_ha_config >>$MIGRATION_LOG_FILE
+    fi
+}
+
 dump_infos
 continue_upgrade
 prepare_configuration
@@ -159,6 +166,7 @@ clean_configuration
 update_pg_config
 start_services
 purge_old_database
+update_ha_config
 
 cat <<-EOF
 
