@@ -112,7 +112,7 @@ stop_services() {
 
 migrate_db() {
     echo "Migrating database..."
-    sudo -u postgres pg_dumpall -p 5432 | sudo -u postgres psql -p 5433 >>$MIGRATION_LOG_FILE
+    sudo -u postgres pg_dumpall -p 5432 | sudo -u postgres psql -p 5433 &>>$MIGRATION_LOG_FILE
     local status=$?
     if [ $status -gt 0 ]; then
         echo "ERROR: migration failed, see $MIGRATION_LOG_FILE for more info."
