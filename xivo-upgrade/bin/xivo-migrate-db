@@ -37,7 +37,7 @@ dump_infos() {
     if [ "$estimate_time_minute" -eq 0 ]; then
         estimate_time_minute=1
     fi
-    cat <<-EOF
+    cat <<EOF
 
     ***************************************************************************
 
@@ -158,10 +158,8 @@ start_services
 purge_old_database
 update_ha_config
 
-cat <<-EOF
+cat <<EOF
 
   *********** PostgreSQL migration from 9.0 to 9.1 successful ************
 
 EOF
-
-exit
