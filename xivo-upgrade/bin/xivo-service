@@ -186,7 +186,7 @@ is_running() {
     local running=0
     if [ "$service" = "postgresql" ] ; then
         pg_state=$(pg_lsclusters | tail -n 1 | awk '{print $4}')
-        if [ "$pg_state" == "down" ] ; then
+        if [ "$pg_state" != "online" ] ; then
             running=3
         fi
     else
