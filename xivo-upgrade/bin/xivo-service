@@ -77,8 +77,7 @@ xivo_status() {
     xivo-check-db
     echo "Checking services..."
     for service in $services; do
-        /etc/init.d/$service status &> /dev/null
-        status=$?
+        status=$(is_running "$service")
         if [ $status -eq 0 ]; then
             echo -e "\trunning\t\t$service"
         elif [ $status -eq 3 ]; then
@@ -184,11 +183,15 @@ is_enabled() {
 
 is_running() {
     local service=$1
-    /etc/init.d/$service status > /dev/null
-    if [ $? -eq 0 ]; then
-        running=0
+    local running=0
+    if [ "$service" = "postgresql" ] ; then
+        pg_state=$(pg_lsclusters | tail -n 1 | awk '{print $4}')
+        if [ "$pg_state" == "down" ] ; then
+            running=3
+        fi
     else
-        running=1
+        /etc/init.d/$service status > /dev/null
+        running=$?
     fi
     echo $running
 }
@@ -204,7 +207,7 @@ start_services() {
                 invoke-rc.d $service start > /dev/null
                 echo -en "\tstarting $service ..."
                 _x=0
-                while ! /etc/init.d/$service status &> /dev/null; do
+                while [ $(is_running "$service") -ne 0 ]; do
                     wait_for_service
                 done
                 echo " OK"
@@ -219,8 +222,8 @@ stop_services() {
     stop_monit
     local services=$1
     for service in $services; do
-        /etc/init.d/$service status &> /dev/null
-        if [ $? -eq 0 ]; then
+        running=$(is_running "$service")
+        if [ $running -eq 0 ]; then
             if [  -f /etc/init.d/$service ]; then
                 invoke-rc.d $service stop > /dev/null
             fi
