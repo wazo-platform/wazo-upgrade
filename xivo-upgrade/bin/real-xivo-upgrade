@@ -87,6 +87,7 @@ exec_database_migration() {
         if ! /usr/bin/xivo-migrate-db; then
             exit
         fi
+        export UPGRADING_POSTGRESQL=1
     fi
 }
 
