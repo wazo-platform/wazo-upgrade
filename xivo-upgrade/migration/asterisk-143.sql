@@ -23,7 +23,7 @@ DO $$
 	BEGIN
 
 		BEGIN
-			ALTER TABLE "sccpline" ADD COLUMN "disallow" varchar(100) NOT NULL DEFAULT '';
+			ALTER TABLE "sccpline" ADD COLUMN "disallow" varchar(100);
 		EXCEPTION
 			WHEN duplicate_column THEN RAISE NOTICE 'column <disallow> already exists in <sccpline>.';
 		END;
