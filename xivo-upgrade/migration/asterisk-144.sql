@@ -25,6 +25,11 @@ BEGIN
     IF NOT FOUND THEN
         INSERT INTO "sccpgeneralsettings" VALUES (DEFAULT, 'allow', '');
     END IF;
+
+    PERFORM 1 FROM "sccpgeneralsettings" WHERE "option_name" = 'keepalive';
+    IF NOT FOUND THEN
+        INSERT INTO "sccpgeneralsettings" VALUES (DEFAULT, 'keepalive', '10');
+    END IF;
 END;
 $$;
 
