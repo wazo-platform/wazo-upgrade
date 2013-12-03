@@ -17,7 +17,22 @@
 
 BEGIN;
 
-ALTER TABLE call_log ADD "source_line_identity" VARCHAR(255);
-ALTER TABLE call_log ADD "destination_line_identity" VARCHAR(255);
+DO $$
+  BEGIN
+
+    BEGIN
+      ALTER TABLE call_log ADD "source_line_identity" VARCHAR(255);
+    EXCEPTION
+      WHEN duplicate_column THEN RAISE NOTICE 'column <source_line_identity> already exists in <call_log>.';
+    END;
+
+    BEGIN
+      ALTER TABLE call_log ADD "destination_line_identity" VARCHAR(255);
+    EXCEPTION
+      WHEN duplicate_column THEN RAISE NOTICE 'column <destination_line_identity> already exists in <call_log>.';
+    END;
+
+  END;
+$$;
 
 COMMIT;
