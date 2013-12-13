@@ -1,5 +1,0 @@
-bin/ usr/
-migration/ usr/share/xivo-upgrade
-pre-stop.d/ usr/share/xivo-upgrade
-pre-start.d/ usr/share/xivo-upgrade
-post-start.d/ usr/share/xivo-upgrade
