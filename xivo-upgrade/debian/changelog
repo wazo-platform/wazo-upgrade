@@ -1,0 +1,17 @@
+xivo-upgrade (1.2.5~20120313.132648.e024d05-3) squeeze-xivo-skaro; urgency=low
+
+  * add logrotate configuration
+
+ -- Jirka HLAVACEK <jhlavacek@avencall.com>  Fri, 05 Apr 2013 14:29:22 +0200
+
+xivo-upgrade (1.2.5~20120313.132648.e024d05-2) squeeze-xivo-skaro; urgency=low
+
+  * remove depends on curl
+
+ -- cabunar <cabunar@kiki.lan-quebec.avencall.com>  Wed, 28 Mar 2012 14:22:27 -0400
+
+xivo-upgrade (1.2.1~dev) squeeze-xivo-skaro; urgency=low
+
+  * Initial release
+
+ -- Nicolas HICHER (atarakt) <nhicher@proformatique.com>  Mon, 20 Feb 2012 19:42:09 -0500
