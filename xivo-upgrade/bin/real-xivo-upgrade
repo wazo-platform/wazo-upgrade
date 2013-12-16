@@ -2,6 +2,7 @@
 PATH=/bin:/usr/bin:/sbin:/usr/sbin
 version=$(cat /usr/share/pf-xivo/XIVO-VERSION)
 lib_directory="/usr/share/xivo-upgrade"
+mirror_xivo="http://mirror.xivo.fr"
 
 differed_action() {
     local state=$1
@@ -54,9 +55,13 @@ upgrade() {
     pre_stop
     stop_xivo
     echo "Upgrading xivo..."
-    execute apt-get install -o Dpkg::Options::="--force-confnew" xivo-config -y
-    execute apt-get install pf-xivo xivo-libdao xivo-ctid xivo-web-interface -y
-    execute apt-get dist-upgrade -y
+    if is_squeeze; then
+    	exec_squeeze_to_wheezy_migration
+	else
+	    execute apt-get install -o Dpkg::Options::="--force-confnew" xivo-config -y
+	    execute apt-get install pf-xivo xivo-libdao xivo-ctid xivo-web-interface -y
+	    execute apt-get dist-upgrade -y
+	fi
     pre_start
     xivo-check-db
     # stop asterisk before start xivo to refresh configuration
@@ -66,10 +71,19 @@ upgrade() {
     xivo-check-conffiles
 }
 
+debian_version_installed() {
+	local xivo_version=$(cut -c1 /etc/debian_version)
+	echo $xivo_version
+}
+
+is_squeeze() {
+	[ $(debian_version_installed) -eq 6 ]
+}
+
 upgrading_system() {
+    upgrade_fai
     get_version
     display_ast11_notice
-    exec_database_migration
     if [ $force -eq 0 ]; then
         read -p 'Would you like to upgrade your system (all services will be restarted) [Y/n]? ' answer
         answer="${answer:-Y}"
@@ -77,8 +91,34 @@ upgrading_system() {
             exit
         fi
     fi
-    upgrade_fai
     upgrade
+}
+
+exec_squeeze_to_wheezy_migration() {
+	wget -q -O - $mirror_xivo/xivo-squeeze-to-wheezy.cfg | debconf-set-selections
+	sed -i 's/squeeze/wheezy/' /etc/apt/sources.list
+	export DEBIAN_FRONTEND=noninteractive
+	
+	xivo-service stop all
+	
+	apt-get update > /dev/null
+	apt-get install --yes --force-yes python2.7 apt
+	apt-get install --yes --force-yes -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" munin monit
+	apt-get upgrade --yes --force-yes -o Dpkg::Options::="--force-confnew"
+	apt-get install --yes --force-yes -o Dpkg::Options::="--force-confnew" python-flask/wheezy python-werkzeug/wheezy python-pika/wheezy
+	apt-get dist-upgrade --yes --force-yes -o Dpkg::Options::="--force-confnew"
+	apt-get update > /dev/null
+	apt-get autoremove --yes
+	
+	kernel_release=$(ls /lib/modules/ |grep ^3.2)
+	for kr in $kernel_release; do
+		apt-get install dahdi-linux-modules-${kr} > /dev/null
+	done
+	
+	apt-get purge --yes xivo-fai-skaro-*  > /dev/null
+	
+	xivo-service restart all
+	service xivo-sysconfd restart
 }
 
 exec_database_migration() {
@@ -134,8 +174,9 @@ fi
 upgrade_fai() {
     echo "upgrade fai if needed"
     old_packages=$(aptitude search pf-fai | grep ^i | grep -oE 'pf-fai.* ' | awk '{print $1}')
+    new_fai="$(dpkg -l | grep '^ii  xivo-fai-*' | awk '{print $2}' | xargs)"
+	new_packages="$new_fai"
     if [ "$old_packages" != "" ]; then
-        new_packages=""
         for package in $old_packages; do
             case $package in
                 "pf-fai") new_packages="$new_packages xivo-fai";;
@@ -145,8 +186,8 @@ upgrade_fai() {
                 "pf-fai-xivo-1.2-skaro-dev") new_packages="$new_packages xivo-fai-skaro-dev";;
             esac
         done
-        apt-get install -y $new_packages > /dev/null
     fi
+	apt-get install -y $new_packages > /dev/null
 }
 
 usage() {
@@ -175,6 +216,8 @@ do
 done
 download_only="${download_only:-"0"}"
 force="${force:-"0"}"
+
+echo "=================="
 
 if [ $download_only -eq 0 ]; then
     upgrading_system
