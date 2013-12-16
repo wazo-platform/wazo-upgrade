@@ -2,6 +2,7 @@
 PATH=/bin:/usr/bin:/sbin:/usr/sbin
 version=$(cat /usr/share/pf-xivo/XIVO-VERSION)
 lib_directory="/usr/share/xivo-upgrade"
+mirror_xivo="http://mirror.xivo.fr"
 
 differed_action() {
     local state=$1
@@ -70,6 +71,7 @@ upgrading_system() {
     get_version
     display_ast11_notice
     exec_database_migration
+    exec_os_migration
     if [ $force -eq 0 ]; then
         read -p 'Would you like to upgrade your system (all services will be restarted) [Y/n]? ' answer
         answer="${answer:-Y}"
@@ -79,6 +81,33 @@ upgrading_system() {
     fi
     upgrade_fai
     upgrade
+}
+
+os_version() {
+	local version_file='/etc/debian_version'
+	if [ ! -f $version_file ]; then
+		echo "FATAL ERROR: $version_file not exist"
+		exit 1
+	fi
+	local version=$(cut -d '.' -f 1 "$version_file")
+	return $version
+}
+
+exec_os_migration() {
+	apt-get update
+	apt-get install --force-yes python2.7 apt
+	echo "deb $mirror_xivo/debian xivo-dev main contrib non-free" > /etc/apt/sources.list.d/xivo.list
+	sed -i 's/squeeze/wheezy/' /etc/apt/sources.list
+	wget -q -O - $mirror_xivo/d-i/wheezy/xivo-squeeze-to-wheezy.cfg | debconf-set-selections
+	#update-alternatives --install /usr/bin/python python /usr/bin/python2.7 1
+	#apt-get update
+	#apt-get dselect-upgrade
+	apt-get update
+	apt-get upgrade --force-yes
+	apt-get update
+	apt-get dist-upgrade --force-yes
+	#apt-get install --force-yes python-werkzeug=0.8.3+dfsg-1 python-pika=0.9.5-1 python-flask=0.8-1
+	apt-get update
 }
 
 exec_database_migration() {
@@ -175,6 +204,8 @@ do
 done
 download_only="${download_only:-"0"}"
 force="${force:-"0"}"
+
+echo "=================="
 
 if [ $download_only -eq 0 ]; then
     upgrading_system

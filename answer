@@ -1,0 +1,128 @@
+Configuration file `/etc/monit/monitrc'
+ ==> Modified (by you or by a script) since installation.
+ ==> Package distributor has shipped an updated version.
+   What would you like to do about it ?  Your options are:
+    Y or I  : install the package maintainer's version
+    N or O  : keep your currently-installed version
+      D     : show the differences between the versions
+      Z     : start a shell to examine the situation
+ The default action is to keep your current version.
+
+ Configuration file `/etc/default/monit'
+ ==> Modified (by you or by a script) since installation.
+ ==> Package distributor has shipped an updated version.
+   What would you like to do about it ?  Your options are:
+    Y or I  : install the package maintainer's version
+    N or O  : keep your currently-installed version
+      D     : show the differences between the versions
+      Z     : start a shell to examine the situation
+ The default action is to keep your current version.
+ 
+ GRUB
+ 
+ Configuration file `/etc/munin/munin-node.conf'
+ ==> Modified (by you or by a script) since installation.
+ ==> Package distributor has shipped an updated version.
+   What would you like to do about it ?  Your options are:
+    Y or I  : install the package maintainer's version
+    N or O  : keep your currently-installed version
+      D     : show the differences between the versions
+      Z     : start a shell to examine the situation
+ The default action is to keep your current version.
+ 
+ Configuration file `/etc/munin/templates/munin-comparison-day.tmpl'
+ ==> Modified (by you or by a script) since installation.
+ ==> Package distributor has shipped an updated version.
+   What would you like to do about it ?  Your options are:
+    Y or I  : install the package maintainer's version
+    N or O  : keep your currently-installed version
+      D     : show the differences between the versions
+      Z     : start a shell to examine the situation
+ The default action is to keep your current version.
+ 
+ Configuration file `/etc/munin/templates/munin-comparison-month.tmpl'
+ ==> Modified (by you or by a script) since installation.
+ ==> Package distributor has shipped an updated version.
+   What would you like to do about it ?  Your options are:
+    Y or I  : install the package maintainer's version
+    N or O  : keep your currently-installed version
+      D     : show the differences between the versions
+      Z     : start a shell to examine the situation
+ The default action is to keep your current version.
+ 
+ Configuration file `/etc/munin/templates/munin-comparison-week.tmpl'
+ ==> Modified (by you or by a script) since installation.
+ ==> Package distributor has shipped an updated version.
+   What would you like to do about it ?  Your options are:
+    Y or I  : install the package maintainer's version
+    N or O  : keep your currently-installed version
+      D     : show the differences between the versions
+      Z     : start a shell to examine the situation
+ The default action is to keep your current version.
+ 
+ Configuration file `/etc/munin/templates/munin-comparison-year.tmpl'
+ ==> Modified (by you or by a script) since installation.
+ ==> Package distributor has shipped an updated version.
+   What would you like to do about it ?  Your options are:
+    Y or I  : install the package maintainer's version
+    N or O  : keep your currently-installed version
+      D     : show the differences between the versions
+      Z     : start a shell to examine the situation
+ The default action is to keep your current version.
+ 
+ Configuration file `/etc/munin/templates/munin-domainview.tmpl'
+ ==> Modified (by you or by a script) since installation.
+ ==> Package distributor has shipped an updated version.
+   What would you like to do about it ?  Your options are:
+    Y or I  : install the package maintainer's version
+    N or O  : keep your currently-installed version
+      D     : show the differences between the versions
+      Z     : start a shell to examine the situation
+ The default action is to keep your current version.
+ 
+ Configuration file `/etc/munin/templates/munin-nodeview.tmpl'
+ ==> Modified (by you or by a script) since installation.
+ ==> Package distributor has shipped an updated version.
+   What would you like to do about it ?  Your options are:
+    Y or I  : install the package maintainer's version
+    N or O  : keep your currently-installed version
+      D     : show the differences between the versions
+      Z     : start a shell to examine the situation
+ The default action is to keep your current version.
+ 
+ Configuration file `/etc/munin/templates/munin-overview.tmpl'
+ ==> Modified (by you or by a script) since installation.
+ ==> Package distributor has shipped an updated version.
+   What would you like to do about it ?  Your options are:
+    Y or I  : install the package maintainer's version
+    N or O  : keep your currently-installed version
+      D     : show the differences between the versions
+      Z     : start a shell to examine the situation
+ The default action is to keep your current version.
+ 
+ Configuration file `/etc/munin/templates/munin-serviceview.tmpl'
+ ==> Modified (by you or by a script) since installation.
+ ==> Package distributor has shipped an updated version.
+   What would you like to do about it ?  Your options are:
+    Y or I  : install the package maintainer's version
+    N or O  : keep your currently-installed version
+      D     : show the differences between the versions
+      Z     : start a shell to examine the situation
+ The default action is to keep your current version.
+ 
+ Configuration file `/etc/munin/munin.conf'
+ ==> Modified (by you or by a script) since installation.
+ ==> Package distributor has shipped an updated version.
+   What would you like to do about it ?  Your options are:
+    Y or I  : install the package maintainer's version
+    N or O  : keep your currently-installed version
+      D     : show the differences between the versions
+      Z     : start a shell to examine the situation
+ The default action is to keep your current version.
+ 
+ W: Failed to fetch http://mirror.xivo.fr/debian/dists/xivo-dev/Release  Unable to find expected entry 'contrib/binary-i386/Packages' in Release file (Wrong sources.list entry or malformed file)
+
+E: Some index files failed to download. They have been ignored, or old ones used instead.
+Would you like to upgrade your system (all services will be restarted) [Y/n]? 
+ 
+ 
