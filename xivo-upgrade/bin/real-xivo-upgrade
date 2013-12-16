@@ -217,8 +217,6 @@ done
 download_only="${download_only:-"0"}"
 force="${force:-"0"}"
 
-echo "=================="
-
 if [ $download_only -eq 0 ]; then
     upgrading_system
 else
