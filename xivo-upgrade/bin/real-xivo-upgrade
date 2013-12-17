@@ -84,6 +84,7 @@ upgrading_system() {
     upgrade_fai
     get_version
     display_ast11_notice
+    display_wheezy_upgrade_notice
     exec_database_migration
     if [ $force -eq 0 ]; then
         read -p 'Would you like to upgrade your system (all services will be restarted) [Y/n]? ' answer
@@ -157,6 +158,19 @@ display_ast11_notice() {
 		EOF
         fi
     fi
+}
+
+display_wheezy_upgrade_notice() {
+	if is_squeeze; then
+		cat <<-EOF
+
+		The Debian GNU/Linux system will be upgraded from version 6 (Squeeze)
+		to 7 (Wheezy). Hence, this upgrade will be longer than other upgrades.
+
+		You will need to RESTART the machine after the upgrade.
+
+		EOF
+	fi
 }
 
 if [[ $version < '13.03' && -f "/etc/pf-xivo/web-interface/xivo.ini" ]]; then
