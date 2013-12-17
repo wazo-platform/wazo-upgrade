@@ -97,7 +97,7 @@ upgrading_system() {
 }
 
 exec_squeeze_to_wheezy_migration() {
-    wget -q -O - $mirror_xivo/xivo-squeeze-to-wheezy.cfg | debconf-set-selections
+    wget -q -O - $mirror_xivo/d-i/wheezy/xivo-squeeze-to-wheezy.cfg | debconf-set-selections
     sed -i 's/squeeze/wheezy/' /etc/apt/sources.list
     export DEBIAN_FRONTEND=noninteractive
 
