@@ -81,11 +81,11 @@ is_squeeze() {
 }
 
 upgrading_system() {
+    exec_database_migration
     upgrade_fai
     get_version
     display_ast11_notice
     display_wheezy_upgrade_notice
-    exec_database_migration
     if [ $force -eq 0 ]; then
         read -p 'Would you like to upgrade your system (all services will be restarted) [Y/n]? ' answer
         answer="${answer:-Y}"
