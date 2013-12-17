@@ -56,6 +56,7 @@ upgrade() {
     stop_xivo
     echo "Upgrading xivo..."
     if is_squeeze; then
+        export UPGRADING_TO_WHEEZY=1
         exec_squeeze_to_wheezy_migration
     else
         execute apt-get install -o Dpkg::Options::="--force-confnew" xivo-config -y
@@ -94,6 +95,7 @@ upgrading_system() {
         fi
     fi
     upgrade
+    display_post_wheezy_upgrade_notice
 }
 
 is_linux_3.2_installed() {
@@ -180,6 +182,35 @@ display_wheezy_upgrade_notice() {
 
 		EOF
 	fi
+}
+
+is_grub2_installed() {
+    [ -n "$(dpkg -l grub-pc | grep '^ii')" ]
+}
+
+display_grub2_notice() {
+    if ! is_grub2_installed ; then
+        cat <<-EOF
+		* We recommend that you install GRUB 2 with the following command:
+
+		apt-get install grub2
+
+		EOF
+    fi
+}
+
+display_restart_notice() {
+	cat <<-EOF
+	* You must RESTART the machine before using XiVO again.
+
+	EOF
+}
+
+display_post_wheezy_upgrade_notice() {
+    if [ "$UPGRADING_TO_WHEEZY" == "1" ] ; then
+        display_grub2_notice
+        display_restart_notice
+    fi
 }
 
 if [[ $version < '13.03' && -f "/etc/pf-xivo/web-interface/xivo.ini" ]]; then
