@@ -1,11 +1,11 @@
 #!/bin/bash
 
-LIST_DIR_TOCLEAN="/var/lib/pf-xivo-web-interface"
+LIST_DIR_TOCLEAN="/var/lib/xivo-web-interface"
 
-LIST_FILE_TOCLEAN="/etc/pf-xivo/web-interface/location.ini
-                   /etc/pf-xivo/web-interface/report.ini
-                   /etc/pf-xivo/web-interface/template.ini
-                   /etc/cron.d/pf-xivo-web-interface
+LIST_FILE_TOCLEAN="/etc/xivo/web-interface/location.ini
+                   /etc/xivo/web-interface/report.ini
+                   /etc/xivo/web-interface/template.ini
+                   /etc/cron.d/xivo-web-interface
                    /etc/default/xivo-agent
                    /etc/default/xivo-ctid"
 
