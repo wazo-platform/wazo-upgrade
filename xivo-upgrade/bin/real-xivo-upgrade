@@ -116,8 +116,6 @@ exec_squeeze_to_wheezy_migration() {
         apt-get install dahdi-linux-modules-${kr} > /dev/null
     done
 
-    apt-get purge --yes xivo-fai-skaro-*  > /dev/null
-
     xivo-service restart all
 }
 
@@ -173,7 +171,8 @@ fi
 
 upgrade_fai() {
     echo "upgrade fai if needed"
-    old_packages=$(aptitude search pf-fai | grep ^i | grep -oE 'pf-fai.* ' | awk '{print $1}')
+    apt-get purge --yes pf-fai-xivo* xivo-fai-skaro-*  > /dev/null
+    old_packages=$(aptitude search pf-fai | grep ^i | grep -oE 'pf-fai.* ' | awk '{print $1}' | xargs)
     new_fai="$(dpkg -l | grep '^ii  xivo-fai-*' | awk '{print $2}' | xargs)"
     new_packages="$new_fai"
     if [ "$old_packages" != "" ]; then
@@ -181,13 +180,12 @@ upgrade_fai() {
             case $package in
                 "pf-fai") new_packages="$new_packages xivo-fai";;
                 "pf-fai-dev") new_packages="$new_packages xivo-fai-dev";;
-                "pf-fai-xivo-1.2-skaro") new_packages="$new_packages xivo-fai-skaro";;
-                "pf-fai-xivo-1.2-skaro-rc") new_packages="$new_packages xivo-fai-skaro-rc";;
-                "pf-fai-xivo-1.2-skaro-dev") new_packages="$new_packages xivo-fai-skaro-dev";;
             esac
         done
+    	apt-get purge --yes $old_packages  > /dev/null
     fi
     apt-get install -y $new_packages > /dev/null
+    apt-get update > /dev/null
 }
 
 usage() {
