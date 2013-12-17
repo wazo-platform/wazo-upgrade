@@ -145,7 +145,7 @@ display_ast11_notice() {
         http://documentation.xivo.fr/production/upgrade/asterisk_11.html for
         more information.
 
-        EOF
+		EOF
 
         if [ -f /usr/lib/asterisk/modules/codec_g729a.so ]; then
             mv /usr/lib/asterisk/modules/codec_g729a.so /tmp
@@ -156,7 +156,7 @@ display_ast11_notice() {
             asterisk 11, it has been moved from /usr/lib/asterisk/modules to /tmp. To continue
             using the G729 module, you will have to install the asterisk 11 version of the module.
 
-            EOF
+		EOF
         fi
     fi
 }
@@ -196,7 +196,7 @@ usage() {
         -d: only download packages
         -f: force yes
         -h: print usage
-    EOF
+	EOF
 }
 
 while getopts :dfh opt
