@@ -96,6 +96,10 @@ upgrading_system() {
     upgrade
 }
 
+is_linux_3.2_installed() {
+    [ -n "$(dpkg -l linux-3.2.0-* 2>/dev/null | grep '^ii')" ]
+}
+
 exec_squeeze_to_wheezy_migration() {
     wget -q -O - $mirror_xivo/d-i/wheezy/xivo-squeeze-to-wheezy.cfg | debconf-set-selections
     sed -i 's/squeeze/wheezy/' /etc/apt/sources.list
@@ -111,6 +115,11 @@ exec_squeeze_to_wheezy_migration() {
     apt-get dist-upgrade --yes --force-yes -o Dpkg::Options::="--force-confnew"
     apt-get update > /dev/null
     apt-get autoremove --yes
+
+    if ! is_linux_3.2_installed ; then
+        # Maybe a problem with the PAE kernel installation, trying the non-PAE kernel
+        apt-get install --yes 'linux-image-3.2.0.*-486'
+    fi
 
     kernel_release=$(ls /lib/modules/ |grep ^3.2)
     for kr in $kernel_release; do
