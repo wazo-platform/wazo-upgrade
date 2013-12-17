@@ -119,7 +119,6 @@ exec_squeeze_to_wheezy_migration() {
     apt-get purge --yes xivo-fai-skaro-*  > /dev/null
 
     xivo-service restart all
-    service xivo-sysconfd restart
 }
 
 exec_database_migration() {
