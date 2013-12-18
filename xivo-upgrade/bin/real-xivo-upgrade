@@ -115,6 +115,7 @@ exec_squeeze_to_wheezy_migration() {
     apt-get upgrade --yes --force-yes -o Dpkg::Options::="--force-confnew"
     apt-get install --yes --force-yes -o Dpkg::Options::="--force-confnew" python-flask/wheezy python-werkzeug/wheezy python-pika/wheezy
     apt-get install --yes --force-yes -o Dpkg::Options::="--force-confnew" pf-xivo
+    apt-get install --yes --force-yes -o Dpkg::Options::="--force-confnew" postgresql-common/wheezy
     apt-get dist-upgrade --yes --force-yes -o Dpkg::Options::="--force-confnew"
     apt-get update > /dev/null
     apt-get autoremove --yes
