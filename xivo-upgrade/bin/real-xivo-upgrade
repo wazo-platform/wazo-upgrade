@@ -191,6 +191,7 @@ is_grub2_installed() {
 display_grub2_notice() {
     if ! is_grub2_installed ; then
         cat <<-EOF
+
 		* We recommend that you install GRUB 2 with the following command:
 
 		apt-get install grub2
