@@ -193,17 +193,18 @@ is_grub2_installed() {
 display_grub2_notice() {
     if ! is_grub2_installed ; then
         cat <<-EOF
-
-		* We recommend that you install GRUB 2 with the following command:
-
-		apt-get install grub2
-
+		**********************************************
+		* You must install GRUB 2 BEFORE restarting: *
+		*                                            *
+		* apt-get install grub2                      *
+		**********************************************
 		EOF
     fi
 }
 
 display_restart_notice() {
 	cat <<-EOF
+
 	* You must RESTART the machine before using XiVO again.
 
 	EOF
