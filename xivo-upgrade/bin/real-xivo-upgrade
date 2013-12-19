@@ -228,7 +228,7 @@ fi
 
 upgrade_fai() {
     echo "upgrade fai if needed"
-    old_fai=$(aptitude search pf-fai-xivo* xivo-fai-skaro-* | grep ^i | awk '{print $1}' | xargs)
+    old_fai=$(aptitude search pf-fai-xivo* xivo-fai-skaro-* | grep ^i | awk '{print $2}' | xargs)
     apt-get purge --yes $old_fai > /dev/null
     old_packages=$(aptitude search pf-fai | grep ^i | grep -oE 'pf-fai.* ' | awk '{print $1}' | xargs)
     new_fai="$(dpkg -l | grep '^ii  xivo-fai-*' | awk '{print $2}' | xargs)"
