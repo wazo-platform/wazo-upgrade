@@ -196,7 +196,6 @@ display_ast11_notice() {
 
 display_wheezy_upgrade_notice() {
 	if is_squeeze; then
-		check_if_grub_is_broken
 		cat <<-EOF
 
 		The Debian GNU/Linux system will be upgraded from version 6 (Squeeze)
@@ -210,6 +209,7 @@ display_wheezy_upgrade_notice() {
 
 display_post_wheezy_upgrade_notice() {
     if [ "$UPGRADING_TO_WHEEZY" == "1" ] ; then
+		check_if_grub_is_broken
         cat <<-EOF
 
 		* You must RESTART the machine before using XiVO again.
