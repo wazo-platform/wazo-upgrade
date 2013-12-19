@@ -92,6 +92,7 @@ check_if_grub_is_broken() {
 		* You must install GRUB 2 BEFORE upgrading: *
 		*                                           *
 		* apt-get install grub2                     *
+		* rm /boot/grub/device.map                  *
 		* grub-install /dev/<boot_device>           *
 		*                                           *
 		*********************************************
