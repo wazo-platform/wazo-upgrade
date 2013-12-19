@@ -81,7 +81,27 @@ is_squeeze() {
     [ $(debian_version_installed) -eq 6 ]
 }
 
+is_grub_broken() {
+    [ ! -e /dev/disk/by-id/$(cat /boot/grub/device.map  | tr '/' ' ' | awk '{print $NF}') ]
+}
+
+check_if_grub_is_broken() {
+    if is_grub_broken; then
+        cat <<-EOF
+		*********************************************
+		* You must install GRUB 2 BEFORE upgrading: *
+		*                                           *
+		* apt-get install grub2                     *
+		* grub-install /dev/<boot_device>           *
+		*                                           *
+		*********************************************
+		EOF
+        exit
+    fi
+}
+
 upgrading_system() {
+    check_if_grub_is_broken
     exec_database_migration
     upgrade_fai
     get_version
@@ -186,34 +206,13 @@ display_wheezy_upgrade_notice() {
 	fi
 }
 
-is_grub2_installed() {
-    [ -n "$(dpkg -l grub-pc | grep '^ii')" ]
-}
-
-display_grub2_notice() {
-    if ! is_grub2_installed ; then
-        cat <<-EOF
-		**********************************************
-		* You must install GRUB 2 BEFORE restarting: *
-		*                                            *
-		* apt-get install grub2                      *
-		**********************************************
-		EOF
-    fi
-}
-
-display_restart_notice() {
-	cat <<-EOF
-
-	* You must RESTART the machine before using XiVO again.
-
-	EOF
-}
-
 display_post_wheezy_upgrade_notice() {
     if [ "$UPGRADING_TO_WHEEZY" == "1" ] ; then
-        display_grub2_notice
-        display_restart_notice
+        cat <<-EOF
+
+		* You must RESTART the machine before using XiVO again.
+
+		EOF
     fi
 }
 
