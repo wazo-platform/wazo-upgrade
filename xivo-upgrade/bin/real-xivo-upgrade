@@ -89,7 +89,7 @@ check_if_grub_is_broken() {
     if is_grub_broken; then
         cat <<-EOF
 		*********************************************
-		* You must install GRUB 2 BEFORE upgrading: *
+		* You must install GRUB 2 BEFORE rebooting: *
 		*                                           *
 		* # apt-get install grub2                   *
 		* # rm /boot/grub/device.map                *
@@ -103,7 +103,6 @@ check_if_grub_is_broken() {
 }
 
 upgrading_system() {
-    check_if_grub_is_broken
     exec_database_migration
     upgrade_fai
     get_version
@@ -197,6 +196,7 @@ display_ast11_notice() {
 
 display_wheezy_upgrade_notice() {
 	if is_squeeze; then
+		check_if_grub_is_broken
 		cat <<-EOF
 
 		The Debian GNU/Linux system will be upgraded from version 6 (Squeeze)
