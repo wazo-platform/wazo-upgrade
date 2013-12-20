@@ -1,5 +1,4 @@
 #!/bin/bash
-version=$(cat /usr/share/xivo/XIVO-VERSION)
 is_executed_file="/var/lib/xivo-upgrade/$(basename $0)"
 
 if [ -f "$is_executed_file" ]; then
@@ -8,7 +7,7 @@ else
     touch "$is_executed_file"
 fi
 
-if [ $version \< '12.24' ]
+if [ $XIVO_VERSION_INSTALLED \< '12.24' ]
 then
     /usr/sbin/asterisk -rx "database deltree Queue/PersistentMembers"
 

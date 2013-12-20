@@ -1,6 +1,5 @@
 #!/bin/bash
 PATH=/bin:/usr/bin:/sbin:/usr/sbin
-version=$(cat /usr/share/xivo/XIVO-VERSION)
 lib_directory="/usr/share/xivo-upgrade"
 mirror_xivo="http://mirror.xivo.fr"
 
@@ -26,10 +25,8 @@ post_start() {
 }
 
 get_version() {
-    xivo_candidate=$(LANG="C" apt-cache policy xivo | grep Candidate | grep -oE '([0-9]{2}\.[0-9]+|1\.2\.[0-9]{1,2})' | head -n1)
-    xivo_installed=$(LANG="C" apt-cache policy xivo | grep Installed | grep -oE '([0-9]{2}\.[0-9]+|1\.2\.[0-9]{1,2})' | head -n1)
-    echo "installed version : $xivo_installed"
-    echo "proposed update   : $xivo_candidate"
+    export XIVO_VERSION_CANDIDATE=$(LANG="C" apt-cache policy xivo | grep Candidate | grep -oE '([0-9]{2}\.[0-9]+|1\.2\.[0-9]{1,2})' | head -n1)
+    export XIVO_VERSION_INSTALLED=$(LANG="C" apt-cache policy xivo | grep Installed | grep -oE '([0-9]{2}\.[0-9]+|1\.2\.[0-9]{1,2})' | head -n1)
 }
 
 execute() {
@@ -80,9 +77,15 @@ is_squeeze() {
     [ $(debian_version_installed) -eq 6 ]
 }
 
+display_xivo_version() {
+    echo "installed version : $XIVO_VERSION_INSTALLED"
+    echo "proposed update   : $XIVO_VERSION_CANDIDATE"
+}
+
 upgrading_system() {
     upgrade_fai
     get_version
+    display_xivo_version
     display_ast11_notice
     exec_database_migration
     if [ $force -eq 0 ]; then
@@ -161,7 +164,7 @@ display_ast11_notice() {
     fi
 }
 
-if [[ $version < '13.03' && -f "/etc/xivo/web-interface/xivo.ini" ]]; then
+if [[ XIVO_VERSION_INSTALLED < '13.03' && -f "/etc/xivo/web-interface/xivo.ini" ]]; then
     touch /var/lib/xivo/configured
     chmod 664 /var/lib/xivo/configured
 fi
