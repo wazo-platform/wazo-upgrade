@@ -28,13 +28,6 @@ if [ -d $old_sysconfd_directory ]; then
     rm -rf $old_sysconfd_directory/*
 fi
 
-# sync old pf-xivo-provd data
-old_provd_directory="/var/lib/pf-xivo-provd"
-if [ -d $old_provd_directory ]; then
-    rsync -av $old_provd_directory/ /var/lib/xivo-provd/ > /dev/null
-    rm -rf $old_provd_directory
-fi
-
 # remove old postgresql-common and postgresql-client-common
 pg_common_version=$(LANG=C apt-cache policy postgresql-common | grep Installed | awk '{print $2}')
 if [ "$pg_common_version" = "140+0.xivo-backport-2" ]; then
