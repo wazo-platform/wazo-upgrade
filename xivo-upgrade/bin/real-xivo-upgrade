@@ -57,6 +57,7 @@ upgrade() {
     stop_xivo
     echo "Upgrading xivo..."
     if is_squeeze; then
+        export UPGRADING_TO_WHEEZY=1
         exec_squeeze_to_wheezy_migration
     else
         execute apt-get install -o Dpkg::Options::="--force-confnew" xivo-config -y
@@ -84,13 +85,34 @@ is_squeeze() {
 display_xivo_version() {
     echo "installed version : $XIVO_VERSION_INSTALLED"
     echo "proposed update   : $XIVO_VERSION_CANDIDATE"
+
+is_grub_broken() {
+    [ ! -e /dev/disk/by-id/$(cat /boot/grub/device.map  | tr '/' ' ' | awk '{print $NF}') ]
+}
+
+check_if_grub_is_broken() {
+    if is_grub_broken; then
+        cat <<-EOF
+		*********************************************
+		* You must install GRUB 2 BEFORE rebooting: *
+		*                                           *
+		* # apt-get install grub2                   *
+		* # rm /boot/grub/device.map                *
+		* # grub-install /dev/<boot_device>         *
+		* # reboot                                  *
+		*                                           *
+		*********************************************
+		EOF
+        exit
+    fi
 }
 
 upgrading_system() {
+    exec_database_migration
     upgrade_fai
     display_xivo_version
     display_ast11_notice
-    exec_database_migration
+    display_wheezy_upgrade_notice
     if [ $force -eq 0 ]; then
         read -p 'Would you like to upgrade your system (all services will be restarted) [Y/n]? ' answer
         answer="${answer:-Y}"
@@ -99,10 +121,15 @@ upgrading_system() {
         fi
     fi
     upgrade
+    display_post_wheezy_upgrade_notice
+}
+
+is_linux_3.2_installed() {
+    [ -n "$(dpkg -l linux-image-3.2.0-* 2>/dev/null | grep '^ii')" ]
 }
 
 exec_squeeze_to_wheezy_migration() {
-    wget -q -O - $mirror_xivo/xivo-squeeze-to-wheezy.cfg | debconf-set-selections
+    wget -q -O - $mirror_xivo/d-i/wheezy/xivo-squeeze-to-wheezy.cfg | debconf-set-selections
     sed -i 's/squeeze/wheezy/' /etc/apt/sources.list
     export DEBIAN_FRONTEND=noninteractive
 
@@ -113,16 +140,21 @@ exec_squeeze_to_wheezy_migration() {
     apt-get install --yes --force-yes -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" munin monit
     apt-get upgrade --yes --force-yes -o Dpkg::Options::="--force-confnew"
     apt-get install --yes --force-yes -o Dpkg::Options::="--force-confnew" python-flask/wheezy python-werkzeug/wheezy python-pika/wheezy
+    apt-get install --yes --force-yes -o Dpkg::Options::="--force-confnew" pf-xivo
+    apt-get install --yes --force-yes -o Dpkg::Options::="--force-confnew" postgresql-common/wheezy
     apt-get dist-upgrade --yes --force-yes -o Dpkg::Options::="--force-confnew"
     apt-get update > /dev/null
     apt-get autoremove --yes
+
+    if ! is_linux_3.2_installed ; then
+        # Maybe a problem with the PAE kernel installation, trying the non-PAE kernel
+        apt-get install --yes 'linux-image-3.2.0.*-486'
+    fi
 
     kernel_release=$(ls /lib/modules/ |grep ^3.2)
     for kr in $kernel_release; do
         apt-get install dahdi-linux-modules-${kr} > /dev/null
     done
-
-    apt-get purge --yes xivo-fai-skaro-*  > /dev/null
 
     xivo-service restart all
 }
@@ -167,6 +199,30 @@ display_ast11_notice() {
     fi
 }
 
+display_wheezy_upgrade_notice() {
+	if is_squeeze; then
+		cat <<-EOF
+
+		The Debian GNU/Linux system will be upgraded from version 6 (Squeeze)
+		to 7 (Wheezy). Hence, this upgrade will be longer than other upgrades.
+
+		You will need to RESTART the machine after the upgrade.
+
+		EOF
+	fi
+}
+
+display_post_wheezy_upgrade_notice() {
+    if [ "$UPGRADING_TO_WHEEZY" == "1" ] ; then
+		check_if_grub_is_broken
+        cat <<-EOF
+
+		* You must RESTART the machine before using XiVO again.
+
+		EOF
+    fi
+}
+
 if [[ $XIVO_VERSION_INSTALLED < '13.03' && -f "/etc/xivo/web-interface/xivo.ini" ]]; then
     touch /var/lib/xivo/configured
     chmod 664 /var/lib/xivo/configured
@@ -179,7 +235,9 @@ fi
 
 upgrade_fai() {
     echo "upgrade fai if needed"
-    old_packages=$(aptitude search pf-fai | grep ^i | grep -oE 'pf-fai.* ' | awk '{print $1}')
+    old_fai=$(dpkg -l 'pf-fai-xivo*' 'xivo-fai-skaro*' | grep 'xivo-fai' | awk '{print $2}' | xargs)
+    dpkg -P $old_fai > /dev/null
+    old_packages=$(aptitude search pf-fai | grep ^i | grep -oE 'pf-fai.* ' | awk '{print $1}' | xargs)
     new_fai="$(dpkg -l | grep '^ii  xivo-fai-*' | awk '{print $2}' | xargs)"
     new_packages="$new_fai"
     if [ "$old_packages" != "" ]; then
@@ -187,13 +245,12 @@ upgrade_fai() {
             case $package in
                 "pf-fai") new_packages="$new_packages xivo-fai";;
                 "pf-fai-dev") new_packages="$new_packages xivo-fai-dev";;
-                "pf-fai-xivo-1.2-skaro") new_packages="$new_packages xivo-fai-skaro";;
-                "pf-fai-xivo-1.2-skaro-rc") new_packages="$new_packages xivo-fai-skaro-rc";;
-                "pf-fai-xivo-1.2-skaro-dev") new_packages="$new_packages xivo-fai-skaro-dev";;
             esac
         done
+    	apt-get purge --yes $old_packages  > /dev/null
     fi
-    apt-get install -y $new_packages > /dev/null
+    apt-get install -y -o Dpkg::Options::="--force-confnew" $new_packages > /dev/null
+    apt-get update > /dev/null
 }
 
 usage() {
