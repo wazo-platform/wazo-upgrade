@@ -167,7 +167,7 @@ display_ast11_notice() {
     fi
 }
 
-if [[ XIVO_VERSION_INSTALLED < '13.03' && -f "/etc/xivo/web-interface/xivo.ini" ]]; then
+if [[ $XIVO_VERSION_INSTALLED < '13.03' && -f "/etc/xivo/web-interface/xivo.ini" ]]; then
     touch /var/lib/xivo/configured
     chmod 664 /var/lib/xivo/configured
 fi
