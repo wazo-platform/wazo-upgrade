@@ -3,7 +3,7 @@ PATH=/bin:/usr/bin:/sbin:/usr/sbin
 lib_directory="/usr/share/xivo-upgrade"
 mirror_xivo="http://mirror.xivo.fr"
 
-dpkg -l xivo 2>/dev/null
+dpkg -l xivo | grep '^i' &>/dev/null
 if [ $? -eq 1 ]; then
     xivo_package="pf-xivo"
 else
