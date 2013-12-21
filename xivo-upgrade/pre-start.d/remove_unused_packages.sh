@@ -20,14 +20,6 @@ if [ -f $base_config_postrm ]; then
     sed -i 's/xivo-config/pf-xivo-base-config/' $base_config_postrm
 fi
 
-# cleanup pf-xivo-sysconfd backup directory
-old_sysconfd_directory="/var/backups/pf-xivo-sysconfd"
-new_sysconfd_directory="/var/backups/xivo-sysconfd"
-if [ -d $old_sysconfd_directory ]; then
-    rsync -av $old_sysconfd_directory/ $new_sysconfd_directory/ > /dev/null
-    rm -rf $old_sysconfd_directory/*
-fi
-
 # remove old postgresql-common and postgresql-client-common
 pg_common_version=$(LANG=C apt-cache policy postgresql-common | grep Installed | awk '{print $2}')
 if [ "$pg_common_version" = "140+0.xivo-backport-2" ]; then
