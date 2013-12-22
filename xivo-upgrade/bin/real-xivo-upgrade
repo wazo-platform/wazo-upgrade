@@ -85,6 +85,7 @@ is_squeeze() {
 display_xivo_version() {
     echo "installed version : $XIVO_VERSION_INSTALLED"
     echo "proposed update   : $XIVO_VERSION_CANDIDATE"
+}
 
 is_grub_broken() {
     [ ! -e /dev/disk/by-id/$(cat /boot/grub/device.map  | tr '/' ' ' | awk '{print $NF}') ]
