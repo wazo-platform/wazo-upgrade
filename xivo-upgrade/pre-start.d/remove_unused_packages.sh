@@ -12,6 +12,11 @@ renamed_packages="pf-xivo-agid
 
 echo "cleanup outdated config files"
 
+if [ -d /etc/pf-xivo ]; then
+	rsync -av /etc/pf-xivo/ /etc/xivo/
+	rm -rf /etc/pf-xivo
+fi
+
 # cleanup pf-xivo-base-config.postrm file to allow package purge
 base_config_postrm="/var/lib/dpkg/info/pf-xivo-base-config.postrm"
 xivo_config_postrm="/var/lib/dpkg/info/xivo-config.postrm"
