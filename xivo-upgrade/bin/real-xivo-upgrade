@@ -228,13 +228,19 @@ if [ ! -f /var/lib/pf-xivo/configured ]; then
     exit 1
 fi
 
+list_packages_with_filter () {
+    filter="$1"
+    aptitude -F '%p' search "$filter" | xargs
+}
+
 upgrade_fai() {
     echo "Upgrading FAI packages..."
-    old_fai=$(dpkg -l 'pf-fai-xivo*' 'xivo-fai-skaro*' | grep 'xivo-fai' | awk '{print $2}' | xargs)
-    dpkg -P $old_fai > /dev/null
-    old_packages=$(aptitude search pf-fai | grep ^i | grep -oE 'pf-fai.* ' | awk '{print $1}' | xargs)
-    new_fai="$(dpkg -l | grep '^ii  xivo-fai-*' | awk '{print $2}' | xargs)"
-    new_packages="$new_fai"
+    old_fai=$(list_packages_with_filter "(?config-files|?installed)?name(\"pf-fai-xivo|xivo-fai-skaro\")")
+    if [ -n "$old_fai" ] ; then
+        dpkg -P $old_fai > /dev/null
+    fi
+    old_packages=$(list_packages_with_filter "(?config-files|?installed)?name(^pf-fai)")
+    new_packages=$(list_packages_with_filter "(?config-files|?installed)?name(^xivo-fai)")
     if [ "$old_packages" != "" ]; then
         for package in $old_packages; do
             case $package in
