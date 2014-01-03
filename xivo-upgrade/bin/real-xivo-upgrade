@@ -156,7 +156,7 @@ exec_squeeze_to_wheezy_migration() {
 
 exec_database_migration() {
     local pg_version=$(pg_lsclusters | grep 'online' | awk '{print $1}')
-    if [[ $pg_version == "9.0" ]]; then
+    if [[ $pg_version == *"9.0"* ]]; then
         if ! /usr/bin/xivo-migrate-db; then
             exit
         fi
