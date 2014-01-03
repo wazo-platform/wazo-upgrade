@@ -224,12 +224,12 @@ if [[ $version < '13.03' && -f "/etc/pf-xivo/web-interface/xivo.ini" ]]; then
 fi
 
 if [ ! -f /var/lib/pf-xivo/configured ]; then
-    echo "Warning You should run the wizard before using xivo-upgrade"
+    echo "Error: You must run the wizard before using xivo-upgrade"
     exit 1
 fi
 
 upgrade_fai() {
-    echo "upgrade fai if needed"
+    echo "Upgrading FAI packages..."
     old_fai=$(dpkg -l 'pf-fai-xivo*' 'xivo-fai-skaro*' | grep 'xivo-fai' | awk '{print $2}' | xargs)
     dpkg -P $old_fai > /dev/null
     old_packages=$(aptitude search pf-fai | grep ^i | grep -oE 'pf-fai.* ' | awk '{print $1}' | xargs)
@@ -242,7 +242,7 @@ upgrade_fai() {
                 "pf-fai-dev") new_packages="$new_packages xivo-fai-dev";;
             esac
         done
-    	apt-get purge --yes $old_packages  > /dev/null
+        apt-get purge --yes $old_packages > /dev/null
     fi
     apt-get install -y -o Dpkg::Options::="--force-confnew" $new_packages > /dev/null
     apt-get update > /dev/null
