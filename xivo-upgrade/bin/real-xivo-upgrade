@@ -49,7 +49,7 @@ stop_xivo() {
 
 start_xivo() {
     xivo-service enable
-    xivo-service restart
+    xivo-service start
 }
 
 upgrade() {
