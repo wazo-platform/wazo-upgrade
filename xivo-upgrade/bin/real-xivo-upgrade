@@ -5,89 +5,89 @@ lib_directory="/usr/share/xivo-upgrade"
 mirror_xivo="http://mirror.xivo.fr"
 
 differed_action() {
-    local state=$1
-    local dir="$lib_directory/$state.d"
-    echo "Executing $state upgrade action..."
-    for script in $dir/*; do
-        $script
-    done
+	local state=$1
+	local dir="$lib_directory/$state.d"
+	echo "Executing $state upgrade action..."
+	for script in $dir/*; do
+		$script
+	done
 }
 
 pre_stop() {
-    differed_action pre-stop
+	differed_action pre-stop
 }
 
 pre_start() {
-    differed_action pre-start
+	differed_action pre-start
 }
 
 post_start() {
-    differed_action post-start
+	differed_action post-start
 }
 
 get_version() {
-    xivo_candidate=$(LANG="C" apt-cache policy pf-xivo | grep Candidate | grep -oE '([0-9]{2}\.[0-9]+|1\.2\.[0-9]{1,2})' | head -n1)
-    xivo_installed=$(LANG="C" apt-cache policy pf-xivo | grep Installed | grep -oE '([0-9]{2}\.[0-9]+|1\.2\.[0-9]{1,2})' | head -n1)
-    echo "installed version : $xivo_installed"
-    echo "proposed update   : $xivo_candidate"
+	xivo_candidate=$(LANG="C" apt-cache policy pf-xivo | grep Candidate | grep -oE '([0-9]{2}\.[0-9]+|1\.2\.[0-9]{1,2})' | head -n1)
+	xivo_installed=$(LANG="C" apt-cache policy pf-xivo | grep Installed | grep -oE '([0-9]{2}\.[0-9]+|1\.2\.[0-9]{1,2})' | head -n1)
+	echo "installed version : $xivo_installed"
+	echo "proposed update   : $xivo_candidate"
 }
 
 execute() {
-    cmd=$*
-    $cmd
-    if [ $? -ne 0 ]; then
-        start_xivo
-        exit -1
-    fi
+	cmd=$*
+	$cmd
+	if [ $? -ne 0 ]; then
+		start_xivo
+		exit -1
+	fi
 }
 
 stop_xivo() {
-    xivo-service stop
-    xivo-service disable
+	xivo-service stop
+	xivo-service disable
 }
 
 start_xivo() {
-    xivo-service enable
-    xivo-service start
+	xivo-service enable
+	xivo-service start
 }
 
 upgrade() {
-    pre_stop
-    stop_xivo
-    echo "Upgrading xivo..."
-    if is_squeeze; then
-        export UPGRADING_TO_WHEEZY=1
-        exec_squeeze_to_wheezy_migration
-    else
-        execute apt-get install -o Dpkg::Options::="--force-confnew" xivo-config -y
-        execute apt-get install pf-xivo xivo-libdao xivo-ctid xivo-web-interface -y
-        execute apt-get dist-upgrade -y
-    fi
-    pre_start
-    xivo-check-db
-    # stop asterisk before start xivo to refresh configuration
-    /usr/sbin/invoke-rc.d asterisk stop > /dev/null
-    start_xivo
-    post_start
-    xivo-check-conffiles
+	pre_stop
+	stop_xivo
+	echo "Upgrading xivo..."
+	if is_squeeze; then
+		export UPGRADING_TO_WHEEZY=1
+		exec_squeeze_to_wheezy_migration
+	else
+		execute apt-get install -o Dpkg::Options::="--force-confnew" xivo-config -y
+		execute apt-get install pf-xivo xivo-libdao xivo-ctid xivo-web-interface -y
+		execute apt-get dist-upgrade -y
+	fi
+	pre_start
+	xivo-check-db
+	# stop asterisk before start xivo to refresh configuration
+	/usr/sbin/invoke-rc.d asterisk stop > /dev/null
+	start_xivo
+	post_start
+	xivo-check-conffiles
 }
 
 debian_version_installed() {
-    local xivo_version=$(cut -c1 /etc/debian_version)
-    echo $xivo_version
+	local xivo_version=$(cut -c1 /etc/debian_version)
+	echo $xivo_version
 }
 
 is_squeeze() {
-    [ $(debian_version_installed) -eq 6 ]
+	[ $(debian_version_installed) -eq 6 ]
 }
 
 is_grub_broken() {
-    [ ! -e /dev/disk/by-id/$(cat /boot/grub/device.map  | tr '/' ' ' | awk '{print $NF}') ]
+	[ ! -e /dev/disk/by-id/$(cat /boot/grub/device.map  | tr '/' ' ' | awk '{print $NF}') ]
 }
 
 check_if_grub_is_broken() {
-    if is_grub_broken; then
-        cat <<-EOF
+	if is_grub_broken; then
+		cat <<-EOF
 		*********************************************
 		* You must install GRUB 2 BEFORE rebooting: *
 		*                                           *
@@ -98,100 +98,100 @@ check_if_grub_is_broken() {
 		*                                           *
 		*********************************************
 		EOF
-        exit
-    fi
+		exit
+	fi
 }
 
 upgrading_system() {
-    exec_database_migration
-    upgrade_fai
-    get_version
-    display_ast11_notice
-    display_wheezy_upgrade_notice
-    if [ $force -eq 0 ]; then
-        read -p 'Would you like to upgrade your system (all services will be restarted) [Y/n]? ' answer
-        answer="${answer:-Y}"
-        if [ "$answer" != 'y' -a "$answer" != 'Y' ]; then
-            exit
-        fi
-    fi
-    upgrade
-    display_post_wheezy_upgrade_notice
+	exec_database_migration
+	upgrade_fai
+	get_version
+	display_ast11_notice
+	display_wheezy_upgrade_notice
+	if [ $force -eq 0 ]; then
+		read -p 'Would you like to upgrade your system (all services will be restarted) [Y/n]? ' answer
+		answer="${answer:-Y}"
+		if [ "$answer" != 'y' -a "$answer" != 'Y' ]; then
+			exit
+		fi
+	fi
+	upgrade
+	display_post_wheezy_upgrade_notice
 }
 
 is_linux_3.2_installed() {
-    [ -n "$(dpkg -l linux-image-3.2.0-* 2>/dev/null | grep '^ii')" ]
+	[ -n "$(dpkg -l linux-image-3.2.0-* 2>/dev/null | grep '^ii')" ]
 }
 
 exec_squeeze_to_wheezy_migration() {
-    wget -q -O - $mirror_xivo/d-i/wheezy/xivo-squeeze-to-wheezy.cfg | debconf-set-selections
-    sed -i 's/squeeze/wheezy/' /etc/apt/sources.list
-    export DEBIAN_FRONTEND=noninteractive
+	wget -q -O - $mirror_xivo/d-i/wheezy/xivo-squeeze-to-wheezy.cfg | debconf-set-selections
+	sed -i 's/squeeze/wheezy/' /etc/apt/sources.list
+	export DEBIAN_FRONTEND=noninteractive
 
-    xivo-service stop all
+	xivo-service stop all
 
-    apt-get update > /dev/null
-    apt-get install --yes --force-yes python2.7 apt
-    apt-get install --yes --force-yes -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" munin monit
-    apt-get upgrade --yes --force-yes -o Dpkg::Options::="--force-confnew"
-    apt-get install --yes --force-yes -o Dpkg::Options::="--force-confnew" python-flask/wheezy python-werkzeug/wheezy python-pika/wheezy
-    apt-get install --yes --force-yes -o Dpkg::Options::="--force-confnew" pf-xivo
-    apt-get install --yes --force-yes -o Dpkg::Options::="--force-confnew" postgresql-common/wheezy
-    apt-get dist-upgrade --yes --force-yes -o Dpkg::Options::="--force-confnew"
-    apt-get update > /dev/null
-    apt-get autoremove --yes
+	apt-get update > /dev/null
+	apt-get install --yes --force-yes python2.7 apt
+	apt-get install --yes --force-yes -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" munin monit
+	apt-get upgrade --yes --force-yes -o Dpkg::Options::="--force-confnew"
+	apt-get install --yes --force-yes -o Dpkg::Options::="--force-confnew" python-flask/wheezy python-werkzeug/wheezy python-pika/wheezy
+	apt-get install --yes --force-yes -o Dpkg::Options::="--force-confnew" pf-xivo
+	apt-get install --yes --force-yes -o Dpkg::Options::="--force-confnew" postgresql-common/wheezy
+	apt-get dist-upgrade --yes --force-yes -o Dpkg::Options::="--force-confnew"
+	apt-get update > /dev/null
+	apt-get autoremove --yes
 
-    if ! is_linux_3.2_installed ; then
-        # Maybe a problem with the PAE kernel installation, trying the non-PAE kernel
-        apt-get install --yes 'linux-image-3.2.0.*-486'
-    fi
+	if ! is_linux_3.2_installed ; then
+		# Maybe a problem with the PAE kernel installation, trying the non-PAE kernel
+		apt-get install --yes 'linux-image-3.2.0.*-486'
+	fi
 
-    kernel_release=$(ls /lib/modules/ |grep ^3.2)
-    for kr in $kernel_release; do
-        apt-get install dahdi-linux-modules-${kr} > /dev/null
-    done
+	kernel_release=$(ls /lib/modules/ |grep ^3.2)
+	for kr in $kernel_release; do
+		apt-get install dahdi-linux-modules-${kr} > /dev/null
+	done
 
-    xivo-service restart all
+	xivo-service restart all
 }
 
 exec_database_migration() {
-    local pg_version=$(pg_lsclusters | grep 'online' | awk '{print $1}')
-    if [[ $pg_version == *"9.0"* ]]; then
-        if ! /usr/bin/xivo-migrate-db; then
-            exit
-        fi
-        export UPGRADING_POSTGRESQL=1
-    fi
+	local pg_version=$(pg_lsclusters | grep 'online' | awk '{print $1}')
+	if [[ $pg_version == *"9.0"* ]]; then
+		if ! /usr/bin/xivo-migrate-db; then
+			exit
+		fi
+		export UPGRADING_POSTGRESQL=1
+	fi
 }
 
 display_ast11_notice() {
-    ast_version=$(dpkg-query -W -f '${Version}' asterisk 2>/dev/null)
-    if dpkg --compare-versions "$ast_version" le 8:11-1; then
-        cat <<-EOF
+	ast_version=$(dpkg-query -W -f '${Version}' asterisk 2>/dev/null)
+	if dpkg --compare-versions "$ast_version" le 8:11-1; then
+		cat <<-EOF
 
-        Asterisk will be upgraded from version 1.8 to 11. You might be impacted if you:
-        * have some custom dialplan
-        * have some custom AGIs
-        * have customized asterisk in some other way
-        If you find yourself in one of these cases, you should make sure that
-        your customizations still work with asterisk 11. Please refer to
-        http://documentation.xivo.fr/production/upgrade/asterisk_11.html for
-        more information.
-
-		EOF
-
-        if [ -f /usr/lib/asterisk/modules/codec_g729a.so ]; then
-            mv /usr/lib/asterisk/modules/codec_g729a.so /tmp
-            cat <<-EOF
-            WARNING: G729 codec module detected.
-
-            A G729 codec module has been detected on your system. Since it will not work with
-            asterisk 11, it has been moved from /usr/lib/asterisk/modules to /tmp. To continue
-            using the G729 module, you will have to install the asterisk 11 version of the module.
+		Asterisk will be upgraded from version 1.8 to 11. You might be impacted if you:
+		* have some custom dialplan
+		* have some custom AGIs
+		* have customized asterisk in some other way
+		If you find yourself in one of these cases, you should make sure that
+		your customizations still work with asterisk 11. Please refer to
+		http://documentation.xivo.fr/production/upgrade/asterisk_11.html for
+		more information.
 
 		EOF
-        fi
-    fi
+
+		if [ -f /usr/lib/asterisk/modules/codec_g729a.so ]; then
+			mv /usr/lib/asterisk/modules/codec_g729a.so /tmp
+			cat <<-EOF
+			WARNING: G729 codec module detected.
+
+			A G729 codec module has been detected on your system. Since it will not work with
+			asterisk 11, it has been moved from /usr/lib/asterisk/modules to /tmp. To continue
+			using the G729 module, you will have to install the asterisk 11 version of the module.
+
+		EOF
+		fi
+	fi
 }
 
 display_wheezy_upgrade_notice() {
@@ -208,79 +208,80 @@ display_wheezy_upgrade_notice() {
 }
 
 display_post_wheezy_upgrade_notice() {
-    if [ "$UPGRADING_TO_WHEEZY" == "1" ] ; then
+	if [ "$UPGRADING_TO_WHEEZY" == "1" ] ; then
 		check_if_grub_is_broken
-        cat <<-EOF
+		cat <<-EOF
 
 		* You must RESTART the machine before using XiVO again.
 
 		EOF
-    fi
+	fi
 }
 
 if [[ $version < '13.03' && -f "/etc/pf-xivo/web-interface/xivo.ini" ]]; then
-    touch /var/lib/pf-xivo/configured
-    chmod 664 /var/lib/pf-xivo/configured
+	touch /var/lib/pf-xivo/configured
+	chmod 664 /var/lib/pf-xivo/configured
 fi
 
 if [ ! -f /var/lib/pf-xivo/configured ]; then
-    echo "Error: You must run the wizard before using xivo-upgrade"
-    exit 1
+	echo "Error: You must run the wizard before using xivo-upgrade"
+	exit 1
 fi
 
 list_packages_with_filter () {
-    filter="$1"
-    aptitude -F '%p' search "$filter" | xargs
+	filter="$1"
+	aptitude -F '%p' search "$filter" | xargs
 }
 
 upgrade_fai() {
-    echo "Upgrading FAI packages..."
-    old_fai=$(list_packages_with_filter "(?config-files|?installed)?name(\"pf-fai-xivo|xivo-fai-skaro\")")
-    if [ -n "$old_fai" ] ; then
-        dpkg -P $old_fai > /dev/null
-    fi
-    old_packages=$(list_packages_with_filter "(?config-files|?installed)?name(^pf-fai)")
-    new_packages=$(list_packages_with_filter "(?config-files|?installed)?name(^xivo-fai)")
-    for package in $old_packages; do
-        case $package in
-            "pf-fai") new_packages="$new_packages xivo-fai";;
-            "pf-fai-dev") new_packages="$new_packages xivo-fai-dev";;
-        esac
-    done
-    apt-get install --yes -o Dpkg::Options::="--force-confnew" $new_packages > /dev/null
-    apt-get purge --yes $old_packages > /dev/null
-    apt-get update > /dev/null
+	echo "Upgrading FAI packages..."
+	old_fai=$(list_packages_with_filter "(?config-files|?installed)?name(\"pf-fai-xivo|xivo-fai-skaro\")")
+	if [ -n "$old_fai" ] ; then
+		dpkg -P $old_fai > /dev/null
+	fi
+	old_packages=$(list_packages_with_filter "(?config-files|?installed)?name(^pf-fai)")
+	new_packages=$(list_packages_with_filter "(?config-files|?installed)?name(^xivo-fai)")
+	for package in $old_packages; do
+		case $package in
+			"pf-fai") new_packages="$new_packages xivo-fai";;
+			"pf-fai-dev") new_packages="$new_packages xivo-fai-dev";;
+		esac
+	done
+	apt-get install --yes -o Dpkg::Options::="--force-confnew" $new_packages > /dev/null
+	apt-get purge --yes $old_packages > /dev/null
+	apt-get update > /dev/null
 }
 
 usage() {
-    cat <<-EOF
-    usage: xivo-upgrade [-d] [-f] [-h]
-        -d: only download packages
-        -f: force yes
-        -h: print usage
+	cat <<-EOF
+	usage: xivo-upgrade [-d] [-f] [-h]
+		-d: only download packages
+		-f: force yes
+		-h: print usage
 	EOF
 }
 
 while getopts :dfh opt
 do
   case ${opt} in
-    d) download_only=1;;
-    f) force=1;;
-    h)
-        usage
-        exit 0
-    ;;
-    '?')  echo "${0} : option ${OPTARG} is not valid" >&2
-          usage
-          exit -1
-    ;;
+	d) download_only=1;;
+	f) force=1;;
+	h)
+		usage
+		exit 0
+	;;
+	'?')
+		echo "${0} : option ${OPTARG} is not valid" >&2
+		usage
+		exit -1
+	;;
   esac
 done
 download_only="${download_only:-"0"}"
 force="${force:-"0"}"
 
 if [ $download_only -eq 0 ]; then
-    upgrading_system
+	upgrading_system
 else
-    apt-get -y -d dist-upgrade
+	apt-get -y -d dist-upgrade
 fi
