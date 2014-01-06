@@ -69,7 +69,7 @@ prepare_configuration() {
     echo "Preparing configuration..."
     echo "Downloading and installing postgresql..."
     apt-get update >>$MIGRATION_LOG_FILE
-    apt-get install -y postgresql-9.1 postgresql-plpython-9.1 psmisc >>$MIGRATION_LOG_FILE
+    DEBIAN_FRONTEND=noninteractive apt-get install -y postgresql-9.1 postgresql-plpython-9.1 psmisc >>$MIGRATION_LOG_FILE
 }
 
 validate_configuration() {
