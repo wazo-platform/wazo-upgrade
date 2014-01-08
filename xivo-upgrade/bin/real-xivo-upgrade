@@ -82,7 +82,12 @@ is_squeeze() {
 }
 
 is_grub_broken() {
-	[ ! -e /dev/disk/by-id/$(cat /boot/grub/device.map  | tr '/' ' ' | awk '{print $NF}') ]
+	for disk in $(awk '{print $2}' /boot/grub/device.map) ; do
+		if [ ! -e "$disk" ] ; then
+			return 0
+		fi
+	done
+	return 1
 }
 
 check_if_grub_is_broken() {
