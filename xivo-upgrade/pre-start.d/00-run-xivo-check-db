@@ -1,0 +1,5 @@
+#!/bin/sh
+
+echo "Checking XiVO database"
+
+xivo-check-db

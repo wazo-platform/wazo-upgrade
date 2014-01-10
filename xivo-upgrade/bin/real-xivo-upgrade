@@ -1,8 +1,16 @@
 #!/bin/bash
 PATH=/bin:/usr/bin:/sbin:/usr/sbin
-version=$(cat /usr/share/pf-xivo/XIVO-VERSION)
 lib_directory="/usr/share/xivo-upgrade"
 mirror_xivo="http://mirror.xivo.fr"
+
+dpkg -l xivo | grep '^i' &>/dev/null
+if [ $? -eq 1 ]; then
+    xivo_package="pf-xivo"
+else
+    xivo_package="xivo"
+fi
+export XIVO_VERSION_CANDIDATE="$(LANG='C' apt-cache policy $xivo_package | grep Candidate | grep -oE '([0-9]{2}\.[0-9]+|1\.2\.[0-9]{1,2})' | head -n1)"
+export XIVO_VERSION_INSTALLED="$(LANG='C' apt-cache policy $xivo_package | grep Installed | grep -oE '([0-9]{2}\.[0-9]+|1\.2\.[0-9]{1,2})' | head -n1)"
 
 differed_action() {
 	local state=$1
@@ -25,13 +33,6 @@ post_start() {
 	differed_action post-start
 }
 
-get_version() {
-	xivo_candidate=$(LANG="C" apt-cache policy pf-xivo | grep Candidate | grep -oE '([0-9]{2}\.[0-9]+|1\.2\.[0-9]{1,2})' | head -n1)
-	xivo_installed=$(LANG="C" apt-cache policy pf-xivo | grep Installed | grep -oE '([0-9]{2}\.[0-9]+|1\.2\.[0-9]{1,2})' | head -n1)
-	echo "installed version : $xivo_installed"
-	echo "proposed update   : $xivo_candidate"
-}
-
 execute() {
 	cmd=$*
 	$cmd
@@ -52,24 +53,21 @@ start_xivo() {
 }
 
 upgrade() {
-	pre_stop
-	stop_xivo
-	echo "Upgrading xivo..."
-	if is_squeeze; then
-		export UPGRADING_TO_WHEEZY=1
-		exec_squeeze_to_wheezy_migration
-	else
-		execute apt-get install -o Dpkg::Options::="--force-confnew" xivo-config -y
-		execute apt-get install pf-xivo xivo-libdao xivo-ctid xivo-web-interface -y
-		execute apt-get dist-upgrade -y
-	fi
-	pre_start
-	xivo-check-db
-	# stop asterisk before start xivo to refresh configuration
-	/usr/sbin/invoke-rc.d asterisk stop > /dev/null
-	start_xivo
-	post_start
-	xivo-check-conffiles
+    pre_stop
+    stop_xivo
+    echo "Upgrading xivo..."
+    if is_squeeze; then
+        export UPGRADING_TO_WHEEZY=1
+        exec_squeeze_to_wheezy_migration
+    else
+        execute apt-get install -o Dpkg::Options::="--force-confnew" xivo-config -y
+        execute apt-get install xivo xivo-libdao xivo-ctid xivo-web-interface -y
+        execute apt-get dist-upgrade -y
+    fi
+    pre_start
+    start_xivo
+    post_start
+    xivo-check-conffiles
 }
 
 debian_version_installed() {
@@ -79,6 +77,11 @@ debian_version_installed() {
 
 is_squeeze() {
 	[ $(debian_version_installed) -eq 6 ]
+}
+
+display_xivo_version() {
+    echo "installed version : $XIVO_VERSION_INSTALLED"
+    echo "proposed update   : $XIVO_VERSION_CANDIDATE"
 }
 
 is_grub_broken() {
@@ -110,14 +113,14 @@ check_if_grub_is_broken() {
 upgrading_system() {
 	exec_database_migration
 	upgrade_fai
-	get_version
+	display_xivo_version
 	display_ast11_notice
 	display_wheezy_upgrade_notice
 	if [ $force -eq 0 ]; then
 		read -p 'Would you like to upgrade your system (all services will be restarted) [Y/n]? ' answer
 		answer="${answer:-Y}"
 		if [ "$answer" != 'y' -a "$answer" != 'Y' ]; then
-			exit
+		exit
 		fi
 	fi
 	upgrade
@@ -140,7 +143,7 @@ exec_squeeze_to_wheezy_migration() {
 	apt-get install --yes --force-yes -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" munin monit
 	apt-get upgrade --yes --force-yes -o Dpkg::Options::="--force-confnew"
 	apt-get install --yes --force-yes -o Dpkg::Options::="--force-confnew" python-flask/wheezy python-werkzeug/wheezy python-pika/wheezy
-	apt-get install --yes --force-yes -o Dpkg::Options::="--force-confnew" pf-xivo
+	apt-get install --yes --force-yes -o Dpkg::Options::="--force-confnew" xivo
 	apt-get install --yes --force-yes -o Dpkg::Options::="--force-confnew" postgresql-common/wheezy
 	apt-get dist-upgrade --yes --force-yes -o Dpkg::Options::="--force-confnew"
 	apt-get update > /dev/null
@@ -183,7 +186,7 @@ display_ast11_notice() {
 		http://documentation.xivo.fr/production/upgrade/asterisk_11.html for
 		more information.
 
-		EOF
+	EOF
 
 		if [ -f /usr/lib/asterisk/modules/codec_g729a.so ]; then
 			mv /usr/lib/asterisk/modules/codec_g729a.so /tmp
@@ -208,7 +211,7 @@ display_wheezy_upgrade_notice() {
 
 		You will need to RESTART the machine after the upgrade.
 
-		EOF
+EOF
 	fi
 }
 
@@ -223,13 +226,13 @@ display_post_wheezy_upgrade_notice() {
 	fi
 }
 
-if [[ $version < '13.03' && -f "/etc/pf-xivo/web-interface/xivo.ini" ]]; then
-	touch /var/lib/pf-xivo/configured
-	chmod 664 /var/lib/pf-xivo/configured
+if [[ $XIVO_VERSION_INSTALLED < '13.03' && -f "/etc/xivo/web-interface/xivo.ini" ]]; then
+	touch /var/lib/xivo/configured
+	chmod 664 /var/lib/xivo/configured
 fi
 
-if [ ! -f /var/lib/pf-xivo/configured ]; then
-	echo "Error: You must run the wizard before using xivo-upgrade"
+if [ ! -f /var/lib/xivo/configured -a ! -f /var/lib/pf-xivo/configured ]; then
+	echo "Warning You should run the wizard before using xivo-upgrade"
 	exit 1
 fi
 
