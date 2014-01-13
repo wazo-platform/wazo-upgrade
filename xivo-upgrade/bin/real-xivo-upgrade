@@ -3,15 +3,6 @@ PATH=/bin:/usr/bin:/sbin:/usr/sbin
 lib_directory="/usr/share/xivo-upgrade"
 mirror_xivo="http://mirror.xivo.fr"
 
-dpkg -l xivo | grep '^i' &>/dev/null
-if [ $? -eq 1 ]; then
-    xivo_package="pf-xivo"
-else
-    xivo_package="xivo"
-fi
-export XIVO_VERSION_CANDIDATE="$(LANG='C' apt-cache policy $xivo_package | grep Candidate | grep -oE '([0-9]{2}\.[0-9]+|1\.2\.[0-9]{1,2})' | head -n1)"
-export XIVO_VERSION_INSTALLED="$(LANG='C' apt-cache policy $xivo_package | grep Installed | grep -oE '([0-9]{2}\.[0-9]+|1\.2\.[0-9]{1,2})' | head -n1)"
-
 differed_action() {
 	local state=$1
 	local dir="$lib_directory/$state.d"
@@ -268,6 +259,14 @@ usage() {
 		-h: print usage
 	EOF
 }
+
+find_xivo_package() {
+	list_packages_with_filter "?installed?name(\"^xivo$|^pf-xivo$\")"
+}
+
+xivo_package=$(find_xivo_package)
+export XIVO_VERSION_CANDIDATE="$(LANG='C' apt-cache policy $xivo_package | grep Candidate | grep -oE '([0-9]{2}\.[0-9]+|1\.2\.[0-9]{1,2})' | head -n1)"
+export XIVO_VERSION_INSTALLED="$(LANG='C' apt-cache policy $xivo_package | grep Installed | grep -oE '([0-9]{2}\.[0-9]+|1\.2\.[0-9]{1,2})' | head -n1)"
 
 while getopts :dfh opt
 do
