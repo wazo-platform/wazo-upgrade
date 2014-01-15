@@ -217,16 +217,6 @@ display_post_wheezy_upgrade_notice() {
 	fi
 }
 
-if [[ $XIVO_VERSION_INSTALLED < '13.03' && -f "/etc/xivo/web-interface/xivo.ini" ]]; then
-	touch /var/lib/xivo/configured
-	chmod 664 /var/lib/xivo/configured
-fi
-
-if [ ! -f /var/lib/xivo/configured -a ! -f /var/lib/pf-xivo/configured ]; then
-	echo "Warning You should run the wizard before using xivo-upgrade"
-	exit 1
-fi
-
 list_packages_with_filter () {
 	filter="$1"
 	aptitude -F '%p' search "$filter" | xargs
@@ -267,6 +257,16 @@ find_xivo_package() {
 xivo_package=$(find_xivo_package)
 export XIVO_VERSION_CANDIDATE="$(LANG='C' apt-cache policy $xivo_package | grep Candidate | grep -oE '([0-9]{2}\.[0-9]+|1\.2\.[0-9]{1,2})' | head -n1)"
 export XIVO_VERSION_INSTALLED="$(LANG='C' apt-cache policy $xivo_package | grep Installed | grep -oE '([0-9]{2}\.[0-9]+|1\.2\.[0-9]{1,2})' | head -n1)"
+
+if [[ $XIVO_VERSION_INSTALLED < '13.03' && -f "/etc/xivo/web-interface/xivo.ini" ]]; then
+	touch /var/lib/xivo/configured
+	chmod 664 /var/lib/xivo/configured
+fi
+
+if [ ! -f /var/lib/xivo/configured -a ! -f /var/lib/pf-xivo/configured ]; then
+	echo "Warning You should run the wizard before using xivo-upgrade"
+	exit 1
+fi
 
 while getopts :dfh opt
 do
