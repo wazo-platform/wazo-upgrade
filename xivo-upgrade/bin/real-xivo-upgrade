@@ -16,6 +16,10 @@ pre_stop() {
 	differed_action pre-stop
 }
 
+post_stop() {
+	differed_action post-stop
+}
+
 pre_start() {
 	differed_action pre-start
 }
@@ -46,6 +50,7 @@ start_xivo() {
 upgrade() {
     pre_stop
     stop_xivo
+    post_stop
     echo "Upgrading xivo..."
     if is_squeeze; then
         export UPGRADING_TO_WHEEZY=1
