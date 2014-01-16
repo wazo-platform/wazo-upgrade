@@ -13,7 +13,7 @@ renamed_packages="pf-xivo-agid
 echo "cleanup outdated config files"
 
 if [ -d /etc/pf-xivo ]; then
-	rsync -av /etc/pf-xivo/ /etc/xivo/
+	rsync -av --prune-empty-dirs /etc/pf-xivo/ /etc/xivo/
 	rm -rf /etc/pf-xivo
 fi
 
