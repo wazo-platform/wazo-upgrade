@@ -1,4 +1,19 @@
 #!/bin/bash
+
+function copy_new_files_while_preserving_old_files () {
+	old_dir="$1"
+	new_dir="$2"
+	backup_dir="$2.bak-xivo-upgrade"
+	if [ -d "$old_dir" ]; then
+		mv "$new_dir" "$backup_dir"
+		mkdir "$new_dir"
+		rsync -av --prune-empty-dirs "$old_dir/" "$new_dir/"
+		rsync -rcbv --suffix=.dpkg-old "$backup_dir/" "$new_dir/"
+		rm -rf "$old_dir"
+		rm -rf "$backup_dir"
+	fi
+}
+
 renamed_packages="pf-xivo-agid
 				pf-xivo-base-config
 				pf-xivo-fetchfw
@@ -10,12 +25,8 @@ renamed_packages="pf-xivo-agid
 				pf-xivo-web-interface-config
 				pf-xivo-sysconfd"
 
-echo "cleanup outdated config files"
-
-if [ -d /etc/pf-xivo ]; then
-	rsync -av --prune-empty-dirs /etc/pf-xivo/ /etc/xivo/
-	rm -rf /etc/pf-xivo
-fi
+echo "Cleaning up outdated config files..."
+copy_new_files_while_preserving_old_files /etc/pf-xivo /etc/xivo
 
 # cleanup pf-xivo-base-config.postrm file to allow package purge
 base_config_postrm="/var/lib/dpkg/info/pf-xivo-base-config.postrm"
