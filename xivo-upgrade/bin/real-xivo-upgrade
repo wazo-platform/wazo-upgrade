@@ -260,7 +260,7 @@ find_xivo_package() {
 }
 
 xivo_package=$(find_xivo_package)
-export XIVO_VERSION_CANDIDATE="$(LANG='C' apt-cache policy $xivo_package | grep Candidate | grep -oE '([0-9]{2}\.[0-9]+|1\.2\.[0-9]{1,2})' | head -n1)"
+export XIVO_VERSION_CANDIDATE="$(LANG='C' apt-cache policy xivo | grep Candidate | grep -oE '([0-9]{2}\.[0-9]+|1\.2\.[0-9]{1,2})' | head -n1)"
 export XIVO_VERSION_INSTALLED="$(LANG='C' apt-cache policy $xivo_package | grep Installed | grep -oE '([0-9]{2}\.[0-9]+|1\.2\.[0-9]{1,2})' | head -n1)"
 
 if [[ $XIVO_VERSION_INSTALLED < '13.03' && -f "/etc/$xivo_package/web-interface/xivo.ini" ]]; then
