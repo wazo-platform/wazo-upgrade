@@ -190,7 +190,7 @@ is_running() {
             running=3
         fi
     else
-        /etc/init.d/$service status > /dev/null
+        /etc/init.d/$service status >& /dev/null
         running=$?
     fi
     echo $running
