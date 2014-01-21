@@ -1,0 +1,29 @@
+xivo-upgrade (14.01~20140115.205518.89d4d31-wheezy-2) xivo-dev; urgency=low
+
+  * add post-stop.d
+
+ -- Sebastien Duthil <sduthil@avencall.com>  Wed, 15 Jan 2014 16:19:50 -0500
+
+xivo-upgrade (14.01~20140113.144744.808e974-wheezy-2) xivo-dev; urgency=low
+
+  * remove handling of xivo-update-db, now handled by xivo-manage-db
+
+ -- Sebastien Duthil <sduthil@avencall.com>  Wed, 15 Jan 2014 10:49:44 -0500
+
+xivo-upgrade (1.2.5~20120313.132648.e024d05-3) squeeze-xivo-skaro; urgency=low
+
+  * add logrotate configuration
+
+ -- Jirka HLAVACEK <jhlavacek@avencall.com>  Fri, 05 Apr 2013 14:29:22 +0200
+
+xivo-upgrade (1.2.5~20120313.132648.e024d05-2) squeeze-xivo-skaro; urgency=low
+
+  * remove depends on curl
+
+ -- cabunar <cabunar@kiki.lan-quebec.avencall.com>  Wed, 28 Mar 2012 14:22:27 -0400
+
+xivo-upgrade (1.2.1~dev) squeeze-xivo-skaro; urgency=low
+
+  * Initial release
+
+ -- Nicolas HICHER (atarakt) <nhicher@proformatique.com>  Mon, 20 Feb 2012 19:42:09 -0500

@@ -1,0 +1,5 @@
+bin/ usr/
+pre-stop.d/ usr/share/xivo-upgrade
+post-stop.d/ usr/share/xivo-upgrade
+pre-start.d/ usr/share/xivo-upgrade
+post-start.d/ usr/share/xivo-upgrade

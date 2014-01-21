@@ -1,0 +1,10 @@
+/var/log/xivo-upgrade.log
+{
+        rotate 10
+        size 100k
+        missingok
+        notifempty
+        delaycompress
+        compress
+}
+
