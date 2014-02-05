@@ -235,12 +235,12 @@ upgrade_fai() {
 	if [ -n "$old_fai" ] ; then
 		dpkg -P $old_fai > /dev/null
 	fi
-	old_packages=$(list_packages_with_filter "(?config-files|?installed)?name(\"^pf-fai|^xivo-fai-\")")
+	old_packages=$(list_packages_with_filter "(?config-files|?installed)?name(^pf-fai)")
 	new_packages=$(list_packages_with_filter "(?config-files|?installed)?name(^xivo-fai)")
 	for package in $old_packages; do
 		case $package in
-			pf-fai|xivo-fai-skaro) new_packages="$new_packages xivo-fai";;
-			pf-fai-dev|xivo-fai-skaro-dev) new_packages="$new_packages xivo-fai-dev";;
+			"pf-fai") new_packages="$new_packages xivo-fai";;
+			"pf-fai-dev") new_packages="$new_packages xivo-fai-dev";;
 		esac
 	done
 	apt-get install --yes -o Dpkg::Options::="--force-confnew" $new_packages > /dev/null
