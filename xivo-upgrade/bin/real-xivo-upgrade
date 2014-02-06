@@ -248,6 +248,15 @@ upgrade_fai() {
 	apt-get update > /dev/null
 }
 
+usage() {
+	cat <<-EOF
+	usage: xivo-upgrade [-d] [-f] [-h]
+		-d: only download packages
+		-f: force yes
+		-h: print usage
+	EOF
+}
+
 xivo_package() {
 	list_packages_with_filter "?installed?name(\"^xivo$|^pf-xivo$\")"
 }
@@ -257,7 +266,7 @@ xivo_version_installed() {
 }
 
 xivo_version_candidate() {
-	echo "$(LANG='C' apt-cache policy $(xivo_package) | grep Candidate | grep -oE '([0-9]{2}\.[0-9]+|1\.2\.[0-9]{1,2})' | head -n1)"
+	echo "$(LANG='C' apt-cache policy xivo | grep Candidate | grep -oE '([0-9]{2}\.[0-9]+|1\.2\.[0-9]{1,2})' | head -n1)"
 }
 
 check_wizard_has_been_run() {
@@ -271,15 +280,6 @@ check_wizard_has_been_run() {
 		echo "Warning You should run the wizard before using xivo-upgrade"
 		exit 1
 	fi
-}
-
-usage() {
-	cat <<-EOF
-	usage: xivo-upgrade [-d] [-f] [-h]
-		-d: only download packages
-		-f: force yes
-		-h: print usage
-	EOF
 }
 
 while getopts :dfh opt
