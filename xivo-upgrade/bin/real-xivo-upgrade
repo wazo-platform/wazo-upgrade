@@ -122,6 +122,7 @@ upgrading_system() {
 		fi
 	fi
 	upgrade
+	clean_fai
 	display_post_wheezy_upgrade_notice
 }
 
@@ -231,30 +232,25 @@ list_packages_with_filter () {
 
 upgrade_fai() {
 	echo "Upgrading FAI packages..."
-	old_fai=$(list_packages_with_filter "(?config-files|?installed)?name(\"pf-fai-xivo|xivo-fai-skaro\")")
-	if [ -n "$old_fai" ] ; then
-		dpkg -P $old_fai > /dev/null
+	is_dev=$(list_packages_with_filter "(?installed)?name(\"pf-fai-xivo-1.2-skaro-dev|pf-fai-dev|xivo-fai-skaro-dev\")")
+	is_rc=$(list_packages_with_filter "(?installed)?name(\"pf-fai-xivo-1.2-skaro-rc|pf-fai-rc|xivo-fai-skaro-rc\")")
+	if [ -n "$is_dev" ]; then
+		fai_package="xivo-fai-dev"
+	elif [ -n "$is_rc" ]; then
+		fai_package="xivo-fai-rc"
+	else
+		fai_package="xivo-fai"
 	fi
-	old_packages=$(list_packages_with_filter "(?config-files|?installed)?name(^pf-fai)")
-	new_packages=$(list_packages_with_filter "(?config-files|?installed)?name(^xivo-fai)")
-	for package in $old_packages; do
-		case $package in
-			"pf-fai") new_packages="$new_packages xivo-fai";;
-			"pf-fai-dev") new_packages="$new_packages xivo-fai-dev";;
-		esac
-	done
-	apt-get install --yes -o Dpkg::Options::="--force-confnew" $new_packages > /dev/null
-	apt-get purge --yes $old_packages > /dev/null
+	echo apt-get install --yes -o Dpkg::Options::="--force-confnew" $fai_package > /dev/null
 	apt-get update > /dev/null
 }
 
-usage() {
-	cat <<-EOF
-	usage: xivo-upgrade [-d] [-f] [-h]
-		-d: only download packages
-		-f: force yes
-		-h: print usage
-	EOF
+clean_fai() {
+	echo "Cleaning FAI packages..."
+	old_fai=$(list_packages_with_filter "(?config-files|?installed)?name(\"pf-fai|xivo-fai-skaro|xivo-fai-squeeze\")")
+	if [ -n "$old_fai" ] ; then
+		dpkg -P $old_fai > /dev/null
+	fi
 }
 
 xivo_package() {
@@ -280,6 +276,15 @@ check_wizard_has_been_run() {
 		echo "Warning You should run the wizard before using xivo-upgrade"
 		exit 1
 	fi
+}
+
+usage() {
+	cat <<-EOF
+	usage: xivo-upgrade [-d] [-f] [-h]
+		-d: only download packages
+		-f: force yes
+		-h: print usage
+	EOF
 }
 
 while getopts :dfh opt
