@@ -2,10 +2,10 @@ Source: xivo-upgrade
 Section: admin
 Priority: extra
 Maintainer: XiVO Dev Team <dev@avencall.com>
-Build-Depends: debhelper (>= 7.0.50~)
-Standards-Version: 3.8.4
-Homepage: http://wiki.xivo.fr
-#Vcs-Git: git://git.xivo.fr/official/xivo-upgrade.git
+Uploaders: XiVO Builder Team <release@xivo.fr>
+Build-Depends: debhelper (>= 9)
+Standards-Version: 3.9.4
+Homepage: http://xivo.fr/
 
 Package: xivo-upgrade
 Architecture: any
