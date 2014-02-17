@@ -121,8 +121,8 @@ upgrading_system() {
 		exit
 		fi
 	fi
-	upgrade
 	clean_fai
+	upgrade
 	display_post_wheezy_upgrade_notice
 }
 
