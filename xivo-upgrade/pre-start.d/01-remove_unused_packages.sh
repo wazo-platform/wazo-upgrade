@@ -45,6 +45,6 @@ fi
 for package in $renamed_packages; do
     dpkg -l $package 2> /dev/null | grep -q '^ii'
     if [ $? = 0 ]; then
-        apt-get purge $package > /dev/null
+        apt-get purge -y --force-yes $package > /dev/null
     fi
 done
