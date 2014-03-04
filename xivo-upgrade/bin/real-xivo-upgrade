@@ -158,6 +158,11 @@ exec_squeeze_to_wheezy_migration() {
 		apt-get install dahdi-linux-modules-${kr}
 	done
 
+	kernel_release=$(ls /lib/modules/ |grep ^2.6)
+	for kr in $kernel_release; do
+		apt-get remove --purge -y dahdi-linux-modules-${kr}
+	done
+
 	xivo-service restart all
 }
 
