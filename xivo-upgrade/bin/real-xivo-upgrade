@@ -127,7 +127,7 @@ upgrading_system() {
 }
 
 is_linux_3.2_installed() {
-	[ -n "$(dpkg -l linux-image-3.2.0-* 2>/dev/null | grep '^ii')" ]
+	[ -n "$(dpkg -l linux-image-3.2.0-* | grep '^ii')" ]
 }
 
 exec_squeeze_to_wheezy_migration() {
@@ -137,7 +137,7 @@ exec_squeeze_to_wheezy_migration() {
 
 	xivo-service stop all
 
-	apt-get update > /dev/null
+	apt-get update
 	apt-get install --yes --force-yes python2.7 apt
 	apt-get install --yes --force-yes -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" munin monit
 	apt-get upgrade --yes --force-yes -o Dpkg::Options::="--force-confnew"
@@ -145,7 +145,7 @@ exec_squeeze_to_wheezy_migration() {
 	apt-get install --yes --force-yes -o Dpkg::Options::="--force-confnew" xivo
 	apt-get install --yes --force-yes -o Dpkg::Options::="--force-confnew" postgresql-common/wheezy
 	apt-get dist-upgrade --yes --force-yes -o Dpkg::Options::="--force-confnew"
-	apt-get update > /dev/null
+	apt-get update
 	apt-get autoremove --yes
 
 	if ! is_linux_3.2_installed ; then
@@ -172,7 +172,7 @@ exec_database_migration() {
 }
 
 display_ast11_notice() {
-	ast_version=$(dpkg-query -W -f '${Version}' asterisk 2>/dev/null)
+	ast_version=$(dpkg-query -W -f '${Version}' asterisk)
 	if dpkg --compare-versions "$ast_version" le 8:11-1; then
 		cat <<-EOF
 
@@ -241,15 +241,15 @@ upgrade_fai() {
 	else
 		fai_package="xivo-fai"
 	fi
-	apt-get install --yes -o Dpkg::Options::="--force-confnew" $fai_package > /dev/null
-	apt-get update > /dev/null
+	apt-get install --yes -o Dpkg::Options::="--force-confnew" $fai_package
+	apt-get update
 }
 
 clean_fai() {
 	echo "Cleaning FAI packages..."
 	old_fai=$(list_packages_with_filter "(?config-files|?installed)?name(\"pf-fai|xivo-fai-skaro|xivo-fai-squeeze\")")
 	if [ -n "$old_fai" ] ; then
-		dpkg -P $old_fai > /dev/null
+		dpkg -P $old_fai
 	fi
 }
 
