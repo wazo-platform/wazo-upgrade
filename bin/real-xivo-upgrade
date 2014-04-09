@@ -5,6 +5,7 @@ mirror_xivo="http://mirror.xivo.fr"
 
 # force all debian upgrade to non interactive mode
 export DEBIAN_FRONTEND=noninteractive
+export APT_LISTCHANGES_FRONTEND=none
 
 differed_action() {
 	local state=$1
