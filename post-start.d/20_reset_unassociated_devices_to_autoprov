@@ -9,7 +9,7 @@ from xivo_dao.data_handler.device import services as devices
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger('reset_unassociated_devices_to_autoprov')
 
-logger.info('Fetching wrongly configured devices...')
+logger.debug('Fetching wrongly configured devices...')
 provd_device_manager = provd_connector.device_manager()
 
 configured_device_ids = {device['id']
@@ -19,7 +19,7 @@ associated_device_ids = {line.device_id for line in lines.find_all()}
 
 wrongly_configured_device_ids = configured_device_ids - associated_device_ids
 
-logger.info('Resetting wrongly configured devices to autoprov...')
+logger.debug('Resetting wrongly configured devices to autoprov...')
 for device_id in wrongly_configured_device_ids:
     logger.info('Resetting device {}'.format(device_id))
     try:
@@ -28,4 +28,4 @@ for device_id in wrongly_configured_device_ids:
     except Exception as e:
         logger.exception(e)
 
-logger.info('Done.')
+logger.debug('Done.')
