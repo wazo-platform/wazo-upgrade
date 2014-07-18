@@ -26,6 +26,6 @@ for device_id in wrongly_configured_device_ids:
         device = devices.get(device_id)
         devices.reset_to_autoprov(device)
     except Exception as e:
-        logging.exception(e)
+        logger.exception(e)
 
 logger.info('Done.')
