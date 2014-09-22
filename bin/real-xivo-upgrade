@@ -241,17 +241,18 @@ install_xivo_dist() {
 			exit 1
 		fi
 
-		is_dev=$(list_packages_with_filter "(?installed)?name(\"pf-fai-xivo-1.2-skaro-dev|pf-fai-dev|xivo-fai-skaro-dev\")")
-		is_rc=$(list_packages_with_filter "(?installed)?name(\"pf-fai-xivo-1.2-skaro-rc|pf-fai-rc|xivo-fai-skaro-rc\")")
+		is_dev=$(list_packages_with_filter "(?installed)?name(\"pf-fai-xivo-1.2-skaro-dev|pf-fai-dev|xivo-fai-skaro-dev|xivo-fai-dev\")")
+		is_rc=$(list_packages_with_filter "(?installed)?name(\"pf-fai-xivo-1.2-skaro-rc|pf-fai-rc|xivo-fai-skaro-rc|xivo-fai-rc\")")
 		if [ -n "$is_dev" ]; then
 			xivo-dist xivo-dev
 		elif [ -n "$is_rc" ]; then
 			xivo-dist xivo-rc
 		fi
-		apt-get update
 
 		echo "Purging FAI packages..."
 		apt-get purge --yes '^(pf-fai|xivo-fai|xivo-wheezy-fai).*$' > /dev/null
+
+		apt-get update
 	fi
 }
 
