@@ -233,13 +233,26 @@ list_packages_with_filter () {
 }
 
 install_xivo_dist() {
-    if [ dpkg -s xivo-dist] ; then
-        echo "Removing/Purging FAI packages..."
-        apt-get purge '^(pf-fai|xivo-fai|xivo-wheezy-fai).*$' > /dev/null
-        echo "Installing xivo-dist package..."
-        apt-get install --yes xivo-dist
-        apt-get update
-    fi
+	is_dist_installed=$(list_packages_with_filter "?installed?name(\"^xivo-dist$\")")
+	if [ -z "$is_dist_installed" ]; then
+		echo "Installing xivo-dist package..."
+		if ! apt-get install --yes xivo-dist; then
+			echo "Failed to install xivo-dist. Aborting upgrade."
+			exit 1
+		fi
+
+		is_dev=$(list_packages_with_filter "(?installed)?name(\"pf-fai-xivo-1.2-skaro-dev|pf-fai-dev|xivo-fai-skaro-dev\")")
+		is_rc=$(list_packages_with_filter "(?installed)?name(\"pf-fai-xivo-1.2-skaro-rc|pf-fai-rc|xivo-fai-skaro-rc\")")
+		if [ -n "$is_dev" ]; then
+			xivo-dist xivo-dev
+		elif [ -n "$is_rc" ]; then
+			xivo-dist xivo-rc
+		fi
+		apt-get update
+
+		echo "Purging FAI packages..."
+		apt-get purge --yes '^(pf-fai|xivo-fai|xivo-wheezy-fai).*$' > /dev/null
+	fi
 }
 
 xivo_package() {
@@ -265,16 +278,6 @@ check_wizard_has_been_run() {
 		echo "Warning You should run the wizard before using xivo-upgrade"
 		exit 1
 	fi
-}
-
-is_package_installed() {
-    local pkg_name=$1
-    local output=$(list_packages_with_filter "?installed?name(\"^$pkg_name$\")")
-    if [ -n "$output" ]; then
-        return 0
-    fi
-
-    return 1
 }
 
 usage() {
