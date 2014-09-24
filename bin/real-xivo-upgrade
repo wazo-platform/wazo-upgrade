@@ -114,7 +114,7 @@ check_if_grub_is_broken() {
 
 upgrading_system() {
 	exec_database_migration
-	upgrade_fai
+	install_xivo_dist
 	display_xivo_version
 	display_ast11_notice
 	display_wheezy_upgrade_notice
@@ -125,7 +125,6 @@ upgrading_system() {
 		exit
 		fi
 	fi
-	clean_fai
 	upgrade
 	display_post_wheezy_upgrade_notice
 }
@@ -233,27 +232,27 @@ list_packages_with_filter () {
 	aptitude -F '%p' search "$filter" | xargs
 }
 
-upgrade_fai() {
-	echo "Upgrading FAI packages..."
-	is_dev=$(list_packages_with_filter "(?installed)?name(\"pf-fai-xivo-1.2-skaro-dev|pf-fai-dev|xivo-fai-skaro-dev\")")
-	is_rc=$(list_packages_with_filter "(?installed)?name(\"pf-fai-xivo-1.2-skaro-rc|pf-fai-rc|xivo-fai-skaro-rc\")")
-	if [ -n "$is_dev" ]; then
-		fai_package="xivo-fai-dev"
-	elif [ -n "$is_rc" ]; then
-		fai_package="xivo-fai-rc"
-	else
-		fai_package="xivo-fai"
-	fi
-	apt-get install --yes -o Dpkg::Options::="--force-confnew" $fai_package
-	apt-get install --yes -o Dpkg::Options::="--force-confnew" $fai_package
-	apt-get update
-}
+install_xivo_dist() {
+	is_dist_installed=$(list_packages_with_filter "?installed?name(\"^xivo-dist$\")")
+	if [ -z "$is_dist_installed" ]; then
+		echo "Installing xivo-dist package..."
+		if ! apt-get install --yes xivo-dist; then
+			echo "Failed to install xivo-dist. Aborting upgrade."
+			exit 1
+		fi
 
-clean_fai() {
-	echo "Cleaning FAI packages..."
-	old_fai=$(list_packages_with_filter "(?config-files|?installed)?name(\"pf-fai|xivo-fai-skaro|xivo-fai-squeeze\")")
-	if [ -n "$old_fai" ] ; then
-		dpkg -P $old_fai > /dev/null
+		is_dev=$(list_packages_with_filter "(?installed)?name(\"pf-fai-xivo-1.2-skaro-dev|pf-fai-dev|xivo-fai-skaro-dev|xivo-fai-dev\")")
+		is_rc=$(list_packages_with_filter "(?installed)?name(\"pf-fai-xivo-1.2-skaro-rc|pf-fai-rc|xivo-fai-skaro-rc|xivo-fai-rc\")")
+		if [ -n "$is_dev" ]; then
+			xivo-dist xivo-dev
+		elif [ -n "$is_rc" ]; then
+			xivo-dist xivo-rc
+		fi
+
+		echo "Purging FAI packages..."
+		apt-get purge --yes '^(pf-fai|xivo-fai|xivo-wheezy-fai).*$' > /dev/null
+
+		apt-get update
 	fi
 }
 
