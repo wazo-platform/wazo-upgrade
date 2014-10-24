@@ -158,7 +158,7 @@ exec_squeeze_to_wheezy_migration() {
 
 	kernel_release=$(ls /lib/modules/ |grep ^3.2)
 	for kr in $kernel_release; do
-		apt-get install dahdi-linux-modules-${kr} > /dev/null
+		apt-get install dahdi-linux-modules-${kr}
 	done
 
 	xivo-service restart all
@@ -259,7 +259,7 @@ install_xivo_dist() {
 
 purge_fai_packages () {
 	echo "Purging FAI packages..."
-	apt-get purge --yes '^(pf-fai|xivo-fai|xivo-wheezy-fai).*$' > /dev/null
+	apt-get purge --yes '^(pf-fai|xivo-fai|xivo-wheezy-fai).*$'
 	apt-get update
 }
 
