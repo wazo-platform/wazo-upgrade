@@ -115,7 +115,7 @@ check_if_grub_is_broken() {
 
 upgrading_system() {
 	exec_database_migration
-	install_xivo_dist
+	prepare_package_sources
 	display_xivo_version
 	display_ast11_notice
 	display_wheezy_upgrade_notice
@@ -233,6 +233,11 @@ list_packages_with_filter () {
 	aptitude -F '%p' search "$filter" | xargs
 }
 
+prepare_package_sources () {
+	install_xivo_dist
+	purge_fai_packages
+}
+
 install_xivo_dist() {
 	is_dist_installed=$(list_packages_with_filter "?installed?name(\"^xivo-dist$\")")
 	if [ -z "$is_dist_installed" ]; then
@@ -249,12 +254,13 @@ install_xivo_dist() {
 		elif [ -n "$is_rc" ]; then
 			xivo-dist xivo-rc
 		fi
-
-		echo "Purging FAI packages..."
-		apt-get purge --yes '^(pf-fai|xivo-fai|xivo-wheezy-fai).*$' > /dev/null
-
-		apt-get update
 	fi
+}
+
+purge_fai_packages () {
+	echo "Purging FAI packages..."
+	apt-get purge --yes '^(pf-fai|xivo-fai|xivo-wheezy-fai).*$' > /dev/null
+	apt-get update
 }
 
 xivo_package() {
