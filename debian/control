@@ -9,6 +9,6 @@ Homepage: http://xivo.io/
 
 Package: xivo-upgrade
 Architecture: any
-Depends: ${misc:Depends}, aptitude, monit
+Depends: ${misc:Depends}, aptitude, monit, python-kombu
 Description: XiVO upgrade tools
  This package provide XiVO upgrading tools

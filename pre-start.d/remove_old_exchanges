@@ -18,7 +18,8 @@
 
 import os
 import subprocess
-import pika
+
+from kombu import Connection
 
 
 EXCHANGES = ['xivo', 'xivo-cti', 'xivo-ami', 'xivo-status-updates']
@@ -40,16 +41,12 @@ def should_skip():
 
 def main():
     if should_skip():
-       return
+        return
 
     start_rabbitmq()
-    connection = pika.BlockingConnection()
-    channel = connection.channel()
-    for exchange in EXCHANGES:
-       try:
-          channel.exchange_delete(exchange=exchange)
-       except Exception:
-          channel = connection.channel()
+    with Connection('amqp://guest:guest@localhost:5672//') as conn:
+        for exchange in EXCHANGES:
+            conn.channel().exchange_delete(exchange)
     stop_rabbitmq()
 
 
