@@ -23,6 +23,7 @@ from kombu import Connection
 
 
 EXCHANGES = ['xivo', 'xivo-cti', 'xivo-ami', 'xivo-status-updates']
+QUEUES = ['xivo-call-logd-queue']
 
 
 def start_rabbitmq():
@@ -36,7 +37,7 @@ def stop_rabbitmq():
 
 
 def should_skip():
-    return os.environ['XIVO_VERSION_INSTALLED'] >= '15.02'
+    return os.environ['XIVO_VERSION_INSTALLED'] >= '15.04'
 
 
 def main():
@@ -45,8 +46,11 @@ def main():
 
     start_rabbitmq()
     with Connection('amqp://guest:guest@localhost:5672//') as conn:
+        channel = conn.channel()
         for exchange in EXCHANGES:
-            conn.channel().exchange_delete(exchange)
+            channel.exchange_delete(exchange)
+        for queue in QUEUES:
+            channel.queue_delete(queue)
     stop_rabbitmq()
 
 
