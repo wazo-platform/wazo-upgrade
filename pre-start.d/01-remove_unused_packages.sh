@@ -44,7 +44,7 @@ if [ "$pg_common_version" = "140+0.xivo-backport-2" ]; then
 fi
 
 for package in $renamed_packages; do
-    dpkg -l $package 2> /dev/null | grep -q '^ii'
+    dpkg -l $package 2> /dev/null | grep -Eq '^(ii|rc)'
     if [ $? = 0 ]; then
         apt-get purge -y --force-yes $package
     fi
