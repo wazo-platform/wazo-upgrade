@@ -8,7 +8,7 @@ else
     touch "$is_executed_file"
 fi
 
-provd_pycli -p '' >/dev/null << EOF
+xivo-provd-cli -p '' >/dev/null << EOF
 for device in devices.find():
     if u'remote_state_sip_username' in device:
         continue
