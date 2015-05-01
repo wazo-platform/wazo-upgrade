@@ -102,24 +102,29 @@ stop_services() {
     /etc/init.d/cron stop >>$MIGRATION_LOG_FILE
     killall xivo-stat &>>$MIGRATION_LOG_FILE
     killall xivo-call-logs &>>$MIGRATION_LOG_FILE
+    /etc/init.d/postgresql stop
 }
 
 migrate_db() {
     echo "Migrating database..."
-    sudo -u postgres pg_dumpall -p 5432 | sudo -u postgres psql -p 5433 &>>$MIGRATION_LOG_FILE
+    ln -s /etc/postgresql/9.1/main/postgresql.conf /var/lib/postgresql/9.1/main/
+    ln -s /etc/postgresql/9.0/main/postgresql.conf /var/lib/postgresql/9.0/main/
+
+    sudo -H -u postgres /usr/lib/postgresql/9.1/bin/pg_upgrade \
+        -b /usr/lib/postgresql/9.0/bin -B /usr/lib/postgresql/9.1/bin \
+        -d /var/lib/postgresql/9.0/main -D /var/lib/postgresql/9.1/main \
+        -p 5432 -P 5433 | tee $MIGRATION_LOG_FILE
     local status=$?
     if [ $status -gt 0 ]; then
         echo "ERROR: migration failed, see $MIGRATION_LOG_FILE for more info."
         exit 1
     fi
-    /etc/init.d/postgresql stop >>$MIGRATION_LOG_FILE
+    pg_dropcluster --stop 9.0 main
 }
 
 update_pg_config() {
     echo "Upgrading PostgreSQL configuration..."
-    sed -i 's/^port = 5432/port = 5433/g' /etc/postgresql/9.0/main/postgresql.conf
     sed -i 's/^port = 5433/port = 5432/g' /etc/postgresql/9.1/main/postgresql.conf
-    sed -i 's/^auto/disabled/g' /etc/postgresql/9.0/main/start.conf
 }
 
 start_services() {
@@ -140,9 +145,9 @@ prepare_configuration
 validate_configuration
 stop_services
 migrate_db
+purge_old_database
 update_pg_config
 start_services
-purge_old_database
 
 cat <<EOF
 
