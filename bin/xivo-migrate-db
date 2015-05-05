@@ -110,7 +110,7 @@ migrate_db() {
     ln -s /etc/postgresql/9.1/main/postgresql.conf /var/lib/postgresql/9.1/main/
     ln -s /etc/postgresql/9.0/main/postgresql.conf /var/lib/postgresql/9.0/main/
 
-    sudo -H -u postgres /usr/lib/postgresql/9.1/bin/pg_upgrade \
+    sudo -H -u postgres /usr/lib/postgresql/9.1/bin/pg_upgrade --link \
         -b /usr/lib/postgresql/9.0/bin -B /usr/lib/postgresql/9.1/bin \
         -d /var/lib/postgresql/9.0/main -D /var/lib/postgresql/9.1/main \
         -p 5432 -P 5433 | tee $MIGRATION_LOG_FILE
