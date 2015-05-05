@@ -115,8 +115,8 @@ migrate_db() {
         -d /var/lib/postgresql/9.0/main -D /var/lib/postgresql/9.1/main \
         -p 5432 -P 5433 | tee -a $MIGRATION_LOG_FILE
     local status=$?
-    rm /var/lib/postgres/9.0/main/postgresql.conf
-    rm /var/lib/postgres/9.1/main/postgresql.conf
+    rm /var/lib/postgresql/9.0/main/postgresql.conf
+    rm /var/lib/postgresql/9.1/main/postgresql.conf
     if [ $status -gt 0 ]; then
         echo "ERROR: migration failed, see $MIGRATION_LOG_FILE for more info."
         exit 1
