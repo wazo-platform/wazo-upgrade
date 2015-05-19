@@ -1,31 +1,46 @@
 #!/usr/bin/env python
 
 import logging
+import requests
 
-from xivo_dao.helpers import provd_connector
-from xivo_dao.data_handler.line import services as lines
-from xivo_dao.data_handler.device import services as devices
+from xivo_provd_client import new_provisioning_client
+
+LOCAL_CONFD = "http://localhost:9487/1.1"
+LOCAL_PROVD = "http://localhost:8666/provd"
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger('reset_unassociated_devices_to_autoprov')
 
 logger.debug('Fetching wrongly configured devices...')
-provd_device_manager = provd_connector.device_manager()
+
+provd_client = new_provisioning_client(LOCAL_PROVD)
+
+session = requests.Session()
+session.headers = {'Accept': 'application/json',
+                   'Content-Type': 'application/json'}
+
+device_manager = provd_client.device_manager()
+
+devices = device_manager.find()
+line_response = session.get("{}/lines".format(LOCAL_CONFD)).json()
 
 configured_device_ids = {device['id']
-                         for device in provd_device_manager.find()
+                         for device in devices
                          if 'config' in device and not device['config'].startswith('autoprov')}
-associated_device_ids = {line.device_id for line in lines.find_all()}
+
+associated_device_ids = {line['device_id'] for line in line_response['items']}
 
 wrongly_configured_device_ids = configured_device_ids - associated_device_ids
 
 logger.debug('Resetting wrongly configured devices to autoprov...')
+
 for device_id in wrongly_configured_device_ids:
     logger.info('Resetting device {}'.format(device_id))
-    try:
-        device = devices.get(device_id)
-        devices.reset_to_autoprov(device)
-    except Exception as e:
-        logger.exception(e)
+    response = session.get("{}/devices/{}/autoprov".format(LOCAL_CONFD, device_id))
+
+    if response.status_code == 204:
+        session.get("{}/devices/{}/synchronize".format(LOCAL_CONFD, device_id))
+    else:
+        logger.error(response.text)
 
 logger.debug('Done.')
