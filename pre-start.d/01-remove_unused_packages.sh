@@ -24,7 +24,8 @@ renamed_packages="pf-xivo-agid
                   pf-xivo-web-interface
                   pf-xivo-web-interface-config
                   pf-xivo-sysconfd
-                  xivo-agent"
+                  xivo-agent
+                  xivo-restapi"
 
 echo "Cleaning up outdated config files..."
 copy_new_files_while_preserving_old_files /etc/pf-xivo /etc/xivo
