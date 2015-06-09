@@ -61,7 +61,7 @@ continue_upgrade() {
 }
 
 prepare_configuration() {
-    echo "Save postgresql 9.0 configuration files in /tmp/postgresql-9.0"
+    echo "Saving postgresql 9.0 configuration files in /tmp/postgresql-9.0"
     cp -r /etc/postgresql/9.0 /tmp/postgresql-9.0
     cd /tmp
     echo "Preparing configuration..."
