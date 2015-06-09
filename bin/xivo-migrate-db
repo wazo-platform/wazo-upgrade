@@ -44,6 +44,8 @@ dump_infos() {
     You can backup your database using this following command:
         $ /usr/sbin/xivo-backup db /var/backups/xivo/pg_migration_90_to_91
 
+    Your configuration files from postgresql 9.0 will be moved in /tmp.
+
     ***************************************************************************
 
 EOF
@@ -59,6 +61,8 @@ continue_upgrade() {
 }
 
 prepare_configuration() {
+    echo "Save postgresql 9.0 configuration files in /tmp/postgresql-9.0"
+    cp -r /etc/postgresql/9.0 /tmp/postgresql-9.0
     cd /tmp
     echo "Preparing configuration..."
     echo "Downloading and installing postgresql..."
