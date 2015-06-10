@@ -87,6 +87,22 @@ display_xivo_version() {
 	echo "proposed update	: $(xivo_version_candidate)"
 }
 
+display_warning_purge_db() {
+	if [ $XIVO_VERSION_INSTALLED \< '15.11' ]
+	then
+		cat <<-EOF
+		******************************************************************
+		*                           WARNING                              *
+		* Call records older than 365 days will be removed periodically. *
+		* See                                                            *
+		* http://documentation.xivo.io/en/stable/system/purge_logs.html  *
+		* for more details                                               *
+		*                                                                *
+		******************************************************************
+		EOF
+	fi
+}
+
 is_grub_broken() {
 	for disk in $(awk '{print $2}' /boot/grub/device.map) ; do
 		if [ ! -e "$disk" ] ; then
@@ -128,6 +144,7 @@ upgrading_system() {
 	fi
 	upgrade
 	display_post_wheezy_upgrade_notice
+	display_warning_purge_db
 }
 
 is_linux_3.2_installed() {
