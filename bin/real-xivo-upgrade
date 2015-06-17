@@ -133,7 +133,7 @@ upgrading_system() {
 	exec_database_migration
 	prepare_package_sources
 	display_xivo_version
-	display_ast11_notice
+	display_ast13_notice
 	display_wheezy_upgrade_notice
 	if [ $force -eq 0 ]; then
 		read -p 'Would you like to upgrade your system (all services will be restarted) [Y/n]? ' answer
@@ -191,18 +191,18 @@ exec_database_migration() {
 	fi
 }
 
-display_ast11_notice() {
+display_ast13_notice() {
 	ast_version=$(dpkg-query -W -f '${Version}' asterisk 2>/dev/null)
-	if dpkg --compare-versions "$ast_version" le 8:11-1; then
+	if dpkg --compare-versions "$ast_version" le 8:13-1; then
 		cat <<-EOF
 
-		Asterisk will be upgraded from version 1.8 to 11. You might be impacted if you:
+		Asterisk will be upgraded from version 11 to 13. You might be impacted if you:
 		* have some custom dialplan
 		* have some custom AGIs
 		* have customized asterisk in some other way
 		If you find yourself in one of these cases, you should make sure that
-		your customizations still work with asterisk 11. Please refer to
-		http://documentation.xivo.io/production/upgrade/asterisk_11.html for
+		your customizations still work with asterisk 13. Please refer to
+		http://documentation.xivo.io/en/stable/upgrade/15.12/asterisk_13.html for
 		more information.
 
 	EOF
@@ -213,8 +213,8 @@ display_ast11_notice() {
 			WARNING: G729 codec module detected.
 
 			A G729 codec module has been detected on your system. Since it will not work with
-			asterisk 11, it has been moved from /usr/lib/asterisk/modules to /tmp. To continue
-			using the G729 module, you will have to install the asterisk 11 version of the module.
+			asterisk 13, it has been moved from /usr/lib/asterisk/modules to /tmp. To continue
+			using the G729 module, you will have to install the asterisk 13 version of the module.
 
 		EOF
 		fi
