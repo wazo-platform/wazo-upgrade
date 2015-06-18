@@ -193,13 +193,27 @@ exec_database_migration() {
 
 display_ast13_notice() {
 	ast_version=$(dpkg-query -W -f '${Version}' asterisk 2>/dev/null)
+	case "$ast_version" in
+		8:1.8.*)
+			ast_major_version="1.8"
+			;;
+		8:11.*)
+			ast_major_version="11"
+			;;
+		*)
+			ast_major_version="unknown"
+			;;
+	esac
 	if dpkg --compare-versions "$ast_version" le 8:13-1; then
 		cat <<-EOF
 
-		Asterisk will be upgraded from version 11 to 13. You might be impacted if you:
-		* have some custom dialplan
-		* have some custom AGIs
-		* have customized asterisk in some other way
+		Asterisk will be upgraded from version $ast_major_version to 13. You might be impacted if you have:
+		* custom dialplan
+		* custom asterisk configuration
+		* custom application using AGI, AMI or any other asterisk interface
+		* custom application exploiting CEL or queue_log
+		* custom asterisk modules (e.g. codec_g729a.so)
+		* customized asterisk in some other way
 		If you find yourself in one of these cases, you should make sure that
 		your customizations still work with asterisk 13. Please refer to
 		http://documentation.xivo.io/en/stable/upgrade/15.12/asterisk_13.html for
