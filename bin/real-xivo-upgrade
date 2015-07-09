@@ -217,7 +217,7 @@ display_ast13_notice() {
 		* DAHDI trunks using SS7 signaling
 		If you find yourself in one of these cases, you should make sure that
 		your customizations still work with asterisk 13. Please refer to
-		http://documentation.xivo.io/en/stable/upgrade/15.12/asterisk_13.html for
+		http://documentation.xivo.io/en/stable/upgrade/15.13/asterisk_13.html for
 		more information.
 
 	EOF
