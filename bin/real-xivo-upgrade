@@ -209,14 +209,14 @@ display_ast13_notice() {
 
 		Asterisk will be upgraded from version $ast_major_version to 13. You might be impacted if you have:
 		* custom dialplan
-		* custom asterisk configuration
-		* custom application using AGI, AMI or any other asterisk interface
+		* custom Asterisk configuration
+		* custom application using AGI, AMI or any other Asterisk interface
 		* custom application exploiting CEL or queue_log
-		* custom asterisk modules (e.g. codec_g729a.so)
-		* customized asterisk in some other way
+		* custom Asterisk modules (e.g. codec_g729a.so)
+		* customized Asterisk in some other way
 		* DAHDI trunks using SS7 signaling
 		If you find yourself in one of these cases, you should make sure that
-		your customizations still work with asterisk 13. Please refer to
+		your customizations still work with Asterisk 13. Please refer to
 		http://documentation.xivo.io/en/stable/upgrade/15.13/asterisk_13.html for
 		more information.
 
