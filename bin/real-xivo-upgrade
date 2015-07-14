@@ -194,7 +194,7 @@ exec_database_migration() {
 display_ast13_notice() {
 	ast_version=$(dpkg-query -W -f '${Version}' asterisk 2>/dev/null)
 	case "$ast_version" in
-		8:1.8.*)
+		*:1.8.*)
 			ast_major_version="1.8"
 			;;
 		8:11.*)
