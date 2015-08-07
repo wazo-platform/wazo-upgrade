@@ -210,7 +210,6 @@ is_running() {
 }
 
 start_services() {
-    start_monit
     local services=$1
     for service in $services; do
         enabled=$(is_enabled $service)
@@ -229,6 +228,7 @@ start_services() {
             echo -e "\t$service is disabled"
         fi
     done
+    start_monit
 }
 
 stop_services() {
