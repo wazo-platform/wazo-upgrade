@@ -19,5 +19,5 @@ start_consul() {
 	fi
 }
 
-enable_consul()
-start_consul()
+enable_consul
+start_consul
