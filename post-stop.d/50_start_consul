@@ -1,0 +1,23 @@
+#!/bin/bash
+
+# When upgrading from a slave, consul does not run. We need it to run during
+# xivo-upgrade (e.g. for xivo-manage-tokens).
+#
+# If the slave is XiVO < 15.18, consul is also disabled and we want to re-enable
+# it for the last time.
+#
+# As consul takes a few secondes before being usable (due to the election
+# process), we need to start consul at the very start of the upgrade process.
+
+enable_consul() {
+	sed -i 's/RUNCONSUL=no/RUNCONSUL=yes/' "/etc/default/consul"
+}
+
+start_consul() {
+	if ! service consul status > /dev/null; then
+		service consul start
+	fi
+}
+
+enable_consul()
+start_consul()

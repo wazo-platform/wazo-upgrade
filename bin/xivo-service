@@ -15,12 +15,11 @@ PATH=/bin:/usr/bin:/sbin:/usr/sbin
 action=$1
 services_filter=$2
 include_monit=1
-xivo_services="consul xivo-auth xivo-confgend xivo-dxtora xivo-provd xivo-agid asterisk xivo-amid xivo-call-logs xivo-agentd xivo-ctid xivo-dird xivo-dird-phoned"
+xivo_services="xivo-auth xivo-confgend xivo-dxtora xivo-provd xivo-agid asterisk xivo-amid xivo-call-logs xivo-agentd xivo-ctid xivo-dird xivo-dird-phoned"
 default_services="dahdi xivo-sysconfd xivo-confd $xivo_services"
-all_services="rabbitmq-server postgresql nginx $default_services"
+all_services="rabbitmq-server consul postgresql nginx $default_services"
 monit_default="/etc/default/monit"
 asterisk_default="/etc/default/asterisk"
-consul_default="/etc/default/consul"
 XIVO_DEFAULT_FILE="/etc/default/xivo"
 MAX_RETRY_SERVICE=30
 
@@ -97,7 +96,6 @@ xivo_enable() {
     echo "Enabling XiVO services..."
     echo startup=yes > $XIVO_DEFAULT_FILE
     enable_asterisk
-    enable_consul
     enable_monit
 }
 
@@ -106,7 +104,6 @@ xivo_disable() {
     echo startup=no > $XIVO_DEFAULT_FILE
     disable_monit
     disable_asterisk
-    disable_consul
 }
 
 disable_asterisk() {
@@ -115,14 +112,6 @@ disable_asterisk() {
 
 enable_asterisk() {
     sed -i 's/RUNASTERISK=no/RUNASTERISK=yes/' $asterisk_default
-}
-
-disable_consul() {
-    sed -i 's/RUNCONSUL=yes/RUNCONSUL=no/' $consul_default
-}
-
-enable_consul() {
-    sed -i 's/RUNCONSUL=no/RUNCONSUL=yes/' $consul_default
 }
 
 disable_monit() {
