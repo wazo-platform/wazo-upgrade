@@ -66,6 +66,7 @@ upgrade() {
 		execute apt-get install -o Dpkg::Options::="--force-confnew" -y xivo-config
 		execute apt-get install -o Dpkg::Options::="--force-confnew" -y xivo xivo-libdao xivo-ctid xivo-web-interface
 		execute apt-get dist-upgrade -y
+		apt-get autoremove -y
 	fi
 	pre_start
 	start_xivo
