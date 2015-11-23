@@ -50,3 +50,6 @@ for package in $renamed_packages; do
         apt-get purge -y --force-yes $package
     fi
 done
+
+# manually purge xivo-manage-tokens
+rm -rf /var/lib/xivo-manage-tokens
