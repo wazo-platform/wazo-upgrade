@@ -1,4 +1,4 @@
-xivo-upgrade (14.01~20140115.205518.89d4d31-wheezy-2) xivo-dev; urgency=low
+xivo-upgrade (14.01~20140115.205518.89d4d31) xivo-dev; urgency=low
 
   * add post-stop.d
 
