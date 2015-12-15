@@ -185,7 +185,10 @@ exec_squeeze_to_wheezy_migration() {
 	for kr in $kernel_release; do
 		apt-get install dahdi-linux-modules-${kr}
 	done
-
+    
+	# Workaround for fix a bug when upgrade from wheezy to jessie (without xivo). Nginx seems disabled.
+	update-rc.d nginx enable
+    
 	xivo-service restart all
 }
 
