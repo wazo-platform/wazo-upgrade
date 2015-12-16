@@ -78,8 +78,7 @@ upgrade() {
 }
 
 debian_version_installed() {
-	local xivo_version=$(cut -c1 /etc/debian_version)
-	echo $xivo_version
+	cut -c1 /etc/debian_version
 }
 
 is_squeeze() {
