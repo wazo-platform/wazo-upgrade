@@ -215,6 +215,11 @@ exec_wheezy_to_jessie_migration() {
 	sed -i 's/wheezy/jessie/' /etc/apt/sources.list
 
 	xivo-service stop all
+	# workaround: when libssl is upgraded, it tries to restart monit, which succeeds because monit
+	# init script only check the START variable on restart; and during the system upgrade, monit
+	# might restart rabbitmq-server at the wrong time, and when it does, this breaks the upgrade, so
+	# modify monit configuration so that it supervise nothing during the upgrade
+	sed -i 's/^include/#xivo-upgrade include/' /etc/monit/monitrc
 
 	apt-get update > /dev/null
 	apt-get install --yes --force-yes -o Dpkg::Options::="--force-confnew" xivo-config
@@ -234,6 +239,8 @@ exec_wheezy_to_jessie_migration() {
 
 	# Workaround a bug in nginx when upgrading to jessie (with or without xivo)
 	update-rc.d nginx enable
+
+	sed -i 's/^#xivo-upgrade include/include/' /etc/monit/monitrc
 
 	xivo-service restart all
 }
