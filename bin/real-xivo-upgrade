@@ -215,10 +215,6 @@ exec_wheezy_to_jessie_migration() {
 	sed -i 's/wheezy/jessie/' /etc/apt/sources.list
 
 	xivo-service stop all
-	# disable monit using update-rc.d, otherwise it will be restarted by the libssl and
-	# xivo-monitoring upgrade since "invoke-rc.d restart monit" ignore the /etc/default/monit START
-	# variable
-	update-rc.d monit disable
 
 	apt-get update > /dev/null
 	apt-get install --yes --force-yes -o Dpkg::Options::="--force-confnew" xivo-config
@@ -239,7 +235,6 @@ exec_wheezy_to_jessie_migration() {
 	# Workaround a bug in nginx when upgrading to jessie (with or without xivo)
 	update-rc.d nginx enable
 
-	update-rc.d monit enable
 	xivo-service restart all
 }
 
