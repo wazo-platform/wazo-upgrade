@@ -117,7 +117,7 @@ enable_asterisk() {
 disable_monit() {
     sed -i 's/startup=1/startup=0/' $monit_default  # older monit
     sed -i 's/START=yes/START=no/' $monit_default
-    update-rc.d monit disable
+    update-rc.d monit disable &> /dev/null
 }
 
 stop_monit() {
