@@ -123,12 +123,12 @@ check_if_grub_is_broken() {
 	if is_grub_broken; then
 		cat <<-EOF
 		*********************************************
-		* You must install GRUB 2 BEFORE rebooting: *
+		* You must install GRUB BEFORE rebooting:   *
 		*                                           *
-		* # apt-get install grub2                   *
+		* # apt-get install grub-pc                 *
 		* # rm /boot/grub/device.map                *
 		* # grub-install /dev/<boot_device>         *
-		* # reboot                                  *
+		* # shutdown -r now                         *
 		*                                           *
 		*********************************************
 		EOF
