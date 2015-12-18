@@ -150,8 +150,22 @@ upgrading_system() {
 		fi
 	fi
 	upgrade
-	display_post_system_upgrade_notice
 	display_warning_purge_db
+	display_post_system_upgrade_notice
+}
+
+disable_current_dist() {
+	cp -n /etc/apt/sources.list.d/xivo-dist.list{,.disabled}
+}
+
+enable_current_dist() {
+	if is_current_dist_disabled; then
+		mv /etc/apt/sources.list.d/xivo-dist.list{.disabled,}
+	fi
+}
+
+is_current_dist_disabled() {
+	[ -e "/etc/apt/sources.list.d/xivo-dist.list.disabled" ]
 }
 
 is_linux_3.2_installed() {
@@ -159,6 +173,9 @@ is_linux_3.2_installed() {
 }
 
 exec_squeeze_to_wheezy_migration() {
+	disable_current_dist
+	xivo-dist xivo-15.19
+
 	wget -q -O - $mirror_xivo/d-i/wheezy/xivo-squeeze-to-wheezy.cfg | debconf-set-selections
 	sed -i 's/squeeze/wheezy/' /etc/apt/sources.list
 
@@ -184,6 +201,8 @@ exec_squeeze_to_wheezy_migration() {
 	for kr in $kernel_release; do
 		apt-get install dahdi-linux-modules-${kr}
 	done
+
+	enable_current_dist
 
 	xivo-service restart all
 }
