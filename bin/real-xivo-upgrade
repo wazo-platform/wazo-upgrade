@@ -336,11 +336,20 @@ display_system_upgrade_notice() {
 EOF
 	elif is_wheezy; then
 		cat <<-EOF
-
-		The Debian GNU/Linux system will be upgraded from version 7 (Wheezy)
-		to 8 (Jessie). Hence, this upgrade will be longer than other upgrades.
-
-		You will need to RESTART the machine after the upgrade.
+	****************************************************************************
+	*                                                                          *
+	*  The Debian GNU/Linux system will be upgraded from version 7 (Wheezy)    *
+	*  to 8 (Jessie) and PostgreSQL will be upgraded from version 9.1 to 9.4.  *
+	*  Hence, this upgrade will be longer than other upgrades.                 *
+	*                                                                          *
+	*  You can backup your database using this following command:              *
+	*      $ /usr/sbin/xivo-backup db /var/backups/xivo/pg_migration_91_to_94  *
+	*                                                                          *
+	*  Your configuration files from postgresql 9.1 will be moved in /tmp.     *
+	*                                                                          *
+	*  You will need to RESTART the machine after the upgrade.                 *
+	*                                                                          *
+	****************************************************************************
 
 EOF
 	fi
