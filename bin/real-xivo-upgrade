@@ -138,7 +138,7 @@ check_if_grub_is_broken() {
 }
 
 upgrading_system() {
-	exec_database_migration
+	exec_database_migration_90_to_91
 	prepare_package_sources
 	display_xivo_version
 	display_ast13_notice
@@ -269,10 +269,10 @@ exec_database_migration_91_to_94() {
 }
 
 
-exec_database_migration() {
+exec_database_migration_90_to_91() {
 	local pg_version=$(pg_lsclusters | grep 'online' | awk '{print $1}')
 	if [[ $pg_version == *"9.0"* ]]; then
-		if ! /usr/bin/xivo-migrate-db; then
+		if ! /usr/bin/xivo-migrate-db-90-to-91; then
 			exit
 		fi
 		export UPGRADING_POSTGRESQL=1
