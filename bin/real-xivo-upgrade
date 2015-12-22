@@ -216,6 +216,14 @@ is_linux_image_686_pae_meta_installed() {
 	[ -n "$(dpkg -l linux-image-686-pae 2>/dev/null | grep '^ii')" ]
 }
 
+is_linux_image_586_meta_installed() {
+	[ -n "$(dpkg -l linux-image-586 2>/dev/null | grep '^ii')" ]
+}
+
+is_cpu_support_pae() {
+	grep -q pae /proc/cpuinfo
+}
+
 install_linux_image() {
 	case $(dpkg --print-architecture) in
 		amd64)
@@ -224,8 +232,14 @@ install_linux_image() {
 			fi
 			;;
 		i386)
-			if ! is_linux_image_686_pae_meta_installed ; then
-				apt-get install --yes linux-image-686-pae
+			if is_cpu_support_pae ; then
+				if ! is_linux_image_686_pae_meta_installed ; then
+					apt-get install --yes linux-image-686-pae
+				fi
+			else
+				if ! is_linux_image_586_meta_installed ; then
+					apt-get install --yes linux-image-586
+				fi
 			fi
 			;;
 	esac
