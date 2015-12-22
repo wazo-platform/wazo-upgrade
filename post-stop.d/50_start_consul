@@ -10,7 +10,9 @@
 # process), we need to start consul at the very start of the upgrade process.
 
 enable_consul() {
-	sed -i 's/RUNCONSUL=no/RUNCONSUL=yes/' "/etc/default/consul"
+	if [ -f /etc/default/consul ]; then
+		sed -i 's/RUNCONSUL=no/RUNCONSUL=yes/' "/etc/default/consul"
+	fi
 }
 
 start_consul() {
