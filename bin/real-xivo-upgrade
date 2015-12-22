@@ -65,6 +65,7 @@ upgrade() {
 	elif is_wheezy; then
 		export UPGRADING_TO_JESSIE=1
 		exec_wheezy_to_jessie_migration
+        exec_database_migration_91_to_94
 	else
 		execute apt-get install -o Dpkg::Options::="--force-confnew" -y xivo-config
 		execute apt-get install -o Dpkg::Options::="--force-confnew" -y xivo xivo-libdao xivo-ctid xivo-web-interface
@@ -137,7 +138,7 @@ check_if_grub_is_broken() {
 }
 
 upgrading_system() {
-	exec_database_migration
+	exec_database_migration_90_to_91
 	prepare_package_sources
 	display_xivo_version
 	display_ast13_notice
@@ -257,10 +258,21 @@ exec_wheezy_to_jessie_migration() {
 	xivo-service restart all
 }
 
-exec_database_migration() {
+exec_database_migration_91_to_94() {
+	local pg_version=$(pg_lsclusters | grep 'online' | awk '{print $1}')
+	if [[ $pg_version == *"9.1"* ]]; then
+		if ! /usr/bin/xivo-migrate-db-91-to-94; then
+			exit
+		fi
+		export UPGRADING_POSTGRESQL=1
+	fi
+}
+
+
+exec_database_migration_90_to_91() {
 	local pg_version=$(pg_lsclusters | grep 'online' | awk '{print $1}')
 	if [[ $pg_version == *"9.0"* ]]; then
-		if ! /usr/bin/xivo-migrate-db; then
+		if ! /usr/bin/xivo-migrate-db-90-to-91; then
 			exit
 		fi
 		export UPGRADING_POSTGRESQL=1
@@ -324,11 +336,17 @@ display_system_upgrade_notice() {
 EOF
 	elif is_wheezy; then
 		cat <<-EOF
-
-		The Debian GNU/Linux system will be upgraded from version 7 (Wheezy)
-		to 8 (Jessie). Hence, this upgrade will be longer than other upgrades.
-
-		You will need to RESTART the machine after the upgrade.
+	****************************************************************************
+	*                                                                          *
+	*  The Debian GNU/Linux system will be upgraded from version 7 (Wheezy)    *
+	*  to 8 (Jessie) and PostgreSQL will be upgraded from version 9.1 to 9.4.  *
+	*  Hence, this upgrade will be longer than other upgrades.                 *
+	*                                                                          *
+	*  Your configuration files from postgresql 9.1 will be moved in /tmp.     *
+	*                                                                          *
+	*  You will need to RESTART the machine after the upgrade.                 *
+	*                                                                          *
+	****************************************************************************
 
 EOF
 	fi
