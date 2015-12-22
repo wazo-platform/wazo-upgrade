@@ -106,7 +106,7 @@ disable_monit() {
 
 stop_monit() {
     if [ $include_monit -eq 1 ]; then
-        /etc/init.d/monit stop > /dev/null
+        service monit stop > /dev/null
     fi
 }
 
@@ -118,7 +118,7 @@ enable_monit() {
 
 start_monit() {
     if [ $include_monit -eq 1 ]; then
-        /etc/init.d/monit start > /dev/null
+        service monit start > /dev/null
     fi
 }
 
@@ -177,7 +177,7 @@ is_running() {
             running=3
         fi
     else
-        /etc/init.d/$service status >& /dev/null
+        service $service status >& /dev/null
         running=$?
     fi
     echo $running
