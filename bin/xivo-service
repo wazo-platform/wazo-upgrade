@@ -1,19 +1,8 @@
 #!/bin/bash
-### BEGIN INIT INFO
-# Provides:          xivo
-# Required-Start:    $remote_fs $syslog $network
-# Required-Stop:     $remote_fs $syslog $network
-# Should-Start:      $named
-# Should-Stop:       $named
-# Default-Start:     2 3 4 5
-# Default-Stop:      0 1 6
-# Short-Description: XiVO corporate telephony server
-# Description:       Controls and starts XiVO and its services
-### END INIT INFO
 
 PATH=/bin:/usr/bin:/sbin:/usr/sbin
 action=$1
-services_filter=$2
+services_filter=${2:-default}
 include_monit=1
 xivo_services="xivo-auth xivo-confgend xivo-dxtora xivo-provd xivo-agid asterisk xivo-amid xivo-call-logs xivo-agentd xivo-ctid xivo-dird xivo-dird-phoned xivo-ctid-ng"
 default_services="dahdi xivo-sysconfd xivo-confd $xivo_services"
@@ -22,10 +11,6 @@ monit_default="/etc/default/monit"
 asterisk_default="/etc/default/asterisk"
 XIVO_DEFAULT_FILE="/etc/default/xivo"
 MAX_RETRY_SERVICE=30
-
-# Support both argument passing conventions
-[ "$services_filter" ] || services_filter=$OCF_RESKEY_services_filter
-[ "$services_filter" ] || services_filter=default
 
 if [ "$services_filter" = default ]; then
     services=$default_services
@@ -39,7 +24,6 @@ elif [ "$services_filter" = "xivo-nomonit" ]; then
 else
     echo "Invalid service filter \"$services_filter\""
     usage
-    exit 2 # same as OCF_ERR_ARGS
 fi
 
 reverse_list() {
