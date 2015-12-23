@@ -11,6 +11,8 @@ monit_default="/etc/default/monit"
 asterisk_default="/etc/default/asterisk"
 XIVO_DEFAULT_FILE="/etc/default/xivo"
 MAX_RETRY_SERVICE=30
+xivo_disabled_file="/var/lib/xivo/disabled"
+is_systemd=0
 
 if [ "$services_filter" = default ]; then
     services=$default_services
@@ -25,6 +27,11 @@ else
     echo "Invalid service filter \"$services_filter\""
     usage
 fi
+
+if [ -d /run/systemd/system ]; then
+    is_systemd=1
+fi
+
 
 reverse_list() {
     local service_list=$1
@@ -78,6 +85,7 @@ xivo_status() {
 
 xivo_enable() {
     echo "Enabling XiVO services..."
+    rm -f $xivo_disabled_file
     echo startup=yes > $XIVO_DEFAULT_FILE
     enable_asterisk
     enable_monit
@@ -85,23 +93,29 @@ xivo_enable() {
 
 xivo_disable() {
     echo "Disabling XiVO services..."
+    touch $xivo_disabled_file
     echo startup=no > $XIVO_DEFAULT_FILE
-    disable_monit
     disable_asterisk
+    disable_monit
 }
 
 disable_asterisk() {
-    sed -i 's/RUNASTERISK=yes/RUNASTERISK=no/' $asterisk_default
+    if [ -f $asterisk_default ]; then
+        sed -i 's/RUNASTERISK=yes/RUNASTERISK=no/' $asterisk_default
+    fi
 }
 
 enable_asterisk() {
-    sed -i 's/RUNASTERISK=no/RUNASTERISK=yes/' $asterisk_default
+    if [ -f $asterisk_default ]; then
+        sed -i 's/RUNASTERISK=no/RUNASTERISK=yes/' $asterisk_default
+    fi
 }
 
 disable_monit() {
     sed -i 's/startup=1/startup=0/' $monit_default  # older monit
     sed -i 's/START=yes/START=no/' $monit_default
-    update-rc.d monit disable &> /dev/null
+    # systemctl disable also updates sysv links via update-rc.d
+    systemctl disable monit
 }
 
 stop_monit() {
@@ -113,7 +127,7 @@ stop_monit() {
 enable_monit() {
     sed -i 's/startup=0/startup=1/' $monit_default  # older monit
     sed -i 's/START=no/START=yes/' $monit_default
-    update-rc.d monit enable
+    systemctl enable monit
 }
 
 start_monit() {
@@ -154,14 +168,24 @@ is_enabled() {
     local service=$1
     enabled=0
     if [ $service = "asterisk" ]; then
-        grep -q 'RUNASTERISK=yes' $asterisk_default
-        enabled=$?
+        if [ $is_systemd -eq 0 ]; then
+            grep -q 'RUNASTERISK=yes' $asterisk_default
+            enabled=$?
+        else
+            test ! -f $xivo_disabled_file
+            enabled=$?
+        fi
     fi
     for srv in $xivo_services; do
         if [ $srv != "asterisk" ]; then
             if [ $srv = $service ]; then
-                grep -q 'startup=yes' $XIVO_DEFAULT_FILE
-                enabled=$?
+                if [ $is_systemd -eq 0 ]; then
+                    grep -q 'startup=yes' $XIVO_DEFAULT_FILE
+                    enabled=$?
+                else
+                    test ! -f $xivo_disabled_file
+                    enabled=$?
+                fi
             fi
         fi
     done
@@ -172,12 +196,17 @@ is_running() {
     local service=$1
     local running=0
     if [ "$service" = "postgresql" ] ; then
-        pg_state=$(pg_lsclusters | tail -n 1 | awk '{print $4}')
-        if [ "$pg_state" != "online" ] ; then
-            running=3
+        if [ $is_systemd -eq 0 ]; then
+            pg_state=$(pg_lsclusters | tail -n 1 | awk '{print $4}')
+            if [ "$pg_state" != "online" ] ; then
+                running=3
+            fi
+        else
+            systemctl status postgresql@9.4-main.service > /dev/null
+            running=$?
         fi
     else
-        service $service status >& /dev/null
+        service $service status > /dev/null
         running=$?
     fi
     echo $running
@@ -186,16 +215,29 @@ is_running() {
 start_services() {
     local services=$1
     for service in $services; do
+        if [ $service = postgresql -a $is_systemd -eq 1 ]; then
+            service=postgresql@9.4-main
+        fi
         enabled=$(is_enabled $service)
         running=$(is_running $service)
         if [ $enabled -eq 0 ] && [ $running -ne 0 ] ; then
-            if [ -f /etc/init.d/$service ]; then
-                invoke-rc.d $service start > /dev/null
+            if [ $is_systemd -eq 0 ]; then
+                if [ -f /etc/init.d/$service ]; then
+                    invoke-rc.d $service start > /dev/null
+                    echo -en "\tstarting $service ..."
+                    _x=0
+                    while [ $(is_running "$service") -ne 0 ]; do
+                        wait_for_service
+                    done
+                    echo " OK"
+                fi
+            else
                 echo -en "\tstarting $service ..."
-                _x=0
-                while [ $(is_running "$service") -ne 0 ]; do
-                    wait_for_service
-                done
+                if ! systemctl start $service; then
+                    echo " NOK"
+                    open_sip_port
+                    exit 1
+                fi
                 echo " OK"
             fi
         elif [ $enabled -ne 0 ]; then
@@ -209,11 +251,19 @@ stop_services() {
     stop_monit
     local services=$1
     for service in $services; do
-        running=$(is_running "$service")
-        if [ $running -eq 0 ]; then
-            if [  -f /etc/init.d/$service ]; then
-                invoke-rc.d $service stop > /dev/null
+        if [ $service = postgresql -a $is_systemd -eq 1 ]; then
+            service=postgresql@9.4-main
+        fi
+
+        if [ $is_systemd -eq 0 ]; then
+            running=$(is_running "$service")
+            if [ $running -eq 0 ]; then
+                if [  -f /etc/init.d/$service ]; then
+                    invoke-rc.d $service stop > /dev/null
+                fi
             fi
+        else
+            systemctl stop $service
         fi
     done
 }
