@@ -1,2 +1,3 @@
+var/lib/xivo
 var/lib/xivo-upgrade
 usr/share/xivo-upgrade
