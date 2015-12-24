@@ -114,8 +114,6 @@ enable_asterisk() {
 disable_monit() {
     sed -i 's/startup=1/startup=0/' $monit_default  # older monit
     sed -i 's/START=yes/START=no/' $monit_default
-    # systemctl disable also updates sysv links via update-rc.d
-    systemctl disable monit
 }
 
 stop_monit() {
@@ -127,7 +125,6 @@ stop_monit() {
 enable_monit() {
     sed -i 's/startup=0/startup=1/' $monit_default  # older monit
     sed -i 's/START=no/START=yes/' $monit_default
-    systemctl enable monit
 }
 
 start_monit() {
