@@ -90,6 +90,14 @@ is_wheezy() {
 	[ $(debian_version_installed) -eq 7 ]
 }
 
+change_sources_list_from_squeeze_to_wheezy() {
+	sed -i 's/squeeze/wheezy/' /etc/apt/sources.list
+}
+
+change_sources_list_from_wheezy_to_jessie() {
+	sed -i 's/wheezy/jessie/' /etc/apt/sources.list
+}
+
 display_xivo_version() {
 	echo "installed version : $(xivo_version_installed)"
 	echo "proposed update	: $(xivo_version_candidate)"
@@ -178,7 +186,7 @@ exec_squeeze_to_wheezy_migration() {
 	xivo-dist xivo-15.19
 
 	wget -q -O - $mirror_xivo/d-i/wheezy/xivo-squeeze-to-wheezy.cfg | debconf-set-selections
-	sed -i 's/squeeze/wheezy/' /etc/apt/sources.list
+	change_sources_list_from_squeeze_to_wheezy
 
 	xivo-service stop all
 
@@ -246,7 +254,7 @@ install_linux_image() {
 }
 
 exec_wheezy_to_jessie_migration() {
-	sed -i 's/wheezy/jessie/' /etc/apt/sources.list
+	change_sources_list_from_wheezy_to_jessie
 
 	xivo-service stop all
 
@@ -470,5 +478,12 @@ check_wizard_has_been_run
 if [ $download_only -eq 0 ]; then
 	upgrading_system
 else
+	if is_squeeze; then
+		change_sources_list_from_squeeze_to_wheezy
+		apt-get update
+	elif is_wheezy; then
+		change_sources_list_from_wheezy_to_jessie
+		apt-get update
+	fi
 	apt-get -y -d dist-upgrade
 fi
