@@ -94,8 +94,16 @@ change_sources_list_from_squeeze_to_wheezy() {
 	sed -i 's/squeeze/wheezy/' /etc/apt/sources.list
 }
 
+change_sources_list_from_wheezy_to_squeeze() {
+	sed -i 's/wheezy/squeeze/' /etc/apt/sources.list
+}
+
 change_sources_list_from_wheezy_to_jessie() {
 	sed -i 's/wheezy/jessie/' /etc/apt/sources.list
+}
+
+change_sources_list_from_jessie_to_wheezy() {
+	sed -i 's/jessie/wheezy/' /etc/apt/sources.list
 }
 
 display_xivo_version() {
@@ -478,12 +486,18 @@ check_wizard_has_been_run
 if [ $download_only -eq 0 ]; then
 	upgrading_system
 else
+	trap : SIGINT
 	if is_squeeze; then
 		change_sources_list_from_squeeze_to_wheezy
 		apt-get update
+		apt-get -y -d dist-upgrade
+		change_sources_list_from_wheezy_to_squeeze
 	elif is_wheezy; then
 		change_sources_list_from_wheezy_to_jessie
 		apt-get update
+		apt-get -y -d dist-upgrade
+		change_sources_list_from_jessie_to_wheezy
+	else
+		apt-get -y -d dist-upgrade
 	fi
-	apt-get -y -d dist-upgrade
 fi
