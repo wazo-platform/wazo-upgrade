@@ -18,6 +18,10 @@ case "$1" in
         if [ -d /usr/share/xivo-upgrade/migration ]; then
             rm -fr /usr/share/xivo-upgrade/migration
         fi
+
+        if [ ! -f /usr/bin/xivo-service ]; then
+            ln -s /usr/lib/xivo-upgrade/xivo-service /usr/bin/xivo-service
+        fi
     ;;
 
     abort-upgrade)
