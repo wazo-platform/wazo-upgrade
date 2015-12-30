@@ -133,6 +133,10 @@ is_grub_broken() {
 			return 0
 		fi
 	done
+	install_device=$(debconf-show grub-pc | grep 'grub-pc/install_devices:' | cut -b3- | cut -f2 -d\ )
+	if [ "$install_device" -a ! -e "$install_device" ]; then
+		return 0
+	fi
 	return 1
 }
 
@@ -146,6 +150,9 @@ check_if_grub_is_broken() {
 		* # rm /boot/grub/device.map                *
 		* # grub-install /dev/<boot_device>         *
 		* # shutdown -r now                         *
+		*                                           *
+		* If you are often getting this error, you  *
+		* should run "dpkg-reconfigure grub-pc".    *
 		*                                           *
 		*********************************************
 		EOF
