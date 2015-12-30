@@ -128,11 +128,13 @@ display_warning_purge_db() {
 }
 
 is_grub_broken() {
-	for disk in $(awk '{print $2}' /boot/grub/device.map) ; do
-		if [ ! -e "$disk" ] ; then
-			return 0
-		fi
-	done
+	if [ -f /boot/grub/device.map ]; then
+		for disk in $(awk '{print $2}' /boot/grub/device.map) ; do
+			if [ ! -e "$disk" ] ; then
+				return 0
+			fi
+		done
+	fi
 	install_device=$(debconf-show grub-pc | grep 'grub-pc/install_devices:' | cut -b3- | cut -f2 -d\ )
 	if [ "$install_device" -a ! -e "$install_device" ]; then
 		return 0
