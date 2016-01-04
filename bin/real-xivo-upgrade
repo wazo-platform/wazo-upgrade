@@ -367,8 +367,8 @@ display_system_upgrade_notice() {
 	if is_squeeze; then
 		cat <<-EOF
 
-		The Debian GNU/Linux system will be upgraded from version 6 (Squeeze)
-		to 7 (Wheezy). Hence, this upgrade will be longer than other upgrades.
+		The Debian GNU/Linux system will be upgraded from version 6 (squeeze)
+		to 7 (wheezy). Hence, this upgrade will be longer than other upgrades.
 
 		You will need to RESTART the machine after the upgrade.
 
@@ -377,8 +377,8 @@ EOF
 		cat <<-EOF
 	****************************************************************************
 	*                                                                          *
-	*  The Debian GNU/Linux system will be upgraded from version 7 (Wheezy)    *
-	*  to 8 (Jessie) and PostgreSQL will be upgraded from version 9.1 to 9.4.  *
+	*  The Debian GNU/Linux system will be upgraded from version 7 (wheezy)    *
+	*  to 8 (jessie) and PostgreSQL will be upgraded from version 9.1 to 9.4.  *
 	*  Hence, this upgrade will be longer than other upgrades.                 *
 	*                                                                          *
 	*  Your configuration files from postgresql 9.1 will be moved in /tmp.     *
