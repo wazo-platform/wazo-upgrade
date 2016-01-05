@@ -372,6 +372,11 @@ display_system_upgrade_notice() {
 
 		You will need to RESTART the machine after the upgrade.
 
+		Note that, after the upgrade, you'll be in version 15.19 of XiVO, which
+		is the last version of XiVO running on Debian 7 (wheezy). If you want
+		to upgrade to a later version, which is running on Debian 8 (jessie),
+		you'll need to do another xivo-upgrade after restarting your machine.
+
 EOF
 	elif is_wheezy; then
 		cat <<-EOF
