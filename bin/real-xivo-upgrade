@@ -277,6 +277,9 @@ exec_wheezy_to_jessie_migration() {
 
 	apt-get update > /dev/null
 	apt-get install --yes --force-yes -o Dpkg::Options::="--force-confnew" xivo-config
+	if dpkg -s xivo-config | grep -q -F '/etc/fail2ban/filter.d/asterisk.conf'; then
+		apt-get install --yes --force-yes -o Dpkg::Options::="--force-confnew" --reinstall xivo-config
+	fi
 	apt-get install --yes --force-yes -o Dpkg::Options::="--force-confold" monit
 	apt-get upgrade --yes --force-yes -o Dpkg::Options::="--force-confnew"
 	apt-get install --yes --force-yes -o Dpkg::Options::="--force-confnew" alembic/jessie python-alembic/jessie rabbitmq-server/jessie python-aniso8601/jessie python-blinker/jessie python-flask-httpauth/jessie
