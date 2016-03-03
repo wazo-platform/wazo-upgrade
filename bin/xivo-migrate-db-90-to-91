@@ -67,7 +67,7 @@ prepare_configuration() {
     echo "Preparing configuration..."
     echo "Downloading and installing postgresql..."
     apt-get update >>$MIGRATION_LOG_FILE
-    DEBIAN_FRONTEND=noninteractive apt-get install -y postgresql-9.1 postgresql-plpython-9.1 psmisc >>$MIGRATION_LOG_FILE
+    DEBIAN_FRONTEND=noninteractive apt-get install -y postgresql-9.1 postgresql-plpython-9.1 >>$MIGRATION_LOG_FILE
 }
 
 validate_configuration() {
@@ -104,8 +104,8 @@ stop_services() {
     echo "Stopping services..."
     xivo-service stop
     /etc/init.d/cron stop >>$MIGRATION_LOG_FILE
-    killall xivo-stat &>>$MIGRATION_LOG_FILE
-    killall xivo-call-logs &>>$MIGRATION_LOG_FILE
+    pkill -f xivo-stat &>>$MIGRATION_LOG_FILE
+    pkill -f xivo-call-logs &>>$MIGRATION_LOG_FILE
     /etc/init.d/postgresql stop
 }
 
