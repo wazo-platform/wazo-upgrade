@@ -10,7 +10,7 @@ LOCAL_PROVD = "http://localhost:8666/provd"
 SCRIPT_NAME = os.path.basename(sys.argv[0])
 SCRIPT_EXEC = os.path.join('/', 'var', 'lib', 'xivo-upgrade', SCRIPT_NAME)
 
-logger = logging.getLogger('reset_unassociated_devices_to_autoprov')
+logger = logging.getLogger('set_default_dtmf_mode')
 
 if os.path.exists(SCRIPT_EXEC):
     sys.exit(0)
