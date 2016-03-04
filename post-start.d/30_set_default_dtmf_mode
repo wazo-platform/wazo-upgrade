@@ -1,0 +1,40 @@
+#!/usr/bin/env python
+
+import logging
+import os
+import sys
+
+from xivo_provd_client import new_provisioning_client
+
+LOCAL_PROVD = "http://localhost:8666/provd"
+SCRIPT_NAME = os.path.basename(sys.argv[0])
+SCRIPT_EXEC = os.path.join('/', 'var', 'lib', 'xivo-upgrade', SCRIPT_NAME)
+
+logger = logging.getLogger('set_default_dtmf_mode')
+
+if os.path.exists(SCRIPT_EXEC):
+    sys.exit(0)
+
+logging.basicConfig(level=logging.INFO)
+
+logger.debug("Connecting to provd...")
+provd_client = new_provisioning_client(LOCAL_PROVD)
+config_manager = provd_client.config_manager()
+
+logger.debug("Fetching default device template...")
+default_config = config_manager.get('defaultconfigdevice')
+
+logger.info("Setting SIP DTMF mode in default template to SIP-INFO")
+raw_config = default_config['raw_config']
+
+if 'sip_dtmf_mode' not in raw_config:
+    raw_config['sip_dtmf_mode'] = 'SIP-INFO'
+    logger.debug("Updating config...")
+    config_manager.update(default_config)
+else:
+    logger.warn("DTMF mode already set. Not updating.")
+
+# Create empty file as a flag to avoid running the script again
+open(SCRIPT_EXEC, 'w').close()
+
+logger.debug('Done.')
