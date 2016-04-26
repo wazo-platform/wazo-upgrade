@@ -479,7 +479,7 @@ check_wizard_has_been_run() {
 }
 
 is_xivo_configured() {
-	[ -n "$(curl -skX GET --header 'Accept: application/json' 'https://localhost:9486/1.1/wizard' | grep '{\"configured\": true}')" ]
+	[ -n "$(curl -skX GET --header 'Accept: application/json' 'https://localhost:9486/1.1/wizard' | grep '\"configured\"[[:space:]]*:[[:space:]]*true')" ]
 }
 
 warning_xivo_not_configured() {
