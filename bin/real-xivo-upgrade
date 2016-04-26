@@ -459,16 +459,31 @@ xivo_version_candidate() {
 }
 
 check_wizard_has_been_run() {
+
 	local xivo_package=$(xivo_package)
 	if [[ $(xivo_version_installed) < '13.03' && -f "/etc/$xivo_package/web-interface/xivo.ini" ]]; then
 		touch "/var/lib/$xivo_package/configured"
 		chmod 664 "/var/lib/$xivo_package/configured"
+
 	fi
 
-	if [ ! -f "/var/lib/$xivo_package/configured" ]; then
-		echo "Warning You should run the wizard before using xivo-upgrade"
+	if [[ $(xivo_version_installed) > '16.05' ]]; then
+	   if ! is_xivo_configured; then
+			warning_xivo_not_configured
+			exit 1
+		fi
+	elif [ ! -f "/var/lib/$xivo_package/configured" ]; then
+		warning_xivo_not_configured
 		exit 1
 	fi
+}
+
+is_xivo_configured() {
+	[ -n "$(curl -skX GET --header 'Accept: application/json' 'https://localhost:9486/1.1/wizard' | grep '{\"configured\": true}')" ]
+}
+
+warning_xivo_not_configured() {
+	echo "Warning You should run the wizard before using xivo-upgrade"
 }
 
 usage() {
