@@ -3,6 +3,7 @@
 PATH=/bin:/usr/bin:/sbin:/usr/sbin
 lib_directory="/usr/share/xivo-upgrade"
 mirror_xivo="http://mirror.xivo.io"
+: ${XIVO_CONFD_PORT:='9486'}
 
 # force all debian upgrade to non interactive mode
 export DEBIAN_FRONTEND=noninteractive
@@ -479,7 +480,7 @@ check_wizard_has_been_run() {
 }
 
 is_xivo_configured() {
-	[ -n "$(curl -skX GET --header 'Accept: application/json' 'https://localhost:9486/1.1/wizard' | grep '\"configured\"[[:space:]]*:[[:space:]]*true')" ]
+	[ -n "$(curl -skX GET --header 'Accept: application/json' "https://localhost:$XIVO_CONFD_PORT/1.1/wizard" | grep '\"configured\"[[:space:]]*:[[:space:]]*true')" ]
 }
 
 warning_xivo_not_configured() {
