@@ -468,23 +468,14 @@ check_wizard_has_been_run() {
 
 	fi
 
-	if [[ $(xivo_version_installed) > '16.05' ]]; then
-		if ! is_xivo_configured; then
-			warning_xivo_not_configured
-			exit 1
-		fi
-	elif [ ! -f "/var/lib/$xivo_package/configured" ]; then
-		warning_xivo_not_configured
+	if ! is_xivo_configured; then
+		echo "Warning You should run the wizard before using xivo-upgrade"
 		exit 1
 	fi
 }
 
 is_xivo_configured() {
-	[ -n "$(curl -skX GET --header 'Accept: application/json' "https://localhost:$XIVO_CONFD_PORT/1.1/wizard" | grep '\"configured\"[[:space:]]*:[[:space:]]*true')" ]
-}
-
-warning_xivo_not_configured() {
-	echo "Warning You should run the wizard before using xivo-upgrade"
+	[ -n "$(curl -skX GET --header 'Accept: application/json' "https://localhost:$XIVO_CONFD_PORT/1.1/wizard" | grep '\"configured\"[[:space:]]*:[[:space:]]*true')" ] || [ -f "/var/lib/$xivo_package/configured" ]
 }
 
 usage() {
