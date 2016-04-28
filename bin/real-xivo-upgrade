@@ -469,7 +469,7 @@ check_wizard_has_been_run() {
 	fi
 
 	if ! is_xivo_configured; then
-		echo "Warning You should run the wizard before using xivo-upgrade"
+		echo "ERROR: You must configure XiVO by running the web wizard before using xivo-upgrade"
 		exit 1
 	fi
 }
