@@ -3,6 +3,7 @@
 PATH=/bin:/usr/bin:/sbin:/usr/sbin
 lib_directory="/usr/share/xivo-upgrade"
 mirror_xivo="http://mirror.xivo.io"
+: ${XIVO_CONFD_PORT:='9486'}
 
 # force all debian upgrade to non interactive mode
 export DEBIAN_FRONTEND=noninteractive
@@ -459,16 +460,22 @@ xivo_version_candidate() {
 }
 
 check_wizard_has_been_run() {
+
 	local xivo_package=$(xivo_package)
 	if [[ $(xivo_version_installed) < '13.03' && -f "/etc/$xivo_package/web-interface/xivo.ini" ]]; then
 		touch "/var/lib/$xivo_package/configured"
 		chmod 664 "/var/lib/$xivo_package/configured"
+
 	fi
 
-	if [ ! -f "/var/lib/$xivo_package/configured" ]; then
-		echo "Warning You should run the wizard before using xivo-upgrade"
+	if ! is_xivo_configured; then
+		echo "ERROR: You must configure XiVO by running the web wizard before using xivo-upgrade"
 		exit 1
 	fi
+}
+
+is_xivo_configured() {
+	[ -n "$(curl -skX GET --header 'Accept: application/json' "https://localhost:$XIVO_CONFD_PORT/1.1/wizard" | grep '\"configured\"[[:space:]]*:[[:space:]]*true')" ] || [ -f "/var/lib/$xivo_package/configured" ]
 }
 
 usage() {
