@@ -414,7 +414,7 @@ display_post_system_upgrade_notice() {
 
 list_packages_with_filter () {
 	filter="$1"
-	aptitude -q -F '%p' search "$filter"
+	aptitude -q -F '%p' --disable-columns search "$filter"
 }
 
 prepare_package_sources () {
