@@ -14,6 +14,16 @@ function copy_new_files_while_preserving_old_files () {
 	fi
 }
 
+is_package_installed() {
+    [ "$(dpkg-query -W -f '${Status}' "$1" 2>/dev/null)" = 'install ok installed' ]
+}
+
+is_package_purgeable() {
+    local output="$(dpkg-query -W -f '${Status}' "$1" 2>/dev/null)"
+
+    [ "$?" -eq 0 -a "$output" != 'unknown ok not-installed' ]
+}
+
 renamed_packages="pf-xivo-agid
                   pf-xivo-base-config
                   pf-xivo-fetchfw
@@ -45,11 +55,17 @@ if [ "$pg_common_version" = "140+0.xivo-backport-2" ]; then
 fi
 
 for package in $renamed_packages; do
-    dpkg -l $package 2> /dev/null | grep -Eq '^(ii|rc)'
-    if [ $? = 0 ]; then
+    if is_package_purgeable $package; then
         apt-get purge -y --force-yes $package
     fi
 done
 
 # manually purge xivo-manage-tokens
 rm -rf /var/lib/xivo-manage-tokens
+
+# purge postgresql-X.X packages
+if is_package_installed xivo-dbms; then
+   if is_package_purgeable postgresql-9.1; then
+       apt-get purge -y --force-yes postgresql-9.1 postgresql-client-9.1 postgresql-plpython-9.1
+   fi
+fi
