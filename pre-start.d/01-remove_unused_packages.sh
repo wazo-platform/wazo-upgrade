@@ -1,6 +1,6 @@
 #!/bin/bash
 
-function copy_new_files_while_preserving_old_files () {
+copy_new_files_while_preserving_old_files() {
 	old_dir="$1"
 	new_dir="$2"
 	backup_dir="$2.bak-xivo-upgrade"
