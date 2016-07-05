@@ -19,7 +19,9 @@ is_package_installed() {
 }
 
 is_package_purgeable() {
-    local output="$(dpkg-query -W -f '${Status}' "$1" 2>/dev/null)"
+    local output
+
+    output="$(dpkg-query -W -f '${Status}' "$1" 2>/dev/null)"
 
     [ "$?" -eq 0 -a "$output" != 'unknown ok not-installed' ]
 }
