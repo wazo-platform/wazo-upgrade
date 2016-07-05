@@ -1,7 +1,6 @@
 bin/real-xivo-upgrade usr/bin/
 bin/xivo-check-conffiles usr/bin/
 bin/xivo-migrate-db-90-to-91 usr/bin/
-bin/xivo-migrate-db-91-to-94 usr/bin/
 bin/xivo-upgrade usr/bin/
 bin/xivo-service usr/lib/xivo-upgrade/
 pre-stop.d/ usr/share/xivo-upgrade
