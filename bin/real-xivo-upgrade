@@ -460,9 +460,14 @@ check_wizard_has_been_run() {
 }
 
 is_xivo_configured() {
-	[ -n "$(curl -skX GET --header 'Accept: application/json' "https://localhost:$XIVO_CONFD_PORT/1.1/wizard" | grep '\"configured\"[[:space:]]*:[[:space:]]*true')" \
-	  -o -f "/var/lib/xivo/configured" \
-	  -o -f "/var/lib/pf-xivo/configured" ]
+	if [ -f "/var/lib/xivo/configured" -o -f "/var/lib/pf-xivo/configured" ] ; then
+		return 0
+	fi
+	if [ ! -f "/var/run/xivo-confd/xivo-confd.pid" ] ; then
+		echo "ERROR: xivo-confd is not running: cannot check if the web wizard has been run."
+		exit 1
+	fi
+	[ -n "$(curl -skX GET --header 'Accept: application/json' "https://localhost:$XIVO_CONFD_PORT/1.1/wizard" | grep '\"configured\"[[:space:]]*:[[:space:]]*true')" ]
 }
 
 usage() {
