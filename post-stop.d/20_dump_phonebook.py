@@ -40,7 +40,13 @@ def _read_old_phonebook(cur):
 
     contacts = {}
 
-    cur.execute("""SELECT {} FROM "phonebook" """.format(','.join(phonebook_fields)))
+    try:
+        cur.execute("""SELECT {} FROM "phonebook" """.format(','.join(phonebook_fields)))
+    except psycopg2.ProgrammingError as e:
+        if 'relation "phonebook" does not exist' in str(e):  # The phonebook as already been migrated
+            sys.exit(0)
+        raise
+
     for row in cur.fetchall():
         id, title, firstname, lastname, displayname, society, email, url, description = row
         contacts[id] = {
