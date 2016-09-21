@@ -7,8 +7,10 @@ import psycopg2
 import sys
 import json
 
+from contextlib import closing
 
-def _read_old_phonebook():
+
+def _read_old_phonebook(cur):
     phonebook_fields = [
         'id',
         'title',
@@ -36,14 +38,7 @@ def _read_old_phonebook():
         'country',
     ]
 
-    try:
-        conn = psycopg2.connect('postgresql://asterisk:proformatique@localhost/asterisk')
-    except:
-        print('Failed to connect to PG', file=sys.stderr)
-        sys.exit(1)
-
     contacts = {}
-    cur = conn.cursor()
 
     cur.execute("""SELECT {} FROM "phonebook" """.format(','.join(phonebook_fields)))
     for row in cur.fetchall():
@@ -60,7 +55,7 @@ def _read_old_phonebook():
         }
 
     if not contacts:
-        return {}
+        return []
 
     cur.execute("""SELECT {} FROM "phonebooknumber" """.format(','.join(phonebook_number_fields)))
     for row in cur.fetchall():
@@ -83,14 +78,19 @@ def _read_old_phonebook():
 
     return contacts.values()
 
-def _save_phonebook(content, filename):
-    if not content:
+
+def _list_entities(cur):
+    cur.execute("""SELECT "name" FROM "entity" where "disable" = 0 """)
+    return [row[0] for row in cur.fetchall()]
+
+def _save_to_file(phonebook, entities, filename):
+    if not phonebook or not entities:
         return
 
     print('saving phonebook to {}'.format(filename), end='... ')
 
     with open(filename, 'w') as f:
-        json.dump(content, f)
+        json.dump([entities, phonebook], f)
 
     print('done.')
 
@@ -103,5 +103,10 @@ if __name__ == '__main__':
     if os.path.exists(phonebook_filename):
         sys.exit(0)
 
-    phonebook_content = _read_old_phonebook()
-    _save_phonebook(phonebook_content, phonebook_filename)
+    with closing(psycopg2.connect('postgresql://asterisk:proformatique@localhost/asterisk')) as conn:
+        cursor = conn.cursor()
+        phonebook_content = _read_old_phonebook(cursor) or []
+        entities = _list_entities(cursor) or []
+
+
+    _save_to_file(phonebook_content, entities, phonebook_filename)
