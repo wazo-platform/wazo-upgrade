@@ -103,7 +103,7 @@ def _save_to_file(phonebook, entities, filename):
 
 
 if __name__ == '__main__':
-    if os.getenv('XIVO_VERSION_INSTALLED' > '16.13'):
+    if os.getenv('XIVO_VERSION_INSTALLED') > '16.13':
         sys.exit(0)
 
     phonebook_filename = '/var/lib/xivo-upgrade/phonebook_dump.json'
