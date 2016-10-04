@@ -43,7 +43,7 @@ def _read_old_phonebook(cur):
     try:
         cur.execute("""SELECT {} FROM "phonebook" """.format(','.join(phonebook_fields)))
     except psycopg2.ProgrammingError as e:
-        if 'relation "phonebook" does not exist' in str(e):  # The phonebook as already been migrated
+        if 'relation "phonebook" does not exist' in str(e):  # The phonebook has already been migrated
             sys.exit(0)
         raise
 
@@ -89,6 +89,7 @@ def _list_entities(cur):
     cur.execute("""SELECT "name" FROM "entity" where "disable" = 0 """)
     return [row[0] for row in cur.fetchall()]
 
+
 def _save_to_file(phonebook, entities, filename):
     if not phonebook or not entities:
         return
@@ -113,6 +114,5 @@ if __name__ == '__main__':
         cursor = conn.cursor()
         phonebook_content = _read_old_phonebook(cursor) or []
         entities = _list_entities(cursor) or []
-
 
     _save_to_file(phonebook_content, entities, phonebook_filename)
