@@ -167,7 +167,7 @@ upgrading_system() {
 	exec_database_migration_90_to_91
 	prepare_package_sources
 	display_xivo_version
-	display_ast13_notice
+	display_asterisk_notice
 	display_system_upgrade_notice
 	if [ $force -eq 0 ]; then
 		read -p 'Would you like to upgrade your system (all services will be restarted) [Y/n]? ' answer
@@ -332,7 +332,7 @@ exec_database_migration_90_to_91() {
 	fi
 }
 
-display_ast13_notice() {
+display_asterisk_notice() {
 	ast_version=$(dpkg-query -W -f '${Version}' asterisk 2>/dev/null)
 	case "$ast_version" in
 		*:1.8.*)
@@ -341,27 +341,41 @@ display_ast13_notice() {
 		8:11.*)
 			ast_major_version="11"
 			;;
+		8:13.*)
+			ast_major_version="13"
+			;;
 		*)
 			ast_major_version="unknown"
 			;;
 	esac
-	if dpkg --compare-versions "$ast_version" le 8:13-1; then
+	if dpkg --compare-versions "$ast_version" le 8:14; then
 		cat <<-EOF
 
-		Asterisk will be upgraded from version $ast_major_version to 13. You might be impacted if you have:
-		* custom dialplan
-		* custom Asterisk configuration
-		* custom application using AGI, AMI or any other Asterisk interface
-		* custom application exploiting CEL or queue_log
-		* custom Asterisk modules (e.g. codec_g729a.so)
-		* customized Asterisk in some other way
-		* DAHDI trunks using SS7 signaling
+		Asterisk will be upgraded from version $ast_major_version to 14. You might be impacted if you have:
+		EOF
+		if dpkg --compare-versions "$ast_version" le 8:13; then
+			cat <<-EOF
+			* custom dialplan
+			* custom Asterisk configuration
+			* custom application using AGI, AMI, ARI or any other Asterisk interface
+			* custom application exploiting CEL or queue_log
+			* custom Asterisk modules (e.g. codec_g729a.so)
+			* customized Asterisk in some other way
+			EOF
+		else
+			cat <<-EOF
+			* custom Asterisk configuration (other than custom dialplan)
+			* custom application using AMI or ARI
+			* custom Asterisk modules (e.g. codec_g729a.so)
+			EOF
+		fi
+		cat <<-EOF
 		If you find yourself in one of these cases, you should make sure that
-		your customizations still work with Asterisk 13. Please refer to
-		http://documentation.xivo.io/en/stable/upgrade/15.13/asterisk_13.html for
+		your customizations still work with Asterisk 14. Please refer to
+		http://documentation.xivo.io/en/stable/upgrade/16.14/asterisk_14.html for
 		more information.
 
-	EOF
+		EOF
 
 		if [ -f /usr/lib/asterisk/modules/codec_g729a.so ]; then
 			mv /usr/lib/asterisk/modules/codec_g729a.so /tmp
@@ -369,8 +383,8 @@ display_ast13_notice() {
 			WARNING: G729 codec module detected.
 
 			A G729 codec module has been detected on your system. Since it will not work with
-			asterisk 13, it has been moved from /usr/lib/asterisk/modules to /tmp. To continue
-			using the G729 module, you will have to install the asterisk 13 version of the module.
+			asterisk 14, it has been moved from /usr/lib/asterisk/modules to /tmp. To continue
+			using the G729 module, you will have to install the asterisk 14 version of the module.
 
 		EOF
 		fi
