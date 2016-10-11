@@ -377,14 +377,20 @@ display_asterisk_notice() {
 
 		EOF
 
-		if [ -f /usr/lib/asterisk/modules/codec_g729a.so ]; then
-			mv /usr/lib/asterisk/modules/codec_g729a.so /tmp
+		custom_modules=$(xivo-asterisk-custom-modules)
+		if [ -n "$custom_modules" ]; then
+			for module in $custom_modules; do
+				mv "/usr/lib/asterisk/modules/$module" /tmp
+			done
 			cat <<-EOF
-			WARNING: G729 codec module detected.
+			WARNING: custom Asterisk modules detected:
 
-			A G729 codec module has been detected on your system. Since it will not work with
-			asterisk 14, it has been moved from /usr/lib/asterisk/modules to /tmp. To continue
-			using the G729 module, you will have to install the asterisk 14 version of the module.
+			$custom_modules
+
+			Since these modules will not work with Asterisk 14 and might cause major
+			instability issues, they have been moved from /usr/lib/asterisk/modules to
+			/tmp. To continue using these modules, you will have to install (or recompile)
+			the Asterisk 14 version of these modules.
 
 		EOF
 		fi
