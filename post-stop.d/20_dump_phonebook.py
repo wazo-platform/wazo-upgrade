@@ -1,4 +1,8 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# Copyright 2016 by Proformatique
+# SPDX-License-Identifier: GPL-3.0+
+
 
 from __future__ import print_function
 
@@ -8,6 +12,9 @@ import sys
 import json
 
 from contextlib import closing
+
+from xivo.chain_map import ChainMap
+from xivo.config_helper import read_config_file_hierarchy
 
 
 def _read_old_phonebook(cur):
@@ -103,14 +110,19 @@ def _save_to_file(phonebook, entities, filename):
 
 
 if __name__ == '__main__':
-    if os.getenv('XIVO_VERSION_INSTALLED') > '16.13':
+    if os.getenv('XIVO_VERSION_INSTALLED') > '16.14':
         sys.exit(0)
 
     phonebook_filename = '/var/lib/xivo-upgrade/phonebook_dump.json'
     if os.path.exists(phonebook_filename):
         sys.exit(0)
 
-    with closing(psycopg2.connect('postgresql://asterisk:proformatique@localhost/asterisk')) as conn:
+    dao_config = read_config_file_hierarchy({'config_file': '/etc/xivo-dao/config.yml',
+                                             'extra_config_files': '/etc/xivo-dao/conf.d'})
+    default_config = {'db_uri': 'postgresql://asterisk:proformatique@localhost/asterisk'}
+    config = ChainMap(dao_config, default_config)
+
+    with closing(psycopg2.connect(config['db_uri'])) as conn:
         cursor = conn.cursor()
         phonebook_content = _read_old_phonebook(cursor) or []
         entities = _list_entities(cursor) or []
