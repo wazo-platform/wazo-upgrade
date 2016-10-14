@@ -98,7 +98,7 @@ def _list_entities(cur):
 
 
 def _save_to_file(phonebook, entities, filename):
-    if not phonebook or not entities:
+    if not entities:
         return
 
     print('saving phonebook to {}'.format(filename), end='... ')
