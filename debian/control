@@ -1,11 +1,10 @@
 Source: xivo-upgrade
 Section: admin
 Priority: extra
-Maintainer: XiVO Dev Team <dev@avencall.com>
+Maintainer: XiVO Dev Team <dev+pkg@proformatique.com>
 Uploaders: XiVO Builder Team <release@xivo.io>
 Build-Depends: debhelper (>= 9)
-Standards-Version: 3.9.4
-Homepage: http://xivo.io/
+Standards-Version: 3.9.6
 
 Package: xivo-upgrade
 Architecture: all

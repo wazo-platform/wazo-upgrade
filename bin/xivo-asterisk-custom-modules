@@ -1,0 +1,20 @@
+#!/bin/sh
+
+set -e
+
+list_installed_modules() {
+	find /usr/lib/asterisk/modules -name '*.so' -type f -printf '%f\n'
+}
+
+list_standard_modules() {
+	grep 'modules' /var/lib/dpkg/info/asterisk.md5sums | cut -c 60-
+	echo 'chan_sccp.so'
+	echo 'res_freeze_check.so'
+}
+
+tmpdir=$(mktemp -d)
+trap 'rm -r --interactive=never "$tmpdir"' EXIT
+
+list_installed_modules | sort > "$tmpdir/installed_modules"
+list_standard_modules | sort > "$tmpdir/standard_modules"
+comm "$tmpdir/installed_modules" "$tmpdir/standard_modules" -2 -3

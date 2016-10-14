@@ -1,4 +1,5 @@
 bin/real-xivo-upgrade usr/bin/
+bin/xivo-asterisk-custom-modules usr/bin/
 bin/xivo-check-conffiles usr/bin/
 bin/xivo-migrate-db-90-to-91 usr/bin/
 bin/xivo-upgrade usr/bin/
