@@ -13,8 +13,7 @@ import json
 
 from contextlib import closing
 
-from xivo.chain_map import ChainMap
-from xivo.config_helper import read_config_file_hierarchy
+DB_URI = 'postgresql://asterisk:proformatique@localhost/asterisk'
 
 
 def _read_old_phonebook(cur):
@@ -117,12 +116,7 @@ if __name__ == '__main__':
     if os.path.exists(phonebook_filename):
         sys.exit(0)
 
-    dao_config = read_config_file_hierarchy({'config_file': '/etc/xivo-dao/config.yml',
-                                             'extra_config_files': '/etc/xivo-dao/conf.d'})
-    default_config = {'db_uri': 'postgresql://asterisk:proformatique@localhost/asterisk'}
-    config = ChainMap(dao_config, default_config)
-
-    with closing(psycopg2.connect(config['db_uri'])) as conn:
+    with closing(psycopg2.connect(DB_URI)) as conn:
         cursor = conn.cursor()
         phonebook_content = _read_old_phonebook(cursor) or []
         entities = _list_entities(cursor) or []

@@ -8,6 +8,6 @@ Standards-Version: 3.9.6
 
 Package: xivo-upgrade
 Architecture: all
-Depends: ${misc:Depends}, aptitude, monit, python-psycopg2, xivo-lib-python
+Depends: ${misc:Depends}, aptitude, monit, python-psycopg2
 Description: XiVO upgrade tools
  This package provide XiVO upgrading tools
