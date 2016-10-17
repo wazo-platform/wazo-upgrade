@@ -1,4 +1,6 @@
 #!/bin/bash
+# Copyright 2016 by Proformatique
+# SPDX-License-Identifier: GPL-3.0+
 
 PATH=/bin:/usr/bin:/sbin:/usr/sbin
 WHEEZY_UPGRADE_FAILED_PATH=/var/lib/xivo-upgrade/wheezy-upgrade-failed
@@ -51,7 +53,7 @@ stop_xivo() {
 
 start_xivo() {
 	xivo-service enable
-	xivo-service start
+	xivo-service restart
 }
 
 upgrade() {
