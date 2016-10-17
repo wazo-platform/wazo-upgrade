@@ -12,5 +12,5 @@ else
     touch "$is_executed_file"
 fi
 
-su - -c "psql -c 'update linefeatures set num = 1 where num = 0;' asterisk > /dev/null" postgres
+sudo -u postgres psql -c 'update linefeatures set num = 1 where num = 0;' asterisk > /dev/null
 curl -s http://localhost/xivo/configuration/json.php/private/provisioning/configregistrar/?act=rebuild_required_config
