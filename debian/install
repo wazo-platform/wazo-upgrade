@@ -1,4 +1,5 @@
 bin/real-xivo-upgrade usr/bin/
+bin/use-wazo-infrastructure usr/lib/xivo-upgrade/
 bin/xivo-asterisk-custom-modules usr/bin/
 bin/xivo-check-conffiles usr/bin/
 bin/xivo-migrate-db-90-to-91 usr/bin/

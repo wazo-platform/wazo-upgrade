@@ -1,0 +1,165 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+# Copyright 2016 The Wazo Authors  (see the AUTHORS file)
+# SPDX-License-Identifier: GPL-3.0+
+
+# Note: this script needs to be python 2.6 compatible since it needs to be
+# able to run on XiVO 1.2.
+
+import os.path
+import socket
+import sys
+
+from subprocess import check_call, CalledProcessError
+
+HEADER_LINE = '# start of section automatically added by use-wazo-infrastructure'
+FOOTER_LINE = '# end of section automatically added by use-wazo-infrastructure'
+
+
+def main():
+    if '--revert' in sys.argv:
+        revert()
+    else:
+        use_wazo_infrastructure()
+
+
+def use_wazo_infrastructure():
+    try:
+        print 'checking if custom template directory exist'
+        custom_tpl_dir = get_custom_template_dir()
+        custom_tpl_file = '{}/hosts'.format(custom_tpl_dir)
+        if not os.path.isdir(custom_tpl_dir):
+            print '  creating directory {}'.format(custom_tpl_dir)
+            check_call(['mkdir', '-p', custom_tpl_dir])
+
+        print 'checking if "hosts" custom template file exist'
+        if not os.path.isfile(custom_tpl_file):
+            source_tpl_dir = get_source_template_dir()
+            source_tpl_file = '{}/hosts'.format(source_tpl_dir)
+            print '  copying source template {} to {}'.format(source_tpl_file, custom_tpl_file)
+            check_call(['cp', source_tpl_file, custom_tpl_file])
+
+        print 'updating "hosts" custom template'
+        lines = read_file_lines(custom_tpl_file)
+        lines = list(filter_wazo_infrastructure_section(lines))
+        lines.extend(generate_wazo_infrastructure_section())
+        write_file_lines(custom_tpl_file, lines)
+
+        print 'running xivo-update-config or equivalent'
+        xivo_update_config_path = get_xivo_update_config_path()
+        check_call([xivo_update_config_path])
+    except CalledProcessError as e:
+        print >>sys.stderr, 'error: {}'.format(e)
+        sys.exit(1)
+
+
+def revert():
+    try:
+        print 'checking if "hosts" custom template file exist'
+        custom_tpl_dir = get_custom_template_dir()
+        custom_tpl_file = '{}/hosts'.format(custom_tpl_dir)
+        if not os.path.isfile(custom_tpl_file):
+            print '  file doesn\'t exist: nothing to do'
+            return
+
+        print 'reading source template content'
+        source_tpl_dir = get_source_template_dir()
+        source_tpl_file = '{}/hosts'.format(source_tpl_dir)
+        source_lines = read_file_lines(source_tpl_file)
+
+        print 'reading custom template content'
+        custom_lines = read_file_lines(custom_tpl_file)
+        custom_lines = list(filter_wazo_infrastructure_section(custom_lines))
+
+        if source_lines == custom_lines:
+            print 'templates are identical: removing custom template'
+            os.unlink(custom_tpl_file)
+        else:
+            print 'templates are different: updating custom template'
+            write_file_lines(custom_tpl_file, custom_lines)
+
+        print 'running xivo-update-config or equivalent'
+        xivo_update_config_path = get_xivo_update_config_path()
+        check_call([xivo_update_config_path])
+    except CalledProcessError as e:
+        print >>sys.stderr, 'error: {}'.format(e)
+        sys.exit(1)
+
+
+def get_custom_template_dir():
+    if os.path.isdir('/etc/xivo/custom-templates'):
+        return '/etc/xivo/custom-templates/system/etc'
+    elif os.path.isdir('/etc/pf-xivo/custom-templates'):
+        return '/etc/pf-xivo/custom-templates/system/etc'
+    else:
+        print >>sys.stderr, 'error: could not determine custom template directory location'
+        sys.exit(1)
+
+
+def get_source_template_dir():
+    if os.path.isdir('/usr/share/xivo-config/templates'):
+        return '/usr/share/xivo-config/templates/system/etc'
+    elif os.path.isdir('/usr/share/pf-xivo-config/templates'):
+        return '/usr/share/xivo-config/templates/system/etc'
+    else:
+        print >>sys.stderr, 'error: could not determine source template directory location'
+        sys.exit(1)
+
+
+def get_xivo_update_config_path():
+    for path in ['/usr/sbin/xivo-update-config',
+                 '/usr/sbin/update-xivo-config',
+                 '/usr/sbin/update-pf-xivo-base-config']:
+        if os.path.isfile(path):
+            return path
+    else:
+        print >>sys.stderr, 'error: could not determine xivo-update-config script location'
+        sys.exit(1)
+
+
+def read_file_lines(path):
+    with open(path) as fobj:
+        return [line.rstrip() for line in fobj]
+
+
+def write_file_lines(path, lines):
+    content = '\n'.join(lines)
+    with open(path, 'w') as fobj:
+        fobj.write(content)
+        fobj.write('\n')
+
+
+def filter_wazo_infrastructure_section(lines):
+    in_section = False
+    for line in lines:
+        if line.startswith(HEADER_LINE):
+            in_section = True
+        if not in_section:
+            yield line
+        if line.startswith(FOOTER_LINE):
+            in_section = False
+
+
+def generate_wazo_infrastructure_section():
+    mirror_ip = resolve_name('mirror.wazo.community')
+    provd_ip = resolve_name('provd.wazo.community')
+    lines = []
+    lines.append(HEADER_LINE)
+    lines.append('{} mirror.xivo.io mirror.xivo.fr'.format(mirror_ip))
+    lines.append('{} provd.xivo.io provd.xivo.fr'.format(provd_ip))
+    lines.append(FOOTER_LINE)
+    return lines
+
+
+def resolve_name(name):
+    try:
+        results = socket.getaddrinfo(name, None, socket.AF_INET)
+    except socket.gaierror as e:
+        print >>sys.stderr, 'error: could not resolve {}: {}'.format(name, e)
+        sys.exit(1)
+    # IP address of first result
+    return results[0][4][0]
+
+
+main()
