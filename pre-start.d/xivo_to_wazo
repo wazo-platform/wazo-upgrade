@@ -1,0 +1,18 @@
+#!/bin/sh
+
+if [ "$XIVO_VERSION_INSTALLED" \> '16.16' ]; then
+    exit 0
+fi
+
+/usr/lib/xivo-upgrade/use-wazo-infrastructure --revert >/dev/null
+
+files="\
+/etc/xivo/provd/provd.conf \
+/var/lib/xivo-provd/app.json \
+"
+
+for file in $files; do
+    if [ -f "$file" ]; then
+	sed -i 's/xivo\.io/wazo.community/' "$file"
+    fi
+done
