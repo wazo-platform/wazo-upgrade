@@ -1,9 +1,24 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
+#!/bin/sh
 
 # Copyright 2016 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
+set -e
+
+version_installed() {
+	for filename in /usr/share/xivo/XIVO-VERSION /usr/share/pf-xivo/XIVO-VERSION; do
+		if [ -f "$filename" ]; then
+			cat "$filename"
+			return
+		fi
+	done
+	echo 'error: could not determine XiVO version' >&2
+	exit 1
+}
+
+use_wazo_infrastructure() {
+	# embedded version of use-wazo-infrastructure, this is a bit nasty
+	python - <<'EOF'
 # Note: this script needs to be python 2.6 compatible since it needs to be
 # able to run on XiVO 1.2.
 
@@ -163,3 +178,30 @@ def resolve_name(name):
 
 
 main()
+EOF
+}
+
+version=$(version_installed)
+
+if [ "$version" \< '14.18' ]; then
+	echo 'Switching to Wazo infrastructure'
+	use_wazo_infrastructure
+fi
+
+if [ "$version" \< '13.25' ]; then
+	echo "Your XiVO needs to be at least in version 13.25 (currently: $version) to be upgradeable to Wazo." >&2
+	echo "Please upgrade your XiVO to 13.25 or later via xivo-upgrade and then rerun $0." >&2
+	exit 1
+fi
+
+if [ "$version" \< '14.18' ]; then
+	echo 'Installing xivo-dist'
+	apt-get update
+	apt-get install -y xivo-dist
+fi
+
+echo 'Updating apt sources to Wazo release'
+sed -i -e 's/xivo\.io/wazo.community/' -e 's/xivo-five/phoenix/' -e 's/xivo-dev/wazo-dev/' -e 's/xivo-rc/wazo-rc/' /etc/apt/sources.list.d/xivo-dist.list
+
+echo 'Launching xivo-upgrade'
+xivo-upgrade
