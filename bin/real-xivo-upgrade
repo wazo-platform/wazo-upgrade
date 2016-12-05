@@ -5,7 +5,7 @@
 PATH=/bin:/usr/bin:/sbin:/usr/sbin
 WHEEZY_UPGRADE_FAILED_PATH=/var/lib/xivo-upgrade/wheezy-upgrade-failed
 lib_directory="/usr/share/xivo-upgrade"
-mirror_xivo="http://mirror.xivo.io"
+mirror_xivo="http://mirror.wazo.community"
 : ${XIVO_CONFD_PORT:='9486'}
 
 # force all debian upgrade to non interactive mode
@@ -118,14 +118,14 @@ display_warning_purge_db() {
 	if [ $XIVO_VERSION_INSTALLED \< '15.11' ]
 	then
 		cat <<-EOF
-		******************************************************************
-		*                           WARNING                              *
-		* Call records older than 365 days will be removed periodically. *
-		* See                                                            *
-		* http://documentation.xivo.io/en/stable/system/purge_logs.html  *
-		* for more details                                               *
-		*                                                                *
-		******************************************************************
+		*************************************************************************
+		*                           WARNING                                     *
+		* Call records older than 365 days will be removed periodically.        *
+		* See                                                                   *
+		* http://documentation.wazo.community/en/stable/system/purge_logs.html  *
+		* for more details                                                      *
+		*                                                                       *
+		*************************************************************************
 		EOF
 	fi
 }
@@ -374,8 +374,8 @@ display_asterisk_notice() {
 		cat <<-EOF
 		If you find yourself in one of these cases, you should make sure that
 		your customizations still work with Asterisk 14. Please refer to
-		http://documentation.xivo.io/en/stable/upgrade/16.14/asterisk_14.html for
-		more information.
+		http://documentation.wazo.community/en/stable/upgrade/16.14/asterisk_14.html
+		for more information.
 
 		EOF
 
@@ -434,7 +434,7 @@ display_post_system_upgrade_notice() {
 		check_if_grub_is_broken
 		cat <<-EOF
 
-		* You must RESTART the machine before using XiVO again.
+		* You must RESTART the machine before using Wazo again.
 
 		EOF
 	fi
@@ -497,7 +497,7 @@ check_wizard_has_been_run() {
 	fi
 
 	if ! is_xivo_configured; then
-		echo "ERROR: You must configure XiVO by running the web wizard before using xivo-upgrade"
+		echo "ERROR: You must configure Wazo by running the web wizard before using xivo-upgrade"
 		exit 1
 	fi
 }
