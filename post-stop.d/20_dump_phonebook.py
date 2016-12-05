@@ -13,7 +13,7 @@ import json
 
 from contextlib import closing
 
-DB_URI = 'postgresql://asterisk:proformatique@localhost/asterisk'
+DB_DSN = 'dbname=asterisk user=asterisk password=proformatique host=localhost'
 
 
 def _read_old_phonebook(cur):
@@ -116,7 +116,7 @@ if __name__ == '__main__':
     if os.path.exists(phonebook_filename):
         sys.exit(0)
 
-    with closing(psycopg2.connect(DB_URI)) as conn:
+    with closing(psycopg2.connect(DB_DSN)) as conn:
         cursor = conn.cursor()
         phonebook_content = _read_old_phonebook(cursor) or []
         entities = _list_entities(cursor) or []
