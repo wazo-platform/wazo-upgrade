@@ -58,12 +58,21 @@ def use_wazo_infrastructure():
         print 'Updating "hosts" custom template'
         lines = read_file_lines(custom_tpl_file)
         lines = list(filter_wazo_infrastructure_section(lines))
-        lines.extend(generate_wazo_infrastructure_section())
+        wazo_infrastructure_section = generate_wazo_infrastructure_section()
+        lines.extend(wazo_infrastructure_section)
         write_file_lines(custom_tpl_file, lines)
 
         print 'Running xivo-update-config or equivalent'
         xivo_update_config_path = get_xivo_update_config_path()
-        check_call([xivo_update_config_path])
+        try:
+            check_call([xivo_update_config_path])
+        except Exception as e:
+            print >>sys.stderr, 'error: {0}'.format(e)
+            print 'Updating /etc/hosts as a fallback'
+            lines = read_file_lines('/etc/hosts')
+            lines = list(filter_wazo_infrastructure_section(lines))
+            lines.extend(wazo_infrastructure_section)
+            write_file_lines('/etc/hosts', lines)
     except CalledProcessError as e:
         print >>sys.stderr, 'error: {0}'.format(e)
         sys.exit(1)
