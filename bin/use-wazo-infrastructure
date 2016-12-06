@@ -28,16 +28,16 @@ def use_wazo_infrastructure():
     try:
         print 'Checking if custom template directory exist'
         custom_tpl_dir = get_custom_template_dir()
-        custom_tpl_file = '{}/hosts'.format(custom_tpl_dir)
+        custom_tpl_file = '{0}/hosts'.format(custom_tpl_dir)
         if not os.path.isdir(custom_tpl_dir):
-            print '  Creating directory {}'.format(custom_tpl_dir)
+            print '  Creating directory {0}'.format(custom_tpl_dir)
             check_call(['mkdir', '-p', custom_tpl_dir])
 
         print 'Checking if "hosts" custom template file exist'
         if not os.path.isfile(custom_tpl_file):
             source_tpl_dir = get_source_template_dir()
-            source_tpl_file = '{}/hosts'.format(source_tpl_dir)
-            print '  Copying source template {} to {}'.format(source_tpl_file, custom_tpl_file)
+            source_tpl_file = '{0}/hosts'.format(source_tpl_dir)
+            print '  Copying source template {0} to {1}'.format(source_tpl_file, custom_tpl_file)
             check_call(['cp', source_tpl_file, custom_tpl_file])
 
         print 'Updating "hosts" custom template'
@@ -50,7 +50,7 @@ def use_wazo_infrastructure():
         xivo_update_config_path = get_xivo_update_config_path()
         check_call([xivo_update_config_path])
     except CalledProcessError as e:
-        print >>sys.stderr, 'error: {}'.format(e)
+        print >>sys.stderr, 'error: {0}'.format(e)
         sys.exit(1)
 
 
@@ -58,14 +58,14 @@ def revert():
     try:
         print 'Checking if "hosts" custom template file exist'
         custom_tpl_dir = get_custom_template_dir()
-        custom_tpl_file = '{}/hosts'.format(custom_tpl_dir)
+        custom_tpl_file = '{0}/hosts'.format(custom_tpl_dir)
         if not os.path.isfile(custom_tpl_file):
             print '  File doesn\'t exist: nothing to do'
             return
 
         print 'Reading source template content'
         source_tpl_dir = get_source_template_dir()
-        source_tpl_file = '{}/hosts'.format(source_tpl_dir)
+        source_tpl_file = '{0}/hosts'.format(source_tpl_dir)
         source_lines = read_file_lines(source_tpl_file)
 
         print 'Reading custom template content'
@@ -83,7 +83,7 @@ def revert():
         xivo_update_config_path = get_xivo_update_config_path()
         check_call([xivo_update_config_path])
     except CalledProcessError as e:
-        print >>sys.stderr, 'error: {}'.format(e)
+        print >>sys.stderr, 'error: {0}'.format(e)
         sys.exit(1)
 
 
@@ -146,8 +146,8 @@ def generate_wazo_infrastructure_section():
     provd_ip = resolve_name('provd.wazo.community')
     lines = []
     lines.append(HEADER_LINE)
-    lines.append('{} mirror.xivo.io mirror.xivo.fr'.format(mirror_ip))
-    lines.append('{} provd.xivo.io provd.xivo.fr'.format(provd_ip))
+    lines.append('{0} mirror.xivo.io mirror.xivo.fr'.format(mirror_ip))
+    lines.append('{0} provd.xivo.io provd.xivo.fr'.format(provd_ip))
     lines.append(FOOTER_LINE)
     return lines
 
@@ -156,7 +156,7 @@ def resolve_name(name):
     try:
         results = socket.getaddrinfo(name, None, socket.AF_INET)
     except socket.gaierror as e:
-        print >>sys.stderr, 'error: could not resolve {}: {}'.format(name, e)
+        print >>sys.stderr, 'error: could not resolve {0}: {1}'.format(name, e)
         sys.exit(1)
     # IP address of first result
     return results[0][4][0]
