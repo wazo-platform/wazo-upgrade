@@ -210,6 +210,9 @@ if [ "$version" \< '14.18' ]; then
 	apt-get install -y xivo-dist
 fi
 
+echo 'Adding/updating Wazo release key to apt'
+wget -q http://mirror.wazo.community/wazo_current.key -O - | apt-key add -
+
 echo 'Updating apt sources to Wazo release'
 sed -i -e 's/xivo\.io/wazo.community/' -e 's/xivo-five/phoenix/' -e 's/xivo-dev/wazo-dev/' -e 's/xivo-rc/wazo-rc/' /etc/apt/sources.list.d/xivo-dist.list
 
