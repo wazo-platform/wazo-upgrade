@@ -7,7 +7,7 @@ DATEFORMAT="%Y-%m-%d_%H:%M:%S"
 
 run_upgrade()
 {
-    echo "Upgrading xivo-upgrade"
+    echo "Upgrading wazo-upgrade"
     apt-get update > /dev/null
     apt-get install -y xivo-upgrade
 
@@ -20,7 +20,7 @@ append_log_start()
     cat >> $logfile <<-EOF
 	
 	===========================================
-	xivo-upgrade started at $(date +$DATEFORMAT)
+	wazo-upgrade started at $(date +$DATEFORMAT)
 	===========================================
 	
 	EOF
@@ -32,7 +32,7 @@ append_log_end()
     cat >> $logfile <<-EOF
 	
 	===========================================
-	xivo-upgrade stopped at $(date +$DATEFORMAT)
+	wazo-upgrade stopped at $(date +$DATEFORMAT)
 	===========================================
 	
 	EOF
@@ -44,5 +44,10 @@ log_and_upgrade()
     run_upgrade "$@" |& tee -a $LOGFILE
     append_log_end $LOGFILE
 }
+
+
+if [ "$(basename "$0")" == 'xivo-upgrade' ]; then
+    echo 'Warning: xivo-upgrade is a deprecated alias to wazo-upgrade: use wazo-upgrade instead' >&2
+fi
 
 log_and_upgrade "$@"

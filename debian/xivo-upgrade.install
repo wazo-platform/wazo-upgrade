@@ -1,9 +1,9 @@
 bin/real-xivo-upgrade usr/bin/
 bin/use-wazo-infrastructure usr/lib/xivo-upgrade/
+bin/wazo-upgrade usr/bin/
 bin/xivo-asterisk-custom-modules usr/bin/
 bin/xivo-check-conffiles usr/bin/
 bin/xivo-migrate-db-90-to-91 usr/bin/
-bin/xivo-upgrade usr/bin/
 bin/xivo-service usr/lib/xivo-upgrade/
 pre-stop.d/ usr/share/xivo-upgrade
 post-stop.d/ usr/share/xivo-upgrade

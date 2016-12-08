@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2016 by Proformatique
+# Copyright 2011-2016 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 PATH=/bin:/usr/bin:/sbin:/usr/sbin
@@ -282,7 +282,7 @@ handle_wheezy_to_jessie_upgrade_error() {
 	* An error occurred during the upgrade. Since this happened during a major *
 	* system upgrade, the upgrade has been stopped and the services have not   *
 	* been restarted. You need to manually fix the problem and then rerun      *
-	* xivo-upgrade.                                                            *
+	* wazo-upgrade.                                                            *
 	*                                                                          *
 	****************************************************************************
 
@@ -411,7 +411,7 @@ display_system_upgrade_notice() {
 		Note that, after the upgrade, you'll be in version 15.19 of XiVO, which
 		is the last version of XiVO running on Debian 7 (wheezy). If you want
 		to upgrade to a later version, which is running on Debian 8 (jessie),
-		you'll need to do another xivo-upgrade after restarting your machine.
+		you'll need to do another wazo-upgrade after restarting your machine.
 
 EOF
 	elif is_wheezy; then
@@ -497,7 +497,7 @@ check_wizard_has_been_run() {
 	fi
 
 	if ! is_xivo_configured; then
-		echo "ERROR: You must configure Wazo by running the web wizard before using xivo-upgrade"
+		echo "ERROR: You must configure Wazo by running the web wizard before using wazo-upgrade"
 		exit 1
 	fi
 }
@@ -515,7 +515,7 @@ is_xivo_configured() {
 
 usage() {
 	cat <<-EOF
-	usage: xivo-upgrade [-d] [-f] [-h]
+	usage: wazo-upgrade [-d] [-f] [-h]
 		-d: only download packages
 		-f: force yes
 		-h: print usage
