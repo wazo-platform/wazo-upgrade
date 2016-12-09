@@ -13,6 +13,6 @@ files="\
 
 for file in $files; do
     if [ -f "$file" ]; then
-	sed -i 's/xivo\.io/wazo.community/' "$file"
+	sed -i -e 's/xivo\.io/wazo.community/' -e 's/xivo\.fr/wazo.community/' "$file"
     fi
 done
