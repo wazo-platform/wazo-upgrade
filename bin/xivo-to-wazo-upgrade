@@ -191,6 +191,7 @@ EOF
 }
 
 version=$(version_installed)
+deb_line=${XIVO_TO_WAZO_DEB_LINE:-'http://mirror.wazo.community/debian/ phoenix main'}
 
 if [ "$version" \< '14.18' ]; then
 	echo 'Switching to Wazo infrastructure'
@@ -205,6 +206,11 @@ if [ "$version" \< '13.25' ]; then
 fi
 
 if [ "$version" \< '14.18' ]; then
+	# xivo-fai need to be installed if an archive version is currently in use
+	echo 'Installing/upgrading xivo-fai'
+	apt-get update
+	apt-get install -y xivo-fai
+
 	echo 'Installing xivo-dist'
 	apt-get update
 	apt-get install -y xivo-dist
@@ -214,7 +220,10 @@ echo 'Adding/updating Wazo release key to apt'
 wget -q http://mirror.wazo.community/wazo_current.key -O - | apt-key add -
 
 echo 'Updating apt sources to Wazo release'
-sed -i -e 's/xivo\.io/wazo.community/' -e 's/xivo-five/phoenix/' -e 's/xivo-dev/wazo-dev/' -e 's/xivo-rc/wazo-rc/' /etc/apt/sources.list.d/xivo-dist.list
+cat >/etc/apt/sources.list.d/xivo-dist.list <<EOF
+deb $deb_line
+# deb-src $deb_line
+EOF
 
 echo 'Launching xivo-upgrade'
 xivo-upgrade "$@"
