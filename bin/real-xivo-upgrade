@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2011-2016 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2011-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 PATH=/bin:/usr/bin:/sbin:/usr/sbin
@@ -305,6 +305,7 @@ exec_wheezy_to_jessie_migration() {
 	apt-get install --yes --force-yes -o Dpkg::Options::="--force-confold" monit
 	apt-get upgrade --yes --force-yes -o Dpkg::Options::="--force-confnew"
 	apt-get install --yes --force-yes -o Dpkg::Options::="--force-confnew" alembic/jessie python-alembic/jessie rabbitmq-server/jessie python-aniso8601/jessie python-blinker/jessie python-flask-httpauth/jessie
+	apt-mark manual postgresql postgresql-contrib
 	apt-get install --yes --force-yes -o Dpkg::Options::="--force-confnew" xivo
 	apt-get dist-upgrade --yes --force-yes -o Dpkg::Options::="--force-confnew"
 	trap ERR
