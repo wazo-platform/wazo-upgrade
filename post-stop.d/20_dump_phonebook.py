@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# Copyright 2016 by Proformatique
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 
@@ -112,13 +112,18 @@ if __name__ == '__main__':
     if os.getenv('XIVO_VERSION_INSTALLED') > '16.14':
         sys.exit(0)
 
+    entity_dsn = DB_DSN
+    if os.getenv('XIVO_VERSION_INSTALLED') < '14.08':
+        entity_dsn = 'dbname=xivo user=xivo password=proformatique host=localhost'
+
     phonebook_filename = '/var/lib/xivo-upgrade/phonebook_dump.json'
     if os.path.exists(phonebook_filename):
         sys.exit(0)
 
     with closing(psycopg2.connect(DB_DSN)) as conn:
-        cursor = conn.cursor()
-        phonebook_content = _read_old_phonebook(cursor) or []
-        entities = _list_entities(cursor) or []
+        phonebook_content = _read_old_phonebook(conn.cursor()) or []
+
+    with closing(psycopg2.connect(entity_dsn)) as conn:
+        entities = _list_entities(conn.cursor()) or []
 
     _save_to_file(phonebook_content, entities, phonebook_filename)
