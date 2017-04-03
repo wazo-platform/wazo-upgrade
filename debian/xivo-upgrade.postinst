@@ -22,6 +22,9 @@ case "$1" in
         if [ ! -f /usr/bin/xivo-service ]; then
             ln -s /usr/lib/xivo-upgrade/xivo-service /usr/bin/xivo-service
         fi
+
+        rm -f /var/lib/xivo-upgrade/05_update_ha_cron.sh
+        rm -f /var/lib/xivo-upgrade/10_fix_cisco_spa_plugins.sh
     ;;
 
     abort-upgrade)

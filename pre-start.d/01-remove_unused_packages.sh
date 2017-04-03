@@ -26,29 +26,14 @@ is_package_purgeable() {
     [ "$?" -eq 0 -a "$output" != 'unknown ok not-installed' ]
 }
 
-renamed_packages="pf-xivo-agid
-                  pf-xivo-base-config
-                  pf-xivo-fetchfw
-                  pf-xivo-provd
-                  pf-xivo-dxtora
-                  pf-xivo-dhcpd-update
-                  pf-xivo-monitoring
+renamed_packages="pf-xivo-monitoring
                   pf-xivo-web-interface
-                  pf-xivo-web-interface-config
                   pf-xivo-sysconfd
                   xivo-agent
                   xivo-restapi"
 
 echo "Cleaning up outdated config files..."
 copy_new_files_while_preserving_old_files /etc/pf-xivo /etc/xivo
-
-# cleanup pf-xivo-base-config.postrm file to allow package purge
-base_config_postrm="/var/lib/dpkg/info/pf-xivo-base-config.postrm"
-xivo_config_postrm="/var/lib/dpkg/info/xivo-config.postrm"
-if [ -f $base_config_postrm ]; then
-    cp $xivo_config_postrm $base_config_postrm
-    sed -i 's/xivo-config/pf-xivo-base-config/' $base_config_postrm
-fi
 
 # remove old postgresql-common and postgresql-client-common
 pg_common_version=$(LANG=C apt-cache policy postgresql-common | grep Installed | awk '{print $2}')

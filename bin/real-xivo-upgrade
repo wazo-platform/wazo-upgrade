@@ -460,8 +460,8 @@ install_xivo_dist() {
 			exit 1
 		fi
 
-		is_dev=$(list_packages_with_filter "(?installed)?name(\"pf-fai-xivo-1.2-skaro-dev|pf-fai-dev|xivo-fai-skaro-dev|xivo-fai-dev\")")
-		is_rc=$(list_packages_with_filter "(?installed)?name(\"pf-fai-xivo-1.2-skaro-rc|pf-fai-rc|xivo-fai-skaro-rc|xivo-fai-rc\")")
+		is_dev=$(list_packages_with_filter "(?installed)?name(\"xivo-fai-skaro-dev|xivo-fai-dev\")")
+		is_rc=$(list_packages_with_filter "(?installed)?name(\"xivo-fai-skaro-rc|xivo-fai-rc\")")
 		if [ -n "$is_dev" ]; then
 			xivo-dist xivo-dev
 		elif [ -n "$is_rc" ]; then
@@ -472,7 +472,7 @@ install_xivo_dist() {
 
 purge_fai_packages () {
 	echo "Purging FAI packages..."
-	apt-get purge --yes '^(pf-fai|xivo-fai|xivo-wheezy-fai).*$'
+	apt-get purge --yes '^(xivo-fai|xivo-wheezy-fai).*$'
 	apt-get update
 }
 
@@ -481,11 +481,11 @@ xivo_package() {
 }
 
 xivo_version_installed() {
-	echo "$(LANG='C' apt-cache policy $(xivo_package) | grep Installed | grep -oE '[0-9]{2}\.[0-9]+(\.[0-9]+)?|1\.2\.[0-9]{1,2}' | head -n1)"
+	echo "$(LANG='C' apt-cache policy $(xivo_package) | grep Installed | grep -oE '[0-9]{2}\.[0-9]+(\.[0-9]+)?' | head -n1)"
 }
 
 xivo_version_candidate() {
-	echo "$(LANG='C' apt-cache policy xivo | grep Candidate | grep -oE '[0-9]{2}\.[0-9]+(\.[0-9]+)?|1\.2\.[0-9]{1,2}' | head -n1)"
+	echo "$(LANG='C' apt-cache policy xivo | grep Candidate | grep -oE '[0-9]{2}\.[0-9]+(\.[0-9]+)?' | head -n1)"
 }
 
 check_wizard_has_been_run() {
