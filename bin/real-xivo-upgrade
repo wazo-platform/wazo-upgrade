@@ -12,14 +12,15 @@ mirror_xivo="http://mirror.wazo.community"
 export DEBIAN_FRONTEND=noninteractive
 export APT_LISTCHANGES_FRONTEND=none
 
-differed_action() {
+differed_action() (
+	shopt -s nullglob
 	local state=$1
 	local dir="$lib_directory/$state.d"
 	echo "Executing $state upgrade action..."
 	for script in $dir/*; do
 		$script
 	done
-}
+)
 
 pre_stop() {
 	differed_action pre-stop
