@@ -19,8 +19,12 @@ case "$1" in
             rm -fr /usr/share/xivo-upgrade/migration
         fi
 
-        if [ ! -f /usr/bin/xivo-service ]; then
-            ln -s /usr/lib/xivo-upgrade/xivo-service /usr/bin/xivo-service
+        if [ ! -f /usr/bin/wazo-service ]; then
+            if [ -f /usr/bin/xivo-service ]; then
+                ln -s /usr/bin/xivo-service /usr/bin/wazo-service
+            else
+                ln -s /usr/lib/xivo-upgrade/xivo-service /usr/bin/wazo-service
+            fi
         fi
 
         rm -f /var/lib/xivo-upgrade/05_update_ha_cron.sh

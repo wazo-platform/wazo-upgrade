@@ -47,13 +47,13 @@ execute() {
 }
 
 stop_xivo() {
-	xivo-service stop
-	xivo-service disable
+	wazo-service stop
+	wazo-service disable
 }
 
 start_xivo() {
-	xivo-service enable
-	xivo-service restart
+	wazo-service enable
+	wazo-service restart
 }
 
 upgrade() {
@@ -208,7 +208,7 @@ exec_squeeze_to_wheezy_migration() {
 	wget -q -O - $mirror_xivo/d-i/wheezy/xivo-squeeze-to-wheezy.cfg | debconf-set-selections
 	change_sources_list_from_squeeze_to_wheezy
 
-	xivo-service stop all
+	wazo-service stop all
 
 	apt-get update > /dev/null
 	apt-get install --yes --force-yes python2.7 apt
@@ -233,7 +233,7 @@ exec_squeeze_to_wheezy_migration() {
 
 	enable_current_dist
 
-	xivo-service restart all
+	wazo-service restart all
 }
 
 is_linux_image_amd64_meta_installed() {
@@ -294,7 +294,7 @@ exec_wheezy_to_jessie_migration() {
 	rm -f "$WHEEZY_UPGRADE_FAILED_PATH"
 	change_sources_list_from_wheezy_to_jessie
 
-	xivo-service stop all
+	wazo-service stop all
 
 	trap handle_wheezy_to_jessie_upgrade_error ERR
 	apt-get update > /dev/null
@@ -322,7 +322,7 @@ exec_wheezy_to_jessie_migration() {
 	# Workaround a bug in nginx when upgrading to jessie (with or without xivo)
 	update-rc.d nginx enable
 
-	xivo-service restart all
+	wazo-service restart all
 }
 
 exec_database_migration_90_to_91() {

@@ -41,7 +41,7 @@ display_warning_msg() {
 
 	   vimdiff FILENAME FILENAME${DPKG_OLD_SUFFIX}
 
-	Once this is done, remove the old files and run "xivo-service restart".
+	Once this is done, remove the old files and run "wazo-service restart".
 	EOF
 }
 
