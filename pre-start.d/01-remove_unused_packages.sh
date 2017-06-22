@@ -30,6 +30,7 @@ renamed_packages="pf-xivo-monitoring
                   pf-xivo-web-interface
                   pf-xivo-sysconfd
                   xivo-agent
+                  xivo-call-logs
                   xivo-restapi"
 
 echo "Cleaning up outdated config files..."
