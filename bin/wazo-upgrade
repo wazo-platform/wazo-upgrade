@@ -29,10 +29,10 @@ check_wazo_mirror_is_available()
 
 run_upgrade()
 {
+    apt-get update > /dev/null
     check_debian_mirror_is_available || return 1
     check_wazo_mirror_is_available || return 1
     echo "Upgrading wazo-upgrade"
-    apt-get update > /dev/null
     apt-get install -y xivo-upgrade
 
     /usr/bin/real-xivo-upgrade "$@"
