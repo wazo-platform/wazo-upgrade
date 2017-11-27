@@ -9,7 +9,6 @@ from wazo_plugind_client import Client as PlugindClient
 from xivo.config_helper import parse_config_file
 from xivo.xivo_logging import silence_loggers
 
-_CERT_FILE = '/usr/share/xivo-certs/server.crt'
 PLUGIND_CLI_KEY = '/var/lib/xivo-auth-keys/wazo-plugind-cli-key.yml'
 logger = logging.getLogger('upgrade_admin_ui_official_plugins')
 logging.basicConfig(level=logging.INFO)
@@ -22,12 +21,12 @@ def auth_config():
     return {'host': 'localhost',
             'username': key_file['service_id'],
             'password': key_file['service_key'],
-            'verify_certificate': _CERT_FILE}
+            'verify_certificate': False}
 
 
 def plugind_config():
     return {'host': 'localhost',
-            'verify_certificate': _CERT_FILE}
+            'verify_certificate': False}
 
 
 def main():
