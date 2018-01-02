@@ -2,11 +2,11 @@
 
 CERTSCONF=/etc/ca-certificates.conf
 
-if [ $XIVO_VERSION_INSTALLED \> '15.20' ]; then
+if [ "$XIVO_VERSION_INSTALLED" \> '15.20' ]; then
     exit 0
 fi
 
-if [ ! -f $CERTSCONF ]; then
+if [ ! -f "$CERTSCONF" ]; then
     exit 0
 fi
 
@@ -16,7 +16,7 @@ if [ -n "$(grep -v -e '^!' -e '^#' -e '^$' $CERTSCONF)" ]; then
 fi
 
 # enable all certificates
-sed -i 's/^!//' $CERTSCONF
+sed -i 's/^!//' "$CERTSCONF"
 
 echo purge | debconf-communicate ca-certificates > /dev/null
 dpkg-reconfigure -f noninteractive ca-certificates
