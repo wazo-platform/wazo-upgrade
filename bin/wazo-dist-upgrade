@@ -1,0 +1,62 @@
+#!/bin/bash
+# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
+# SPDX-License-Identifier: GPL-3.0+
+
+LOGFILE="/var/log/xivo-upgrade.log"
+export DEBIAN_FRONTEND=noninteractive
+export APT_LISTCHANGES_FRONTEND=none
+
+differed_action() {
+	  local state=$1
+	  echo "Executing $state upgrade action..."
+	  export XIVO_VERSION_INSTALLED=17.17
+    shopt -qs nullglob  # avoid warning when action directory has no scripts
+	  for script in /usr/share/xivo-upgrade/$state.d/* ; do
+		    $script
+	  done
+    shopt -qu nullglob
+}
+
+dist_upgrade() {
+    differed_action pre-stop
+    wazo-service stop
+    wazo-service disable
+    differed_action post-stop
+
+    xivo-dist wazo-dev
+    apt-get update -qq
+    apt-get install xivo-dist
+
+    xivo-dist wazo-dev-stretch
+    sed -i 's/jessie/stretch/' /etc/apt/sources.list
+    apt-get update -qq
+
+    apt-get install --yes --force-yes -o Dpkg::Options::="--force-confnew" xivo-config alembic python-alembic
+    apt-get upgrade --yes --force-yes -o Dpkg::Options::="--force-confnew"
+    apt-get dist-upgrade --yes --force-yes -o Dpkg::Options::="--force-confnew"
+    apt-get autoremove --yes
+
+    xivo-configure-uuid
+    wazo-migrate-db-94-to-96
+    differed_action pre-start
+    wazo-service enable
+    wazo-service restart
+    differed_action post-start
+}
+
+append_log()
+{
+    logfile=$1
+    action=$2
+    cat >> $logfile <<-EOF
+	
+	================================================
+	wazo-dist-upgrade ${action} at $(date +$DATEFORMAT)
+	================================================
+	
+	EOF
+}
+
+append_log $LOGFILE started
+dist_upgrade |& tee -a $LOGFILE
+append_log $LOGFILE stopped
