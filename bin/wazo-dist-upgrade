@@ -6,6 +6,8 @@ LOGFILE="/var/log/xivo-upgrade.log"
 export DEBIAN_FRONTEND=noninteractive
 export APT_LISTCHANGES_FRONTEND=none
 
+system_conf_failed=false
+
 differed_action() {
 	  local state=$1
 	  echo "Executing $state upgrade action..."
@@ -15,6 +17,21 @@ differed_action() {
 		    $script
 	  done
     shopt -qu nullglob
+}
+
+migrate_systemd_system_conf() {
+    if [ ! -f /etc/systemd/system.conf.dpkg-old ] ; then
+        return 0
+    fi
+    system_conf_diff="$(diff -u0 <(grep -v '^#' /etc/systemd/system.conf) <(grep -v '^#' /etc/systemd/system.conf.dpkg-old))"
+    if [ $(echo "${system_conf_diff}" | wc -l) != 4 -o $(echo "${system_conf_diff}" | grep DefaultEnvironment | wc -l) != 1 ] ; then
+        system_conf_failed=true
+        return 1
+    fi
+
+    old_default_environment=$(grep ^DefaultEnvironment /etc/systemd/system.conf.dpkg-old)
+    sed -i "s/^#DefaultEnvironment=.*/${old_default_environment}/" /etc/systemd/system.conf | grep DefaultEnv
+    rm /etc/systemd/system.conf.dpkg-old
 }
 
 dist_upgrade() {
@@ -36,7 +53,8 @@ dist_upgrade() {
     apt-get dist-upgrade --yes --force-yes -o Dpkg::Options::="--force-confnew"
     apt-get autoremove --yes
 
-    xivo-configure-uuid
+    migrate_systemd_system_conf
+
     wazo-migrate-db-94-to-96
     differed_action pre-start
     wazo-service enable
