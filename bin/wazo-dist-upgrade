@@ -55,7 +55,6 @@ dist_upgrade() {
 
     migrate_systemd_system_conf
 
-    wazo-migrate-db-94-to-96
     differed_action pre-start
     wazo-service enable
     wazo-service restart
