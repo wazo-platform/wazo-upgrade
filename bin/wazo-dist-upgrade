@@ -42,7 +42,7 @@ dist_upgrade() {
 
     xivo-dist wazo-dev
     apt-get update -qq
-    apt-get install xivo-dist
+    apt-get install --yes --force-yes -o Dpkg::Options::="--force-confnew" xivo-dist
 
     xivo-dist wazo-dev-stretch
     sed -i 's/jessie/stretch/' /etc/apt/sources.list
