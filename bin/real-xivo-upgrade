@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2011-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2011-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 PATH=/bin:/usr/bin:/sbin:/usr/sbin
@@ -175,7 +175,7 @@ upgrading_system() {
 		read -p 'Would you like to upgrade your system (all services will be restarted) [Y/n]? ' answer
 		answer="${answer:-Y}"
 		if [ "$answer" != 'y' -a "$answer" != 'Y' ]; then
-		exit
+			exit
 		fi
 	fi
 	upgrade
