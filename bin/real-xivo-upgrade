@@ -93,6 +93,14 @@ is_wheezy() {
 	[ $(debian_version_installed) -eq 7 -o -f "$WHEEZY_UPGRADE_FAILED_PATH" ]
 }
 
+is_jessie() {
+		[ $(debian_version_installed) -eq 8 ]
+}
+
+is_last_jessie() {
+		is_jessie && [ "$(xivo_version_installed)" = 17.17 -o "$(xivo_version_installed)" = 18.01 ]
+}
+
 change_sources_list_from_squeeze_to_wheezy() {
 	sed -i 's/squeeze/wheezy/' /etc/apt/sources.list
 }
@@ -171,6 +179,9 @@ upgrading_system() {
 	display_xivo_version
 	display_asterisk_notice
 	display_system_upgrade_notice
+	if is_last_jessie && [ $force -eq 0 ] ; then
+		return
+	fi
 	if [ $force -eq 0 ]; then
 		read -p 'Would you like to upgrade your system (all services will be restarted) [Y/n]? ' answer
 		answer="${answer:-Y}"
@@ -423,6 +434,24 @@ EOF
 	*  to 8 (jessie). Hence, this upgrade will be longer than other upgrades.  *
 	*                                                                          *
 	*  You will need to RESTART the machine after the upgrade.                 *
+	*                                                                          *
+	****************************************************************************
+
+EOF
+	elif is_last_jessie; then
+		cat <<-EOF
+
+	****************************************************************************
+	*                                                                          *
+	*  The Debian GNU/Linux system must be upgraded from version 8 (jessie)    *
+	*  to 9 (stretch). This is mandatory to upgrade to newer versions of Wazo. *
+	*  To do this, you must run the following command:                         *
+	*                                                                          *
+	*    wazo-dist-upgrade                                                     *
+	*                                                                          *
+	*  To keep Debian Jessie and Wazo $(xivo_version_installed) but benefit from security updates: *
+	*                                                                          *
+	*    wazo-upgrade -f                                                       *
 	*                                                                          *
 	****************************************************************************
 
