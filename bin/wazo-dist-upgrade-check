@@ -38,10 +38,19 @@ class WrongWazoVersion(WazoDistUpgradeException):
         super().__init__(self._message.format(version=wazo_version))
 
 
+class UpgradeAborted(WazoDistUpgradeException):
+
+    _message = 'Aborting.'
+
+    def __init__(self):
+        super().__init__(self._message)
+
+
 def main():
     try:
         check_wazo_version()
         check_wizard_is_run()
+        confirm_upgrade()
     except WazoDistUpgradeException as e:
         print(e, file=sys.stderr)
         sys.exit(1)
@@ -70,6 +79,19 @@ def check_wizard_is_run():
             raise WizardNotConfigured()
     except (ValueError, KeyError):
         raise ConfdError()
+
+
+def confirm_upgrade():
+    while True:
+        answer = input('Would you like to upgrade your system (all services will be restarted) [Y/n]? ').lower()
+        if answer not in ('y', 'n'):
+            print('Invalid answer.')
+            continue
+        else:
+            break
+
+    if answer == 'n':
+        raise UpgradeAborted()
 
 
 if __name__ == '__main__':
