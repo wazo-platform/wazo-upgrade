@@ -89,6 +89,6 @@ done
 
 append_log $LOGFILE started
 if /usr/lib/xivo-upgrade/wazo-dist-upgrade-check $force ; then
-    echo dist_upgrade |& tee -a $LOGFILE
+    dist_upgrade |& tee -a $LOGFILE
 fi
 append_log $LOGFILE stopped
