@@ -75,6 +75,18 @@ append_log()
 	EOF
 }
 
+
+while getopts :f opt
+do
+	  case ${opt} in
+		    f) force=-f;;
+		    '?')
+			      echo "${0} : option ${OPTARG} is not valid" >&2
+			      exit -1
+		        ;;
+	  esac
+done
+
 append_log $LOGFILE started
 if /usr/lib/xivo-upgrade/wazo-dist-upgrade-check $force ; then
     echo dist_upgrade |& tee -a $LOGFILE

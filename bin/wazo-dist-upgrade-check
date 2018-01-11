@@ -2,6 +2,7 @@
 # Copyright 2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
+import argparse
 import os
 import requests
 import sys
@@ -47,13 +48,24 @@ class UpgradeAborted(WazoDistUpgradeException):
 
 
 def main():
+    args = parse_args()
     try:
         check_wazo_version()
         check_wizard_is_run()
-        confirm_upgrade()
+        if not args.force:
+            confirm_upgrade()
     except WazoDistUpgradeException as e:
         print(e, file=sys.stderr)
         sys.exit(1)
+
+
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-f',
+                        '--force',
+                        action='store_true',
+                        help="Disable interactive prompts. Default: %(default)s")
+    return parser.parse_args()
 
 
 def check_wazo_version():
