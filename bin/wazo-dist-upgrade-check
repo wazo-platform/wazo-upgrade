@@ -2,31 +2,53 @@
 # Copyright 2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
+import os
+import requests
 import sys
+import urllib3
+
+urllib3.disable_warnings()
 
 
 class WazoDistUpgradeException(Exception):
     pass
 
 
+class WizardNotConfigured(WazoDistUpgradeException):
+
+    _message = 'The Wazo wizard is not configured.'
+
+    def __init__(self):
+        super().__init__(self._message)
+
+
+class ConfdError(WazoDistUpgradeException):
+
+    _message = 'xivo-confd is not reachable. You should check /var/log/xivo-confd.log for errors.'
+
+    def __init__(self):
+        super().__init__(self._message)
+
+
 class WrongWazoVersion(WazoDistUpgradeException):
 
-    _message = 'wazo-dist-upgrade should not be run on Wazo {}. You should run wazo-upgrade instead.'
+    _message = 'wazo-dist-upgrade should not be run on Wazo {version}. You should run wazo-upgrade instead.'
 
     def __init__(self, wazo_version):
-        super().__init__(self._message.format(wazo_version))
+        super().__init__(self._message.format(version=wazo_version))
 
 
 def main():
     try:
         check_wazo_version()
+        check_wizard_is_run()
     except WazoDistUpgradeException as e:
         print(e, file=sys.stderr)
         sys.exit(1)
 
 
 def check_wazo_version():
-    print(installed_wazo_version())
+    # 17.17 = latest prod version, 18.01 = latest dev version
     if installed_wazo_version() not in ('17.17', '18.01'):
         raise WrongWazoVersion(installed_wazo_version())
 
@@ -34,6 +56,20 @@ def check_wazo_version():
 def installed_wazo_version():
     with open('/usr/share/xivo/XIVO-VERSION', 'r') as version_file:
         return str(version_file.read()).strip()
+
+
+def check_wizard_is_run():
+    port = os.environ.get('XIVO_CONFD_PORT', '9486')
+    try:
+        r = requests.get('https://localhost:{port}/1.1/wizard'.format(port=port), verify=False)
+    except requests.RequestException:
+        raise ConfdError()
+
+    try:
+        if r.json()['configured'] is False:
+            raise WizardNotConfigured()
+    except (ValueError, KeyError):
+        raise ConfdError()
 
 
 if __name__ == '__main__':
