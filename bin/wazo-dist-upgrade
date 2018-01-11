@@ -76,5 +76,6 @@ append_log()
 }
 
 append_log $LOGFILE started
+/usr/lib/xivo-upgrade/wazo-dist-upgrade-check
 dist_upgrade |& tee -a $LOGFILE
 append_log $LOGFILE stopped
