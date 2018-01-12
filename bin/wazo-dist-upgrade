@@ -41,6 +41,14 @@ upgrade_dahdi_linux_modules(){
     done
 }
 
+change_sources_list_from_jessie_to_stretch() {
+	sed -i 's/jessie/stretch/' /etc/apt/sources.list
+}
+
+change_sources_list_from_stretch_to_jessie() {
+	sed -i 's/stretch/jessie/' /etc/apt/sources.list
+}
+
 dist_upgrade() {
     differed_action pre-stop
     wazo-service stop
@@ -52,7 +60,7 @@ dist_upgrade() {
     apt-get install --yes --force-yes -o Dpkg::Options::="--force-confnew" xivo-dist
 
     xivo-dist wazo-dev-stretch
-    sed -i 's/jessie/stretch/' /etc/apt/sources.list
+    change_sources_list_from_jessie_to_stretch
     apt-get update -qq
 
     apt-get install --yes --force-yes -o Dpkg::Options::="--force-confnew" xivo-certs xivo-config
@@ -83,20 +91,59 @@ append_log()
 	EOF
 }
 
+debian_version_installed() {
+    cut -c1 /etc/debian_version
+}
 
-while getopts :f opt
+is_jessie() {
+    [ $(debian_version_installed) -eq 8 ]
+}
+
+usage() {
+    cat <<-EOF
+	usage: wazo-upgrade [-d] [-f] [-h]
+	    -d: only download packages
+	    -f: force yes
+	    -h: print usage
+	EOF
+}
+
+download_packages() {
+    trap : SIGINT
+    if is_jessie; then
+        change_sources_list_from_jessie_to_stretch
+        apt-get update
+        apt-get -y -d dist-upgrade
+        change_sources_list_from_stretch_to_jessie
+    else
+		apt-get update
+        apt-get -y -d dist-upgrade
+    fi
+}
+
+while getopts :dfh opt
 do
     case ${opt} in
+        d) download_only=1;;
         f) force=-f;;
+        h)
+            usage
+            exit 0
+        ;;
         '?')
             echo "${0} : option ${OPTARG} is not valid" >&2
+            usage
             exit -1
         ;;
     esac
 done
 
 append_log $LOGFILE started
-if /usr/lib/xivo-upgrade/wazo-dist-upgrade-check $force ; then
-    dist_upgrade |& tee -a $LOGFILE
+if [ $download_only -eq 0 ]; then
+    if /usr/lib/xivo-upgrade/wazo-dist-upgrade-check $force ; then
+        dist_upgrade |& tee -a $LOGFILE
+    fi
+else
+    download_packages |& tee -a $LOGFILE
 fi
 append_log $LOGFILE stopped
