@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-# Copyright 2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import logging
+import urllib3
 
 from xivo_auth_client import Client as AuthClient
 from wazo_plugind_client import Client as PlugindClient
@@ -12,8 +13,7 @@ from xivo.xivo_logging import silence_loggers
 PLUGIND_CLI_KEY = '/var/lib/xivo-auth-keys/wazo-plugind-cli-key.yml'
 logger = logging.getLogger('upgrade_admin_ui_official_plugins')
 logging.basicConfig(level=logging.INFO)
-silence_loggers(['urllib3.connectionpool'], level=logging.WARNING)
-
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
 def auth_config():
