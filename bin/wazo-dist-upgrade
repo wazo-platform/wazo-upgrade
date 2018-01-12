@@ -9,13 +9,13 @@ export APT_LISTCHANGES_FRONTEND=none
 system_conf_failed=false
 
 differed_action() {
-	  local state=$1
-	  echo "Executing $state upgrade action..."
-	  export XIVO_VERSION_INSTALLED=17.17
+    local state=$1
+    echo "Executing $state upgrade action..."
+    export XIVO_VERSION_INSTALLED=17.17
     shopt -qs nullglob  # avoid warning when action directory has no scripts
-	  for script in /usr/share/xivo-upgrade/$state.d/* ; do
-		    $script
-	  done
+    for script in /usr/share/xivo-upgrade/$state.d/* ; do
+        $script
+    done
     shopt -qu nullglob
 }
 
@@ -67,24 +67,24 @@ append_log()
     logfile=$1
     action=$2
     cat >> $logfile <<-EOF
-	
-	================================================
-	wazo-dist-upgrade ${action} at $(date +%Y-%m-%d_%H:%M:%S)
-	================================================
-	
-	EOF
+
+    ================================================
+    wazo-dist-upgrade ${action} at $(date +%Y-%m-%d_%H:%M:%S)
+    ================================================
+
+    EOF
 }
 
 
 while getopts :f opt
 do
-	  case ${opt} in
-		    f) force=-f;;
-		    '?')
-			      echo "${0} : option ${OPTARG} is not valid" >&2
-			      exit -1
-		        ;;
-	  esac
+    case ${opt} in
+        f) force=-f;;
+        '?')
+            echo "${0} : option ${OPTARG} is not valid" >&2
+            exit -1
+        ;;
+    esac
 done
 
 append_log $LOGFILE started
