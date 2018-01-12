@@ -69,8 +69,7 @@ def parse_args():
 
 
 def check_wazo_version():
-    # 17.17 = latest prod version, 18.01 = latest dev version
-    if installed_wazo_version() not in ('17.17', '18.01'):
+    if installed_wazo_version() != '17.17':
         raise WrongWazoVersion(installed_wazo_version())
 
 
