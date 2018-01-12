@@ -95,7 +95,7 @@ def check_wizard_is_run():
 
 def confirm_upgrade():
     while True:
-        answer = input('Would you like to upgrade your system (all services will be restarted) [Y/n]? ').lower()
+        answer = input('Would you like to upgrade your system (all services will be restarted) [y/n]? ').lower()
         if answer not in ('y', 'n'):
             print('Invalid answer.')
             continue
