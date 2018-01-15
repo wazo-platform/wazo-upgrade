@@ -90,11 +90,11 @@ def parse_args():
 
 
 def check_running_kernel_is_up_to_date():
-    installed_kernels = sorted([LooseVersion(version) for version in os.listdir('/lib/modules')])
+    installed_kernels = [LooseVersion(version) for version in os.listdir('/lib/modules')]
     running_kernel = platform.release()
     try:
-        last_available_kernel = str(installed_kernels.pop())
-    except IndexError:
+        last_available_kernel = max(installed_kernels)
+    except ValueError:
         raise KernelNotFound()
 
     if running_kernel != last_available_kernel:
