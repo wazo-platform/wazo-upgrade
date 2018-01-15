@@ -41,6 +41,12 @@ upgrade_dahdi_linux_modules(){
     done
 }
 
+change_sources_list() {
+    from=$1
+    to=$2
+    sed -i "s/$from/$to/" /etc/apt/sources.list
+}
+
 dist_upgrade() {
     differed_action pre-stop
     wazo-service stop
@@ -52,7 +58,7 @@ dist_upgrade() {
     apt-get install --yes --force-yes -o Dpkg::Options::="--force-confnew" xivo-dist
 
     xivo-dist wazo-dev-stretch
-    sed -i 's/jessie/stretch/' /etc/apt/sources.list
+    change_sources_list 'jessie' 'stretch'
     apt-get update -qq
 
     apt-get install --yes --force-yes -o Dpkg::Options::="--force-confnew" xivo-certs xivo-config
@@ -83,20 +89,56 @@ append_log()
 	EOF
 }
 
+usage() {
+    cat <<-EOF
+	usage: wazo-upgrade [-d] [-f] [-h]
+	    -d: only download packages
+	    -f: force yes
+	    -h: print usage
+	EOF
+}
 
-while getopts :f opt
+download_packages() {
+    trap : SIGINT
+    cp /etc/apt/sources.list.d/xivo-dist.list /tmp/xivo-dist.list.bak
+    xivo-dist phoenix
+    sed -i 's/phoenix/wazo-dev-stretch/' /etc/apt/sources.list.d/xivo-dist.list
+    change_sources_list 'jessie' 'stretch'
+    apt-get update -qq
+
+    apt-get -y -d dist-upgrade
+
+    change_sources_list 'stretch' 'jessie'
+    mv /tmp/xivo-dist.list.bak /etc/apt/sources.list.d/xivo-dist.list
+    apt-get update -qq
+}
+
+download_only=1
+while getopts :dfh opt
 do
     case ${opt} in
+        d) download_only=0;;
         f) force=-f;;
+        h)
+            usage
+            exit 0
+        ;;
         '?')
             echo "${0} : option ${OPTARG} is not valid" >&2
+            usage
             exit -1
         ;;
     esac
 done
 
-append_log $LOGFILE started
-if /usr/lib/xivo-upgrade/wazo-dist-upgrade-check $force ; then
-    dist_upgrade |& tee -a $LOGFILE
+if [ $download_only -eq 0 ]; then
+    append_log $LOGFILE started
+    download_packages |& tee -a $LOGFILE
+    append_log $LOGFILE stopped
+else
+    append_log $LOGFILE started
+    if /usr/lib/xivo-upgrade/wazo-dist-upgrade-check $force ; then
+        dist_upgrade |& tee -a $LOGFILE
+    fi
+    append_log $LOGFILE stopped
 fi
-append_log $LOGFILE stopped
