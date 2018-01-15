@@ -137,7 +137,11 @@ if [ $download_only -eq 0 ]; then
     append_log $LOGFILE stopped
 else
     append_log $LOGFILE started
-    if /usr/lib/xivo-upgrade/wazo-dist-upgrade-check $force ; then
+    set -o pipefail
+    /usr/lib/xivo-upgrade/wazo-dist-upgrade-check $force |& tee -a $LOGFILE
+    should_upgrade=$?
+    set +o pipefail
+    if [ ${should_upgrade} -eq 0 ] ; then
         dist_upgrade |& tee -a $LOGFILE
     fi
     append_log $LOGFILE stopped
