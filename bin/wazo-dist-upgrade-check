@@ -4,9 +4,11 @@
 
 import argparse
 import os
+import platform
 import requests
 import sys
 import urllib3
+from distutils.version import LooseVersion
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -39,6 +41,25 @@ class WrongWazoVersion(WazoDistUpgradeException):
         super().__init__(self._message.format(version=wazo_version))
 
 
+class KernelLibException(WazoDistUpgradeException):
+
+    _message = 'Unable to found kernel in /lib/modules. Please install linux-image-amd64 or linux-image-686'
+
+    def __init__(self):
+        super().__init__(self._message.format())
+
+
+class WrongKernelVersion(WazoDistUpgradeException):
+
+    _message = """wazo-dist-upgrade should not be run on system without the last kernel available.
+You must reboot before re-run wazo-dist-upgrade.
+The last kernel installed is: {last_version} and the running kernel is {running_version}"""
+
+    def __init__(self, last_version, running_version):
+        super().__init__(self._message.format(last_version=last_version, running_version=running_version))
+
+
+
 class UpgradeAborted(WazoDistUpgradeException):
 
     _message = 'Aborting.'
@@ -52,6 +73,7 @@ def main():
     try:
         check_wazo_version()
         check_wizard_is_run()
+        check_last_kernel_booted()
         if not args.force:
             confirm_upgrade()
     except WazoDistUpgradeException as e:
@@ -66,6 +88,18 @@ def parse_args():
                         action='store_true',
                         help="Disable interactive prompts. Default: %(default)s")
     return parser.parse_args()
+
+
+def check_last_kernel_booted():
+    installed_kernels = sorted([LooseVersion(version) for version in os.listdir('/lib/modules')])
+    running_kernel = platform.release()
+    try:
+        last_available_kernel = str(installed_kernels.pop())
+    except IndexError:
+        raise KernelLibException()
+
+    if running_kernel != last_available_kernel:
+        raise WrongKernelVersion(last_available_kernel, running_kernel)
 
 
 def check_wazo_version():
