@@ -43,21 +43,20 @@ class WrongWazoVersion(WazoDistUpgradeException):
 
 class KernelLibException(WazoDistUpgradeException):
 
-    _message = 'Unable to found kernel in /lib/modules. Please install linux-image-amd64 or linux-image-686'
+    _message = 'No kernel found in /lib/modules. Please install linux-image-amd64 or linux-image-686'
 
     def __init__(self):
-        super().__init__(self._message.format())
+        super().__init__(self._message)
 
 
 class WrongKernelVersion(WazoDistUpgradeException):
 
-    _message = """wazo-dist-upgrade should not be run on system without the last kernel available.
-You must reboot before re-run wazo-dist-upgrade.
-The last kernel installed is: {last_version} and the running kernel is {running_version}"""
+    _message = """The machine was not rebooted since the last Linux kernel update. You need to reboot before running wazo-dist-upgrade again.
+  Kernel installed: {last_version}
+  Kernel running:   {running_version}"""
 
     def __init__(self, last_version, running_version):
         super().__init__(self._message.format(last_version=last_version, running_version=running_version))
-
 
 
 class UpgradeAborted(WazoDistUpgradeException):
