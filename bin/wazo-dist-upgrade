@@ -124,12 +124,14 @@ do
     esac
 done
 
-append_log $LOGFILE started
-if [ $download_only -eq 1 ]; then
+if [ $download_only -eq 0 ]; then
+    append_log $LOGFILE started
+    download_packages |& tee -a $LOGFILE
+    append_log $LOGFILE stopped
+else
+    append_log $LOGFILE started
     if /usr/lib/xivo-upgrade/wazo-dist-upgrade-check $force ; then
         dist_upgrade |& tee -a $LOGFILE
     fi
-else
-    download_packages |& tee -a $LOGFILE
+    append_log $LOGFILE stopped
 fi
-append_log $LOGFILE stopped
