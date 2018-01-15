@@ -74,11 +74,24 @@ upgrade() {
 		execute apt-get install -o Dpkg::Options::="--force-confnew" -y xivo-libdao xivo-ctid
 		execute apt-get dist-upgrade -y
 		apt-get autoremove -y
+		if is_jessie; then
+			upgrade_dahdi_linux_modules 3.16
+		elif is_stretch; then
+			upgrade_dahdi_linux_modules 4.9
+		fi
 	fi
 	pre_start
 	start_xivo
 	post_start
 	xivo-check-conffiles
+}
+
+upgrade_dahdi_linux_modules(){
+	VERSION=$1
+	kernel_release=$(ls /lib/modules/ | grep ^$VERSION)
+	for kr in $kernel_release; do
+		apt-get install dahdi-linux-modules-${kr}
+	done
 }
 
 debian_version_installed() {
@@ -94,11 +107,15 @@ is_wheezy() {
 }
 
 is_jessie() {
-		[ $(debian_version_installed) -eq 8 ]
+	[ $(debian_version_installed) -eq 8 ]
 }
 
 is_last_jessie() {
-		is_jessie && [ "$(xivo_version_installed)" = 17.17 -o "$(xivo_version_installed)" = 18.01 ]
+	is_jessie && [ "$(xivo_version_installed)" = 17.17 -o "$(xivo_version_installed)" = 18.01 ]
+}
+
+is_stretch() {
+	[ $(debian_version_installed) -eq 9 ]
 }
 
 change_sources_list_from_squeeze_to_wheezy() {
