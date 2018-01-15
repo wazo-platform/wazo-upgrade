@@ -114,7 +114,7 @@ download_packages() {
         apt-get -y -d dist-upgrade
         change_sources_list 'stretch' 'jessie'
     else
-		apt-get update
+        apt-get update
         apt-get -y -d dist-upgrade
     fi
 }
