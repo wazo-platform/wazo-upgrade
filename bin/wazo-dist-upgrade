@@ -41,12 +41,10 @@ upgrade_dahdi_linux_modules(){
     done
 }
 
-change_sources_list_from_jessie_to_stretch() {
-	sed -i 's/jessie/stretch/' /etc/apt/sources.list
-}
-
-change_sources_list_from_stretch_to_jessie() {
-	sed -i 's/stretch/jessie/' /etc/apt/sources.list
+change_sources_list() {
+    from=$1
+    to=$2
+    sed -i "s/$from/$to/" /etc/apt/sources.list
 }
 
 dist_upgrade() {
@@ -60,7 +58,7 @@ dist_upgrade() {
     apt-get install --yes --force-yes -o Dpkg::Options::="--force-confnew" xivo-dist
 
     xivo-dist wazo-dev-stretch
-    change_sources_list_from_jessie_to_stretch
+    change_sources_list 'jessie' 'stretch'
     apt-get update -qq
 
     apt-get install --yes --force-yes -o Dpkg::Options::="--force-confnew" xivo-certs xivo-config
@@ -111,10 +109,10 @@ usage() {
 download_packages() {
     trap : SIGINT
     if is_jessie; then
-        change_sources_list_from_jessie_to_stretch
+        change_sources_list 'jessie' 'stretch'
         apt-get update
         apt-get -y -d dist-upgrade
-        change_sources_list_from_stretch_to_jessie
+        change_sources_list 'stretch' 'jessie'
     else
 		apt-get update
         apt-get -y -d dist-upgrade
