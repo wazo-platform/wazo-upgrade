@@ -89,14 +89,6 @@ append_log()
 	EOF
 }
 
-debian_version_installed() {
-    cut -c1 /etc/debian_version
-}
-
-is_jessie() {
-    [ $(debian_version_installed) -eq 8 ]
-}
-
 usage() {
     cat <<-EOF
 	usage: wazo-upgrade [-d] [-f] [-h]
@@ -108,15 +100,10 @@ usage() {
 
 download_packages() {
     trap : SIGINT
-    if is_jessie; then
-        change_sources_list 'jessie' 'stretch'
-        apt-get update
-        apt-get -y -d dist-upgrade
-        change_sources_list 'stretch' 'jessie'
-    else
-        apt-get update
-        apt-get -y -d dist-upgrade
-    fi
+    change_sources_list 'jessie' 'stretch'
+    apt-get update
+    apt-get -y -d dist-upgrade
+    change_sources_list 'stretch' 'jessie'
 }
 
 while getopts :dfh opt
