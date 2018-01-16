@@ -6,8 +6,6 @@ LOGFILE="/var/log/xivo-upgrade.log"
 export DEBIAN_FRONTEND=noninteractive
 export APT_LISTCHANGES_FRONTEND=none
 
-system_conf_failed=false
-
 differed_action() {
     local state=$1
     echo "Executing $state upgrade action..."
