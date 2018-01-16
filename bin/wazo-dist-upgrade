@@ -77,6 +77,7 @@ dist_upgrade() {
 maybe_dist_upgrade() {
     if /usr/lib/xivo-upgrade/wazo-dist-upgrade-check $force ; then
         dist_upgrade
+        xivo-check-conffiles
     fi
 }
 
