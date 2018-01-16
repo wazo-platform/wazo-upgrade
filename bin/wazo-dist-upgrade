@@ -6,6 +6,23 @@ LOGFILE="/var/log/xivo-upgrade.log"
 export DEBIAN_FRONTEND=noninteractive
 export APT_LISTCHANGES_FRONTEND=none
 
+display_upgrade_notice() {
+    cat <<-EOF
+	*****************************************************************************
+	*                                                                           *
+	*  The Debian GNU/Linux system will be upgraded from version 8 (jessie)     *
+	*  to 9 (stretch). Hence, this upgrade will be longer than other upgrades.  *
+	*                                                                           *
+	*  Please make sure you have read the upgrade notes:                        *
+	*  http://documentation.wazo.community/en/latest/upgrade/18.01/stretch.html *
+	*                                                                           *
+	*  You must RESTART the machine after the upgrade.                          *
+	*                                                                           *
+	*****************************************************************************
+
+EOF
+}
+
 differed_action() {
     local state=$1
     echo "Executing $state upgrade action..."
@@ -72,6 +89,7 @@ dist_upgrade() {
 }
 
 maybe_dist_upgrade() {
+    display_upgrade_notice
     if /usr/lib/xivo-upgrade/wazo-dist-upgrade-check $force ; then
         dist_upgrade
         xivo-check-conffiles
