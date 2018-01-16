@@ -12,7 +12,7 @@ bd9f841cf1dfc3d110d88f1f06fa5b60  /etc/xivo/asterisk/xivo_ring.conf.dpkg-old
 "
 
 list_modified_conffiles() {
-    for conffile in $(sort /var/lib/dpkg/info/xivo-config.conffiles); do
+    for conffile in $(sort /var/lib/dpkg/info/xivo-config.conffiles) /etc/systemd/system.conf; do
         conffile_old="${conffile}${DPKG_OLD_SUFFIX}"
         if [ -f "$conffile_old" ]; then
             if is_conffile_old_ignored "$conffile_old"; then
