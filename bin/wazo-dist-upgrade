@@ -106,16 +106,14 @@ usage() {
 
 download_packages() {
     trap : SIGINT
-    cp /etc/apt/sources.list.d/xivo-dist.list /tmp/xivo-dist.list.bak
-    xivo-dist phoenix
-    sed -i 's/phoenix/wazo-dev-stretch/' /etc/apt/sources.list.d/xivo-dist.list
+    echo "deb http://mirror.wazo.community/debian/ wazo-dev-stretch main" > /etc/apt/sources.list.d/wazo-dist-upgrade.list
     change_sources_list 'jessie' 'stretch'
     apt-get update -qq
 
     apt-get -y -d dist-upgrade
 
     change_sources_list 'stretch' 'jessie'
-    mv /tmp/xivo-dist.list.bak /etc/apt/sources.list.d/xivo-dist.list
+    rm /etc/apt/sources.list.d/wazo-dist-upgrade.list
     apt-get update -qq
 }
 
