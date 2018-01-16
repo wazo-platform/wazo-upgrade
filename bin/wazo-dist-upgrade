@@ -76,6 +76,12 @@ dist_upgrade() {
     differed_action post-start
 }
 
+maybe_dist_upgrade() {
+    if /usr/lib/xivo-upgrade/wazo-dist-upgrade-check $force ; then
+        dist_upgrade
+    fi
+}
+
 append_log()
 {
     logfile=$1
@@ -137,12 +143,6 @@ if [ $download_only -eq 0 ]; then
     append_log $LOGFILE stopped
 else
     append_log $LOGFILE started
-    set -o pipefail
-    /usr/lib/xivo-upgrade/wazo-dist-upgrade-check $force |& tee -a $LOGFILE
-    should_upgrade=$?
-    set +o pipefail
-    if [ ${should_upgrade} -eq 0 ] ; then
-        dist_upgrade |& tee -a $LOGFILE
-    fi
+    maybe_dist_upgrade |& tee -a $LOGFILE
     append_log $LOGFILE stopped
 fi
