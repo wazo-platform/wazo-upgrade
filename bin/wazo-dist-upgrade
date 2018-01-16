@@ -49,11 +49,10 @@ dist_upgrade() {
     wazo-service disable
     differed_action post-stop
 
-    xivo-dist wazo-dev
     apt-get update -qq
     apt-get install --yes --force-yes -o Dpkg::Options::="--force-confnew" xivo-dist
 
-    xivo-dist wazo-dev-stretch
+    xivo-dist ${wazo_distribution}
     change_sources_list 'jessie' 'stretch'
     apt-get update -qq
 
@@ -98,6 +97,7 @@ usage() {
 	    -d: only download packages
 	    -f: force yes
 	    -h: print usage
+	    -t: specify target distribution (default: phoenix-stretch)
 	EOF
 }
 
@@ -115,7 +115,7 @@ download_packages() {
     fi
 
     trap : SIGINT
-    echo "deb http://mirror.wazo.community/debian/ wazo-dev-stretch main" > /etc/apt/sources.list.d/wazo-dist-upgrade.list
+    echo "deb http://mirror.wazo.community/debian/ $wazo_distribution main" > /etc/apt/sources.list.d/wazo-dist-upgrade.list
     change_sources_list 'jessie' 'stretch'
     apt-get update -qq
 
@@ -127,7 +127,8 @@ download_packages() {
 }
 
 download_only=1
-while getopts :dfh opt
+wazo_distribution=phoenix-stretch
+while getopts :dfht: opt
 do
     case ${opt} in
         d) download_only=0;;
@@ -136,6 +137,7 @@ do
             usage
             exit 0
         ;;
+        t) wazo_distribution=${OPTARG};;
         '?')
             echo "${0} : option ${OPTARG} is not valid" >&2
             usage
