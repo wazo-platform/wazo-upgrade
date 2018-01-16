@@ -104,7 +104,19 @@ usage() {
 	EOF
 }
 
+debian_version_installed() {
+    cut -c1 /etc/debian_version
+}
+
+is_stretch() {
+    [ $(debian_version_installed) -eq 9 ]
+}
+
 download_packages() {
+    if is_stretch; then
+        return 0
+    fi
+
     trap : SIGINT
     echo "deb http://mirror.wazo.community/debian/ wazo-dev-stretch main" > /etc/apt/sources.list.d/wazo-dist-upgrade.list
     change_sources_list 'jessie' 'stretch'
