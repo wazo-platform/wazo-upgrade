@@ -6,6 +6,29 @@ LOGFILE="/var/log/xivo-upgrade.log"
 export DEBIAN_FRONTEND=noninteractive
 export APT_LISTCHANGES_FRONTEND=none
 
+fetch_wazo_versions() {
+    echo "Fetching Wazo versions..."
+    apt-get update -qq
+    apt-get install -qq --yes --force-yes -o Dpkg::Options::="--force-confnew" xivo-dist
+    trap : SIGINT
+    cp /etc/apt/sources.list.d/xivo-dist.list{,.bak}
+    xivo-dist ${wazo_distribution}
+    apt-get update -qq
+    wazo_version_installed=$(wazo_version_installed)
+    wazo_version_candidate=$(wazo_version_candidate)
+    mv /etc/apt/sources.list.d/xivo-dist.list{.bak,}
+    trap - SIGINT
+    apt-get update -qq
+}
+
+wazo_version_installed() {
+	  echo "$(LANG='C' apt-cache policy xivo | grep Installed | grep -oE '[0-9]{2}\.[0-9]+(\.[0-9]+)?' | head -n1)"
+}
+
+wazo_version_candidate() {
+	  echo "$(LANG='C' apt-cache policy xivo | grep Candidate | grep -oE '[0-9]{2}\.[0-9]+(\.[0-9]+)?' | head -n1)"
+}
+
 display_upgrade_notice() {
     cat <<-EOF
 	*****************************************************************************
@@ -21,6 +44,11 @@ display_upgrade_notice() {
 	*****************************************************************************
 
 EOF
+}
+
+display_wazo_versions() {
+    echo "Currently installed Wazo version: ${wazo_version_installed}"
+    echo "Proposed update:                  ${wazo_version_candidate}"
 }
 
 differed_action() {
@@ -89,7 +117,9 @@ dist_upgrade() {
 }
 
 maybe_dist_upgrade() {
+    fetch_wazo_versions
     display_upgrade_notice
+    display_wazo_versions
     if /usr/lib/xivo-upgrade/wazo-dist-upgrade-check $force ; then
         dist_upgrade
         xivo-check-conffiles
