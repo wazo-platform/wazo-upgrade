@@ -116,6 +116,14 @@ dist_upgrade() {
     differed_action post-start
 }
 
+display_reboot_notice() {
+    cat <<-EOF
+
+	* You must RESTART the machine before using Wazo again.
+
+	EOF
+}
+
 maybe_dist_upgrade() {
     fetch_wazo_versions
     display_upgrade_notice
@@ -123,6 +131,7 @@ maybe_dist_upgrade() {
     if /usr/lib/xivo-upgrade/wazo-dist-upgrade-check $force ; then
         dist_upgrade
         xivo-check-conffiles
+        display_reboot_notice
     fi
 }
 
