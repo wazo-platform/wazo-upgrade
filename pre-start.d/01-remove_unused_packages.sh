@@ -60,7 +60,7 @@ fi
 
 # purge php5-common
 if ! is_package_installed php5-common; then
-    if is_package_purgeable php5-common
+    if is_package_purgeable php5-common; then
        apt-get purge -y --force-yes php5-common
     fi
 fi
