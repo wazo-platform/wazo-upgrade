@@ -90,7 +90,7 @@ upgrade_dahdi_linux_modules(){
 	VERSION=$1
 	kernel_release=$(ls /lib/modules/ | grep ^$VERSION)
 	for kr in $kernel_release; do
-		apt-get install dahdi-linux-modules-${kr}
+		apt-get install -o Dpkg::Options::="--force-confnew" -y dahdi-linux-modules-${kr}
 	done
 }
 
