@@ -51,12 +51,12 @@ class KernelNotFound(WazoDistUpgradeException):
 
 class WrongKernelVersion(WazoDistUpgradeException):
 
-    _message = """The machine was not rebooted since the last Linux kernel update. You need to reboot before running wazo-dist-upgrade again.
-  Kernel installed: {last_version}
-  Kernel running:   {running_version}"""
+    _message = """The running Linux kernel is not recent enough. You need to reboot before running wazo-dist-upgrade again.
+  Kernel minimum: {minimum_version}
+  Kernel running: {running_version}"""
 
-    def __init__(self, last_version, running_version):
-        super().__init__(self._message.format(last_version=last_version, running_version=running_version))
+    def __init__(self, minimum_version, running_version):
+        super().__init__(self._message.format(minimum_version=minimum_version, running_version=running_version))
 
 
 class UpgradeAborted(WazoDistUpgradeException):
@@ -90,15 +90,11 @@ def parse_args():
 
 
 def check_running_kernel_is_up_to_date():
-    installed_kernels = [LooseVersion(version) for version in os.listdir('/lib/modules')]
-    running_kernel = platform.release()
-    try:
-        last_available_kernel = max(installed_kernels)
-    except ValueError:
-        raise KernelNotFound()
+    running_kernel = LooseVersion(platform.release())
+    minimum_kernel = LooseVersion('3.16.0')
 
-    if running_kernel != last_available_kernel:
-        raise WrongKernelVersion(last_available_kernel, running_kernel)
+    if running_kernel < minimum_kernel:
+        raise WrongKernelVersion(minimum_kernel, running_kernel)
 
 
 def check_wazo_version():
