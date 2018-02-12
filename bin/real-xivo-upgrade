@@ -132,7 +132,6 @@ upgrading_system() {
 		fi
 	fi
 	upgrade
-	display_post_system_upgrade_notice
 }
 
 display_asterisk_notice() {
