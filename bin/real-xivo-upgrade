@@ -63,23 +63,11 @@ upgrade() {
 	stop_xivo
 	post_stop
 	echo "Upgrading xivo..."
-	if is_squeeze; then
-		export UPGRADING_TO_WHEEZY=1
-		exec_squeeze_to_wheezy_migration
-	elif is_wheezy; then
-		export UPGRADING_TO_JESSIE=1
-		exec_wheezy_to_jessie_migration
-	else
-		execute apt-get install -o Dpkg::Options::="--force-confnew" -y xivo-config
-		execute apt-get install -o Dpkg::Options::="--force-confnew" -y xivo-libdao xivo-ctid
-		execute apt-get dist-upgrade -y
-		apt-get autoremove -y
-		if is_jessie; then
-			upgrade_dahdi_linux_modules 3.16
-		elif is_stretch; then
-			upgrade_dahdi_linux_modules 4.9
-		fi
-	fi
+	execute apt-get install -o Dpkg::Options::="--force-confnew" -y xivo-config
+	execute apt-get install -o Dpkg::Options::="--force-confnew" -y xivo-libdao xivo-ctid
+	execute apt-get dist-upgrade -y
+	apt-get autoremove -y
+	upgrade_dahdi_linux_modules 4.9
 	pre_start
 	start_xivo
 	post_start
@@ -94,65 +82,9 @@ upgrade_dahdi_linux_modules(){
 	done
 }
 
-debian_version_installed() {
-	cut -c1 /etc/debian_version
-}
-
-is_squeeze() {
-	[ $(debian_version_installed) -eq 6 ]
-}
-
-is_wheezy() {
-	[ $(debian_version_installed) -eq 7 -o -f "$WHEEZY_UPGRADE_FAILED_PATH" ]
-}
-
-is_jessie() {
-	[ $(debian_version_installed) -eq 8 ]
-}
-
-is_last_jessie() {
-	is_jessie && [ "$(xivo_version_installed)" = 17.17 -o "$(xivo_version_installed)" = 18.01 ]
-}
-
-is_stretch() {
-	[ $(debian_version_installed) -eq 9 ]
-}
-
-change_sources_list_from_squeeze_to_wheezy() {
-	sed -i 's/squeeze/wheezy/' /etc/apt/sources.list
-}
-
-change_sources_list_from_wheezy_to_squeeze() {
-	sed -i 's/wheezy/squeeze/' /etc/apt/sources.list
-}
-
-change_sources_list_from_wheezy_to_jessie() {
-	sed -i 's/wheezy/jessie/' /etc/apt/sources.list
-}
-
-change_sources_list_from_jessie_to_wheezy() {
-	sed -i 's/jessie/wheezy/' /etc/apt/sources.list
-}
-
 display_xivo_version() {
 	echo "installed version : $(xivo_version_installed)"
 	echo "proposed update	: $(xivo_version_candidate)"
-}
-
-display_warning_purge_db() {
-	if [ $XIVO_VERSION_INSTALLED \< '15.11' ]
-	then
-		cat <<-EOF
-		*************************************************************************
-		*                           WARNING                                     *
-		* Call records older than 365 days will be removed periodically.        *
-		* See                                                                   *
-		* http://documentation.wazo.community/en/stable/system/purge_logs.html  *
-		* for more details                                                      *
-		*                                                                       *
-		*************************************************************************
-		EOF
-	fi
 }
 
 is_grub_broken() {
@@ -191,14 +123,8 @@ check_if_grub_is_broken() {
 }
 
 upgrading_system() {
-	exec_database_migration_90_to_91
-	prepare_package_sources
 	display_xivo_version
 	display_asterisk_notice
-	display_system_upgrade_notice
-	if is_last_jessie && [ $force -eq 0 ] ; then
-		return
-	fi
 	if [ $force -eq 0 ]; then
 		read -p 'Would you like to upgrade your system (all services will be restarted) [Y/n]? ' answer
 		answer="${answer:-Y}"
@@ -207,171 +133,12 @@ upgrading_system() {
 		fi
 	fi
 	upgrade
-	display_warning_purge_db
 	display_post_system_upgrade_notice
-}
-
-disable_current_dist() {
-	cp -n /etc/apt/sources.list.d/xivo-dist.list{,.disabled}
-}
-
-enable_current_dist() {
-	if is_current_dist_disabled; then
-		mv /etc/apt/sources.list.d/xivo-dist.list{.disabled,}
-	fi
-}
-
-is_current_dist_disabled() {
-	[ -e "/etc/apt/sources.list.d/xivo-dist.list.disabled" ]
-}
-
-is_linux_3.2_installed() {
-	[ -n "$(dpkg -l linux-image-3.2.0-* 2>/dev/null | grep '^ii')" ]
-}
-
-exec_squeeze_to_wheezy_migration() {
-	disable_current_dist
-	xivo-dist xivo-15.19
-
-	wget -q -O - $mirror_xivo/d-i/wheezy/xivo-squeeze-to-wheezy.cfg | debconf-set-selections
-	change_sources_list_from_squeeze_to_wheezy
-
-	wazo-service stop all
-
-	apt-get update > /dev/null
-	apt-get install --yes --force-yes python2.7 apt
-	apt-get install --yes --force-yes -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" munin monit
-	apt-get upgrade --yes --force-yes -o Dpkg::Options::="--force-confnew"
-	apt-get install --yes --force-yes -o Dpkg::Options::="--force-confnew" python-flask/wheezy python-werkzeug/wheezy python-pika/wheezy
-	apt-get install --yes --force-yes -o Dpkg::Options::="--force-confnew" xivo
-	apt-get install --yes --force-yes -o Dpkg::Options::="--force-confnew" postgresql-common/wheezy
-	apt-get dist-upgrade --yes --force-yes -o Dpkg::Options::="--force-confnew"
-	apt-get update > /dev/null
-	apt-get autoremove --yes
-
-	if ! is_linux_3.2_installed ; then
-		# Maybe a problem with the PAE kernel installation, trying the non-PAE kernel
-		apt-get install --yes 'linux-image-3.2.0.*-486'
-	fi
-
-	kernel_release=$(ls /lib/modules/ |grep ^3.2)
-	for kr in $kernel_release; do
-		apt-get install dahdi-linux-modules-${kr}
-	done
-
-	enable_current_dist
-
-	wazo-service restart all
-}
-
-is_linux_image_amd64_meta_installed() {
-	[ -n "$(dpkg -l linux-image-amd64 2>/dev/null | grep '^ii')" ]
-}
-
-is_linux_image_686_pae_meta_installed() {
-	[ -n "$(dpkg -l linux-image-686-pae 2>/dev/null | grep '^ii')" ]
-}
-
-is_linux_image_586_meta_installed() {
-	[ -n "$(dpkg -l linux-image-586 2>/dev/null | grep '^ii')" ]
-}
-
-is_cpu_support_pae() {
-	grep -q pae /proc/cpuinfo
-}
-
-install_linux_image() {
-	case $(dpkg --print-architecture) in
-		amd64)
-			if ! is_linux_image_amd64_meta_installed ; then
-				apt-get install --yes linux-image-amd64
-			fi
-			;;
-		i386)
-			if is_cpu_support_pae ; then
-				if ! is_linux_image_686_pae_meta_installed ; then
-					apt-get install --yes linux-image-686-pae
-				fi
-			else
-				if ! is_linux_image_586_meta_installed ; then
-					apt-get install --yes linux-image-586
-				fi
-			fi
-			;;
-	esac
-}
-
-handle_wheezy_to_jessie_upgrade_error() {
-	touch "$WHEEZY_UPGRADE_FAILED_PATH"
-	cat <<-EOF
-
-	****************************************************************************
-	*                                                                          *
-	* An error occurred during the upgrade. Since this happened during a major *
-	* system upgrade, the upgrade has been stopped and the services have not   *
-	* been restarted. You need to manually fix the problem and then rerun      *
-	* wazo-upgrade.                                                            *
-	*                                                                          *
-	****************************************************************************
-
-EOF
-	exit 1
-}
-
-exec_wheezy_to_jessie_migration() {
-	rm -f "$WHEEZY_UPGRADE_FAILED_PATH"
-	change_sources_list_from_wheezy_to_jessie
-
-	wazo-service stop all
-
-	trap handle_wheezy_to_jessie_upgrade_error ERR
-	apt-get update > /dev/null
-	apt-get install --yes --force-yes -o Dpkg::Options::="--force-confnew" xivo-config
-	if dpkg -s xivo-config | grep -q -F '/etc/fail2ban/filter.d/asterisk.conf'; then
-		apt-get install --yes --force-yes -o Dpkg::Options::="--force-confnew" --reinstall xivo-config
-	fi
-	apt-get install --yes --force-yes -o Dpkg::Options::="--force-confold" monit
-	apt-get upgrade --yes --force-yes -o Dpkg::Options::="--force-confnew"
-	apt-get install --yes --force-yes -o Dpkg::Options::="--force-confnew" alembic/jessie python-alembic/jessie rabbitmq-server/jessie python-aniso8601/jessie python-blinker/jessie python-flask-httpauth/jessie
-	apt-mark manual postgresql postgresql-contrib
-	apt-get install --yes --force-yes -o Dpkg::Options::="--force-confnew" xivo
-	apt-get dist-upgrade --yes --force-yes -o Dpkg::Options::="--force-confnew"
-	trap ERR
-	apt-get update > /dev/null
-	apt-get autoremove --yes
-
-	install_linux_image
-
-	kernel_release=$(ls /lib/modules/ | grep ^3.16)
-	for kr in $kernel_release; do
-		apt-get install dahdi-linux-modules-${kr}
-	done
-
-	# Workaround a bug in nginx when upgrading to jessie (with or without xivo)
-	update-rc.d nginx enable
-
-	wazo-service restart all
-}
-
-exec_database_migration_90_to_91() {
-	local pg_version=$(pg_lsclusters | grep 'online' | awk '{print $1}')
-	if [[ $pg_version == *"9.0"* ]]; then
-		if ! /usr/bin/xivo-migrate-db-90-to-91; then
-			exit
-		fi
-		export UPGRADING_POSTGRESQL=1
-	fi
 }
 
 display_asterisk_notice() {
 	ast_version=$(dpkg-query -W -f '${Version}' asterisk 2>/dev/null)
 	case "$ast_version" in
-		*:1.8.*)
-			ast_major_version="1.8"
-			;;
-		8:11.*)
-			ast_major_version="11"
-			;;
 		8:13.*)
 			ast_major_version="13"
 			;;
@@ -383,24 +150,11 @@ display_asterisk_notice() {
 		cat <<-EOF
 
 		Asterisk will be upgraded from version $ast_major_version to 14. You might be impacted if you have:
-		EOF
-		if dpkg --compare-versions "$ast_version" le 8:13; then
-			cat <<-EOF
-			* custom dialplan
-			* custom Asterisk configuration
-			* custom application using AGI, AMI, ARI or any other Asterisk interface
-			* custom application exploiting CEL or queue_log
-			* custom Asterisk modules (e.g. codec_g729a.so)
-			* customized Asterisk in some other way
-			EOF
-		else
-			cat <<-EOF
-			* custom Asterisk configuration (other than custom dialplan)
-			* custom application using AMI or ARI
-			* custom Asterisk modules (e.g. codec_g729a.so)
-			EOF
-		fi
-		cat <<-EOF
+
+		* custom Asterisk configuration (other than custom dialplan)
+		* custom application using AMI or ARI
+		* custom Asterisk modules (e.g. codec_g729a.so)
+
 		If you find yourself in one of these cases, you should make sure that
 		your customizations still work with Asterisk 14. Please refer to
 		http://documentation.wazo.community/en/stable/upgrade/16.14/asterisk_14.html
@@ -428,98 +182,9 @@ display_asterisk_notice() {
 	fi
 }
 
-display_system_upgrade_notice() {
-	if is_squeeze; then
-		cat <<-EOF
-
-		The Debian GNU/Linux system will be upgraded from version 6 (squeeze)
-		to 7 (wheezy). Hence, this upgrade will be longer than other upgrades.
-
-		You will need to RESTART the machine after the upgrade.
-
-		Note that, after the upgrade, you'll be in version 15.19 of XiVO, which
-		is the last version of XiVO running on Debian 7 (wheezy). If you want
-		to upgrade to a later version, which is running on Debian 8 (jessie),
-		you'll need to do another wazo-upgrade after restarting your machine.
-
-EOF
-	elif is_wheezy; then
-		cat <<-EOF
-	****************************************************************************
-	*                                                                          *
-	*  The Debian GNU/Linux system will be upgraded from version 7 (wheezy)    *
-	*  to 8 (jessie). Hence, this upgrade will be longer than other upgrades.  *
-	*                                                                          *
-	*  You will need to RESTART the machine after the upgrade.                 *
-	*                                                                          *
-	****************************************************************************
-
-EOF
-	elif is_last_jessie; then
-		cat <<-EOF
-
-	****************************************************************************
-	*                                                                          *
-	*  The Debian GNU/Linux system must be upgraded from version 8 (jessie)    *
-	*  to 9 (stretch). This is mandatory to upgrade to newer versions of Wazo. *
-	*  To do this, you must run the following command:                         *
-	*                                                                          *
-	*    wazo-dist-upgrade                                                     *
-	*                                                                          *
-	*  To keep Debian Jessie and Wazo $(xivo_version_installed) but benefit from security updates: *
-	*                                                                          *
-	*    wazo-upgrade -f                                                       *
-	*                                                                          *
-	****************************************************************************
-
-EOF
-	fi
-}
-
-display_post_system_upgrade_notice() {
-	if [[ "$UPGRADING_TO_WHEEZY" == "1" || "$UPGRADING_TO_JESSIE" == "1" ]]; then
-		check_if_grub_is_broken
-		cat <<-EOF
-
-		* You must RESTART the machine before using Wazo again.
-
-		EOF
-	fi
-}
-
 list_packages_with_filter () {
 	filter="$1"
 	aptitude -q -F '%p' --disable-columns search "$filter"
-}
-
-prepare_package_sources () {
-	install_xivo_dist
-	purge_fai_packages
-}
-
-install_xivo_dist() {
-	is_dist_installed=$(list_packages_with_filter "?installed?name(\"^xivo-dist$\")")
-	if [ -z "$is_dist_installed" ]; then
-		echo "Installing xivo-dist package..."
-		if ! apt-get install --yes xivo-dist; then
-			echo "Failed to install xivo-dist. Aborting upgrade."
-			exit 1
-		fi
-
-		is_dev=$(list_packages_with_filter "(?installed)?name(\"xivo-fai-skaro-dev|xivo-fai-dev\")")
-		is_rc=$(list_packages_with_filter "(?installed)?name(\"xivo-fai-skaro-rc|xivo-fai-rc\")")
-		if [ -n "$is_dev" ]; then
-			xivo-dist xivo-dev
-		elif [ -n "$is_rc" ]; then
-			xivo-dist xivo-rc
-		fi
-	fi
-}
-
-purge_fai_packages () {
-	echo "Purging FAI packages..."
-	apt-get purge --yes '^(xivo-fai|xivo-wheezy-fai).*$'
-	apt-get update
 }
 
 xivo_package() {
@@ -593,18 +258,5 @@ check_wizard_has_been_run
 if [ $download_only -eq 0 ]; then
 	upgrading_system
 else
-	trap : SIGINT
-	if is_squeeze; then
-		change_sources_list_from_squeeze_to_wheezy
-		apt-get update
-		apt-get -y -d dist-upgrade
-		change_sources_list_from_wheezy_to_squeeze
-	elif is_wheezy; then
-		change_sources_list_from_wheezy_to_jessie
-		apt-get update
-		apt-get -y -d dist-upgrade
-		change_sources_list_from_jessie_to_wheezy
-	else
-		apt-get -y -d dist-upgrade
-	fi
+	apt-get -y -d dist-upgrade
 fi

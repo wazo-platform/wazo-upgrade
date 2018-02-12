@@ -5,33 +5,17 @@
 
 set -e
 
-# summary of how this script can be called:
-#        * <new-preinst> `install'
-#        * <new-preinst> `install' <old-version>
-#        * <new-preinst> `upgrade' <old-version>
-#        * <old-preinst> `abort-upgrade' <new-version>
-# for details, see http://www.debian.org/doc/debian-policy/ or
-# the debian-policy package
-
 case "$1" in
     configure)
-        if [ -d /usr/share/xivo-upgrade/migration ]; then
-            rm -fr /usr/share/xivo-upgrade/migration
-        fi
-
-        if [ ! -f /usr/bin/wazo-service ]; then
-            if [ -f /usr/bin/xivo-service ]; then
-                ln -s /usr/bin/xivo-service /usr/bin/wazo-service
-            else
-                ln -s /usr/lib/xivo-upgrade/xivo-service /usr/bin/wazo-service
-            fi
-        fi
-
-        rm -f /var/lib/xivo-upgrade/05_update_ha_cron.sh
-        rm -f /var/lib/xivo-upgrade/10_fix_cisco_spa_plugins.sh
+        rm -f /var/lib/xivo-upgrade/02_rebuild_provd_config_registrar.sh
+        rm -f /var/lib/xivo-upgrade/03_migrate_contact_center.sh
+        rm -f /var/lib/xivo-upgrade/30_set_default_dtmf_mode
+        rm -f /var/lib/xivo-upgrade/provd_add_remote_state_sip.sh
+        rm -f /var/lib/xivo-upgrade/provd_sync_needed_device.sh
+        rm -f /var/lib/xivo-upgrade/rebuild_provd_config_label_null.sh
     ;;
 
-    abort-upgrade)
+    abort-upgrade|abort-remove|abort-deconfigure)
     ;;
 
     *)

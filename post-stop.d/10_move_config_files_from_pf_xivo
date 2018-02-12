@@ -1,7 +1,0 @@
-#!/bin/bash
-
-old_common_conf=/etc/pf-xivo/common.conf
-if [ -e "$old_common_conf" ] ; then
-    mkdir -p /etc/xivo
-    cp "$old_common_conf" /etc/xivo/common.conf
-fi
