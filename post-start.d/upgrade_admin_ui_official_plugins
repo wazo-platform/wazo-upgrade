@@ -4,20 +4,25 @@
 
 import logging
 import urllib3
+import yaml
 
 from xivo_auth_client import Client as AuthClient
 from wazo_plugind_client import Client as PlugindClient
-from xivo.config_helper import parse_config_file
-from xivo.xivo_logging import silence_loggers
 
-PLUGIND_CLI_KEY = '/var/lib/xivo-auth-keys/wazo-plugind-cli-key.yml'
+WAZO_UPGRADE_KEY = '/var/lib/xivo-auth-keys/wazo-upgrade-keys.yml'
 logger = logging.getLogger('upgrade_admin_ui_official_plugins')
 logging.basicConfig(level=logging.INFO)
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
+def _parse_config_file(config_file_name):
+    with open(config_file_name) as config_file:
+        data = yaml.load(config_file)
+    return data if data else {}
+
+
 def auth_config():
-    key_file = parse_config_file(PLUGIND_CLI_KEY)
+    key_file = _parse_config_file(WAZO_UPGRADE_KEY)
     return {'host': 'localhost',
             'username': key_file['service_id'],
             'password': key_file['service_key'],
