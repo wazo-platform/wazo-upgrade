@@ -4,41 +4,42 @@
 
 import logging
 import urllib3
-import yaml
 
-from xivo_auth_client import Client as AuthClient
 from wazo_plugind_client import Client as PlugindClient
+from xivo.chain_map import ChainMap
+from xivo.config_helper import read_config_file_hierarchy, parse_config_file
+from xivo_auth_client import Client as AuthClient
 
-WAZO_UPGRADE_KEY = '/var/lib/xivo-auth-keys/wazo-upgrade-key.yml'
 logger = logging.getLogger('upgrade_admin_ui_official_plugins')
 logging.basicConfig(level=logging.INFO)
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-
-def _parse_config_file(config_file_name):
-    with open(config_file_name) as config_file:
-        data = yaml.load(config_file)
-    return data if data else {}
-
-
-def auth_config():
-    key_file = _parse_config_file(WAZO_UPGRADE_KEY)
-    return {'host': 'localhost',
-            'username': key_file['service_id'],
-            'password': key_file['service_key'],
-            'verify_certificate': False}
+_DEFAULT_CONFIG = {
+    'config_file': '/etc/wazo-upgrade/config.yml',
+    'auth': {
+        'key_file': '/var/lib/xivo-auth-keys/wazo-upgrade-key.yml'
+    }
+}
 
 
-def plugind_config():
-    return {'host': 'localhost',
-            'verify_certificate': False}
+def load_config():
+    file_config = read_config_file_hierarchy(_DEFAULT_CONFIG)
+    key_config = _load_key_file(ChainMap(file_config, _DEFAULT_CONFIG))
+    return ChainMap(key_config, file_config, _DEFAULT_CONFIG)
+
+
+def _load_key_file(config):
+    key_file = parse_config_file(config['auth']['key_file'])
+    return {'auth': {'username': key_file['service_id'],
+                     'password': key_file['service_key']}}
 
 
 def main():
-    auth_client = AuthClient(**auth_config())
+    config = load_config()
+    auth_client = AuthClient(**config['auth'])
     token_data = auth_client.token.new('xivo_service', expiration=300)
 
-    plugind_client = PlugindClient(**plugind_config())
+    plugind_client = PlugindClient(**config['plugind'])
     plugind_client.set_token(token_data['token'])
 
     plugin_list = plugind_client.market.list(namespace='official', installed=True)
