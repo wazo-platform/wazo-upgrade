@@ -21,7 +21,18 @@ differed_action() {
 }
 
 pre_stop() {
-	differed_action pre-stop
+	local dir="$lib_directory/pre-stop.d"
+	echo "Executing pre-stop upgrade action..."
+	for script in $(ls $dir); do
+		$dir/$script
+		if [ $? -ne 0 ]; then
+			cat <<-EOF
+			Fail to execute $dir/$script
+			Please, fix this issue before re-executing wazo-upgrade
+			EOF
+			exit -1
+		fi
+	done
 }
 
 post_stop() {
