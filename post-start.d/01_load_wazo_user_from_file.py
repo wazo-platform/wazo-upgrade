@@ -40,6 +40,11 @@ def _create_user(auth_client, user):
         auth_client.users.new(**user)
     except requests.HTTPError as e:
         error = e.response.json() or {}
+        if error.get('error_id') == 'invalid_data':
+            if error.get('details', {}).get('email_address', {}).get('constraint_id') == 'email':
+                user['email_address'] = None
+                _create_user(auth_client, user)
+                return
         if error.get('error_id') == 'conflict':
             if error.get('details', {}).get('uuid', {}).get('constraint_id') == 'unique':
                 return
