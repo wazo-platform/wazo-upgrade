@@ -76,7 +76,7 @@ def main():
     config = _load_config()
     db_uri = config['db_uri']
 
-    if os.getenv('XIVO_VERSION_INSTALLED') > '18.03':
+    if os.getenv('XIVO_VERSION_INSTALLED') > '18.04':
         sys.exit(0)
 
     migration_file = '/var/lib/xivo-upgrade/migrate_xivo_user_to_wazo_user'

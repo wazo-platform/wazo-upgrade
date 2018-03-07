@@ -70,7 +70,7 @@ def _import_wazo_user(users):
 
 def main():
 
-    if os.getenv('XIVO_VERSION_INSTALLED') > '18.03':
+    if os.getenv('XIVO_VERSION_INSTALLED') > '18.04':
         sys.exit(0)
 
     migration_file = '/var/lib/xivo-upgrade/migrate_xivo_user_to_wazo_user'
