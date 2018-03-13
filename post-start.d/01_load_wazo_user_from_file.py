@@ -2,6 +2,7 @@
 # Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
+import argparse
 import json
 import sys
 import os
@@ -69,8 +70,9 @@ def _import_wazo_user(users):
 
 
 def main():
+    args = parse_args()
 
-    if os.getenv('XIVO_VERSION_INSTALLED') > '18.04':
+    if not args.force and os.getenv('XIVO_VERSION_INSTALLED') > '18.04':
         sys.exit(0)
 
     migration_file = '/var/lib/xivo-upgrade/migrate_xivo_user_to_wazo_user'
@@ -92,6 +94,15 @@ def main():
         pass
 
     os.unlink(user_file)
+
+
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-f',
+                        '--force',
+                        action='store_true',
+                        help="Do not check the variable XIVO_VERSION_INSTALLED. Default: %(default)s")
+    return parser.parse_args()
 
 
 if __name__ == '__main__':
