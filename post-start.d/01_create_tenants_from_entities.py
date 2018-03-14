@@ -62,8 +62,21 @@ def _build_tenant_bodies_from_entities(cursor):
     return [_entity_to_tenant(row) for row in cursor.fetchall()]
 
 
-def _get_existing_tenant_names(auth_client):
-    return {tenant['name'] for tenant in auth_client.tenants.list()['items']}
+def _get_existing_tenants(auth_client):
+    return {tenant['name']: tenant['uuid'] for tenant in auth_client.tenants.list()['items']}
+
+
+def _upsert_tenant(cursor, tenant_uuid):
+    qry = 'INSERT INTO tenant(uuid) VALUES (%s) ON CONFLICT DO NOTHING'
+    cursor.execute(qry, (tenant_uuid,))
+
+
+def _update_entity_tenant_uuid(cursor, entity_name, tenant_uuid):
+    if not entity_name:
+        return
+
+    qry = 'UPDATE entity SET tenant_uuid = %s WHERE name = %s'
+    cursor.execute(qry, (tenant_uuid, entity_name))
 
 
 def do_migration(config):
@@ -74,12 +87,22 @@ def do_migration(config):
     token = auth_client.token.new('xivo_service', expiration=36000)['token']
     auth_client.set_token(token)
 
-    existing_tenant_names = _get_existing_tenant_names(auth_client)
+    existing_tenants = _get_existing_tenants(auth_client)
 
     for tenant in tenants:
-        if tenant['name'] in existing_tenant_names:
+        if tenant['name'] in existing_tenants.keys():
             continue
-        auth_client.tenants.new(**tenant)
+        tenant = auth_client.tenants.new(**tenant)
+
+        existing_tenants[tenant['name']] = tenant['uuid']
+
+    with closing(psycopg2.connect(config['db_uri'])) as conn:
+        cursor = conn.cursor()
+        for name, tenant_uuid in existing_tenants.items():
+            _upsert_tenant(cursor, tenant_uuid)
+            conn.commit()
+            _update_entity_tenant_uuid(cursor, name, tenant_uuid)
+            conn.commit()
 
 
 def main():
