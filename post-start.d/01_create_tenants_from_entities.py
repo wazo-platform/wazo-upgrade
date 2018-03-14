@@ -56,7 +56,7 @@ def _entity_to_tenant(row):
     return body
 
 
-def _get_entities(cursor):
+def _build_tenant_bodies_from_entities(cursor):
     qry = 'SELECT name, phonenumber, address1, address2, city, state, zipcode, country from entity'
     cursor.execute(qry)
     return [_entity_to_tenant(row) for row in cursor.fetchall()]
@@ -68,7 +68,7 @@ def _get_existing_tenant_names(auth_client):
 
 def do_migration(config):
     with closing(psycopg2.connect(config['db_uri'])) as conn:
-        entities = _get_entities(conn.cursor())
+        tenants = _build_tenant_bodies_from_entities(conn.cursor())
 
     auth_client = AuthClient(**config['auth'])
     token = auth_client.token.new('xivo_service', expiration=36000)['token']
@@ -76,7 +76,7 @@ def do_migration(config):
 
     existing_tenant_names = _get_existing_tenant_names(auth_client)
 
-    for tenant in entities:
+    for tenant in tenants:
         if tenant['name'] in existing_tenant_names:
             continue
         auth_client.tenants.new(**tenant)
