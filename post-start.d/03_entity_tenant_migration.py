@@ -106,7 +106,7 @@ def main():
     # Check if the previous migration has been executed since we depend on all tenants
     # existing in wazo-auth
     if not os.path.exists('/var/lib/xivo-upgrade/entity_tenant_migration'):
-        print('01_create_tenants_from_entities.py should be executed first')
+        print('02_create_tenants_from_entities.py should be executed first')
         sys.exit(1)
 
     sentinel_file = '/var/lib/xivo-upgrade/entity_tenant_association_migration'
