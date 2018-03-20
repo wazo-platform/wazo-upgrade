@@ -7,28 +7,17 @@ import os
 import sys
 
 from contextlib import closing
-from xivo_auth_client import Client as AuthClient
 from xivo.chain_map import ChainMap
-from xivo.config_helper import read_config_file_hierarchy, parse_config_file
+from xivo.config_helper import read_config_file_hierarchy
 
 _DEFAULT_CONFIG = {
     'config_file': '/etc/wazo-upgrade/config.yml',
-    'auth': {
-        'key_file': '/var/lib/xivo-auth-keys/wazo-upgrade-key.yml'
-    }
 }
 
 
 def _load_config():
     file_config = read_config_file_hierarchy(_DEFAULT_CONFIG)
-    key_config = _load_key_file(ChainMap(file_config, _DEFAULT_CONFIG))
-    return ChainMap(key_config, file_config, _DEFAULT_CONFIG)
-
-
-def _load_key_file(config):
-    key_file = parse_config_file(config['auth']['key_file'])
-    return {'auth': {'username': key_file['service_id'],
-                     'password': key_file['service_key']}}
+    return ChainMap(file_config, _DEFAULT_CONFIG)
 
 
 def _associate_userfeatures_to_tenants(cursor, entity_tenant_map):
@@ -37,67 +26,16 @@ def _associate_userfeatures_to_tenants(cursor, entity_tenant_map):
         cursor.execute(qry, (tenant_uuid, entityid))
 
 
-def _create_all_tenants(cursor, entity_tenant_map):
-    existing_tenants = _get_existing_tenants(cursor)
-    tenant_uuids = set(entity_tenant_map.values())
-    missing_tenants = tenant_uuids - existing_tenants
-
-    if not missing_tenants:
-        return
-
-    print('inserting tenants', missing_tenants)
-    qry = 'INSERT INTO tenant(uuid) VALUES(%s)'
-    for tenant_uuid in missing_tenants:
-        cursor.execute(qry, (tenant_uuid,))
-
-
 def _get_entities(cursor):
-    qry = 'SELECT id, name FROM entity'
-    cursor.execute(qry)
-    return {row[1]: row[0] for row in cursor.fetchall()}
-
-
-def _get_existing_tenants(cursor):
-    qry = 'SELECT uuid FROM tenant'
-    cursor.execute(qry)
-    return {row[0] for row in cursor.fetchall()}
-
-
-def _get_tenants(auth_client):
-    return {tenant['name']: tenant['uuid'] for tenant in auth_client.tenants.list()['items']}
-
-
-def _get_users(cursor):
-    qry = 'SELECT uuid, tenant_uuid FROM userfeatures'
+    qry = 'SELECT id, tenant_uuid FROM entity'
     cursor.execute(qry)
     return {row[0]: row[1] for row in cursor.fetchall()}
 
 
-def _build_entity_tenant_map(auth_client, cursor):
-    entity_map = _get_entities(cursor)
-    tenant_map = _get_tenants(auth_client)
-
-    entity_tenant_map = {}
-    for name, id_ in entity_map.items():
-        tenant_uuid = tenant_map.get(name)
-        if not tenant_uuid:
-            continue
-        entity_tenant_map[id_] = tenant_uuid
-
-    return entity_tenant_map
-
-
 def do_migration(config):
-    auth_client = AuthClient(**config['auth'])
-    token = auth_client.token.new('xivo_service', expiration=36000)['token']
-    auth_client.set_token(token)
-
     with closing(psycopg2.connect(config['db_uri'])) as conn:
         cursor = conn.cursor()
-        entity_tenant_map = _build_entity_tenant_map(auth_client, cursor)
-        _create_all_tenants(cursor, entity_tenant_map)
-        conn.commit()
-
+        entity_tenant_map = _get_entities(cursor)
         _associate_userfeatures_to_tenants(cursor, entity_tenant_map)
         conn.commit()
 
