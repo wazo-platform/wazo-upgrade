@@ -103,6 +103,9 @@ def do_migration(config):
 
 
 def main():
+    if os.getenv('XIVO_VERSION_INSTALLED') > '18.04':
+        sys.exit(0)
+
     # Check if the previous migration has been executed since we depend on all tenants
     # existing in wazo-auth
     if not os.path.exists('/var/lib/xivo-upgrade/entity_tenant_migration'):
