@@ -74,7 +74,7 @@ def do_migration(config):
 
 def main():
     if not os.path.exists('/var/lib/xivo-upgrade/entity_tenant_association_migration'):
-        print('03_entity_tenant_tenant_migration.py should be executed first')
+        print('03_entity_tenant_migration.py should be executed first')
         sys.exit(1)
 
     sentinel_file = '/var/lib/xivo-upgrade/tenant_synchronization'
