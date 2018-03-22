@@ -73,6 +73,9 @@ def do_migration(config):
 
 
 def main():
+    if os.getenv('XIVO_VERSION_INSTALLED') > '18.04':
+        sys.exit(0)
+
     if not os.path.exists('/var/lib/xivo-upgrade/entity_tenant_association_migration'):
         print('03_entity_tenant_migration.py should be executed first')
         sys.exit(1)
