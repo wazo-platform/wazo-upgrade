@@ -36,9 +36,9 @@ def _load_key_file(config):
                      'password': key_file['service_key']}}
 
 
-def _create_user(auth_client, user):
+def _create_user(auth_client, tenant_uuid, user):
     try:
-        auth_client.users.new(**user)
+        auth_client.users.new(tenant_uuid=tenant_uuid, **user)
     except requests.HTTPError as e:
         error = e.response.json() or {}
         if error.get('error_id') == 'invalid_data':
@@ -62,9 +62,15 @@ def _import_wazo_user(users):
     token = auth_client.token.new('xivo_service', expiration=36000)['token']
     auth_client.set_token(token)
 
+    print('creating temporary tenant', end='', flush=True)
+    tenant = auth_client.tenants.new(name='xivo-to-wazo-user-migration')
+    token = auth_client.token.new('xivo_service', expiration=36000)['token']
+    auth_client.set_token(token)
+    print(' done')
+
     print('migrate users to wazo-auth', end='', flush=True)
     for user in users:
-        _create_user(auth_client, user)
+        _create_user(auth_client, tenant['uuid'], user)
         print('.', end='', flush=True)
     print('\ndone')
 
