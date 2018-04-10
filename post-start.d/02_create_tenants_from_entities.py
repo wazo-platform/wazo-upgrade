@@ -88,11 +88,13 @@ def do_migration(config):
     auth_client.set_token(token)
 
     existing_tenants = _get_existing_tenants(auth_client)
+    # The top tenant will not be necessary when all users have a tenant_uuid to inherit from
+    top_tenant = [t for t in auth_client.tenants.list()['items'] if t['uuid'] == t['parent_uuid']][0]
 
     for tenant in tenants:
         if tenant['name'] in existing_tenants.keys():
             continue
-        tenant = auth_client.tenants.new(**tenant)
+        tenant = auth_client.tenants.new(parent_uuid=top_tenant['uuid'], **tenant)
 
         existing_tenants[tenant['name']] = tenant['uuid']
 
