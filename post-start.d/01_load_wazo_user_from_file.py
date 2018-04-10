@@ -63,7 +63,9 @@ def _import_wazo_user(users):
     auth_client.set_token(token)
 
     print('creating temporary tenant', end='', flush=True)
-    tenant = auth_client.tenants.new(name='xivo-to-wazo-user-migration')
+    # The top tenant will not be necessary when all users have a tenant_uuid to inherit from
+    top_tenant = [t for t in auth_client.tenants.list()['items'] if t['uuid'] == t['parent_uuid']][0]
+    tenant = auth_client.tenants.new(name='xivo-to-wazo-user-migration', parent_uuid=top_tenant['uuid'])
     token = auth_client.token.new('xivo_service', expiration=36000)['token']
     auth_client.set_token(token)
     print(' done')
