@@ -37,6 +37,7 @@ def _read_userfeatures(cur):
         'enableclient',
         'loginclient',
         'passwdclient',
+        'entityid',
     ]
 
     users = []
@@ -52,6 +53,7 @@ def _read_userfeatures(cur):
             'enabled': bool(enableclient),
             'username': loginclient or email or uuid,
             'password': passwdclient or None,
+            'entity_id': row.entityid,
         })
 
     if not users:
