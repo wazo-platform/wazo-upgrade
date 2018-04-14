@@ -36,7 +36,12 @@ def _load_key_file(config):
                      'password': key_file['service_key']}}
 
 
-def _create_user(auth_client, tenant_uuid, user):
+def _create_user(auth_client, entity_to_tenant_map, user):
+    tenant_uuid = entity_to_tenant_map.get(user.get('entity_id'))
+    if not tenant_uuid:
+        print('The following user has no entity skipping... ', user)
+        return
+
     try:
         auth_client.users.new(tenant_uuid=tenant_uuid, **user)
     except requests.HTTPError as e:
@@ -44,7 +49,7 @@ def _create_user(auth_client, tenant_uuid, user):
         if error.get('error_id') == 'invalid_data':
             if error.get('details', {}).get('email_address', {}).get('constraint_id') == 'email':
                 user['email_address'] = None
-                _create_user(auth_client, user)
+                _create_user(auth_client, entity_to_tenant_map, user)
                 return
         if error.get('error_id') == 'conflict':
             if error.get('details', {}).get('uuid', {}).get('constraint_id') == 'unique':
@@ -56,23 +61,25 @@ def _create_user(auth_client, tenant_uuid, user):
         raise
 
 
+def _build_entity_tenant_map(cursor):
+    qry = 'SELECT id, tenant_uuid FROM entity'
+    cursor.execute(qry)
+    return {row[0]: row[1] for row in cursor.fetchall()}
+
+
 def _import_wazo_user(users):
     config = _load_config()
     auth_client = AuthClient(**config['auth'])
     token = auth_client.token.new('xivo_service', expiration=36000)['token']
     auth_client.set_token(token)
 
-    print('creating temporary tenant', end='', flush=True)
-    # The top tenant will not be necessary when all users have a tenant_uuid to inherit from
-    top_tenant = [t for t in auth_client.tenants.list()['items'] if t['uuid'] == t['parent_uuid']][0]
-    tenant = auth_client.tenants.new(name='xivo-to-wazo-user-migration', parent_uuid=top_tenant['uuid'])
-    token = auth_client.token.new('xivo_service', expiration=36000)['token']
-    auth_client.set_token(token)
-    print(' done')
+    with closing(psycopg2.connect(config['db_uri'])) as conn:
+        cursor = conn.cursor()
+        entity_to_tenant_map = _build_entity_tenant_map(cursor)
 
     print('migrate users to wazo-auth', end='', flush=True)
     for user in users:
-        _create_user(auth_client, tenant['uuid'], user)
+        _create_user(auth_client, enityt_to_tenant_map, user)
         print('.', end='', flush=True)
     print('\ndone')
 
@@ -82,6 +89,10 @@ def main():
 
     if not args.force and os.getenv('XIVO_VERSION_INSTALLED') > '18.04':
         sys.exit(0)
+
+    if not os.path.exists('/var/lib/xivo-upgrade/entity_tenant_association_migration'):
+        print('Tenant migration should be completed first')
+        sys.exit(1)
 
     migration_file = '/var/lib/xivo-upgrade/migrate_xivo_user_to_wazo_user'
     if os.path.exists(migration_file):
