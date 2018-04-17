@@ -106,6 +106,8 @@ def do_migration(config):
             _update_entity_tenant_uuid(cursor, name, tenant_uuid)
             conn.commit()
 
+    auth_client.token.revoke(token)
+
 
 def main():
     if os.getenv('XIVO_VERSION_INSTALLED') > '18.04':

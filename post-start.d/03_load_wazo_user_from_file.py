@@ -83,6 +83,8 @@ def _import_wazo_user(users):
         print('.', end='', flush=True)
     print('\ndone')
 
+    auth_client.token.revoke(token)
+
 
 def main():
     args = parse_args()
