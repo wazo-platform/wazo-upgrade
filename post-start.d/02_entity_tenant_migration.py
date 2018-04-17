@@ -29,7 +29,7 @@ def _associate_userfeatures_to_tenants(cursor, entity_tenant_map):
 def _get_entities(cursor):
     qry = 'SELECT id, tenant_uuid FROM entity'
     cursor.execute(qry)
-    return {row[0]: row[1] for row in cursor.fetchall()}
+    return {entity_id: tenant_uuid for (entity_id, tenant_uuid) in cursor.fetchall()}
 
 
 def do_migration(config):
