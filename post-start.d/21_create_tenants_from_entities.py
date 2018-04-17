@@ -63,7 +63,8 @@ def _build_tenant_bodies_from_entities(cursor):
 
 
 def _get_existing_tenants(auth_client):
-    return {tenant['name']: tenant['uuid'] for tenant in auth_client.tenants.list()['items']}
+    tenants = auth_client.tenants.list()['items']
+    return {tenant['name']: tenant['uuid'] for tenant in tenants}
 
 
 def _upsert_tenant(cursor, tenant_uuid):
@@ -72,9 +73,6 @@ def _upsert_tenant(cursor, tenant_uuid):
 
 
 def _update_entity_tenant_uuid(cursor, entity_name, tenant_uuid):
-    if not entity_name:
-        return
-
     qry = 'UPDATE entity SET tenant_uuid = %s WHERE name = %s'
     cursor.execute(qry, (tenant_uuid, entity_name))
 
@@ -88,23 +86,27 @@ def do_migration(config):
     auth_client.set_token(token)
 
     existing_tenants = _get_existing_tenants(auth_client)
-    # The top tenant will not be necessary when all users have a tenant_uuid to inherit from
-    top_tenant = [t for t in auth_client.tenants.list()['items'] if t['uuid'] == t['parent_uuid']][0]
 
     for tenant in tenants:
         if tenant['name'] in existing_tenants.keys():
             continue
-        tenant = auth_client.tenants.new(parent_uuid=top_tenant['uuid'], **tenant)
+        tenant = auth_client.tenants.new(**tenant)
 
         existing_tenants[tenant['name']] = tenant['uuid']
 
     with closing(psycopg2.connect(config['db_uri'])) as conn:
         cursor = conn.cursor()
         for name, tenant_uuid in existing_tenants.items():
+            if not name:
+                # wazo-auth allow tenants without names but those do not map to entities
+                continue
+
             _upsert_tenant(cursor, tenant_uuid)
             conn.commit()
             _update_entity_tenant_uuid(cursor, name, tenant_uuid)
             conn.commit()
+
+    auth_client.token.revoke(token)
 
 
 def main():

@@ -29,7 +29,7 @@ def _associate_userfeatures_to_tenants(cursor, entity_tenant_map):
 def _get_entities(cursor):
     qry = 'SELECT id, tenant_uuid FROM entity'
     cursor.execute(qry)
-    return {row[0]: row[1] for row in cursor.fetchall()}
+    return {entity_id: tenant_uuid for (entity_id, tenant_uuid) in cursor.fetchall()}
 
 
 def do_migration(config):
@@ -47,7 +47,7 @@ def main():
     # Check if the previous migration has been executed since we depend on all tenants
     # existing in wazo-auth
     if not os.path.exists('/var/lib/xivo-upgrade/entity_tenant_migration'):
-        print('02_create_tenants_from_entities.py should be executed first')
+        print('01_create_tenants_from_entities.py should be executed first')
         sys.exit(1)
 
     sentinel_file = '/var/lib/xivo-upgrade/entity_tenant_association_migration'

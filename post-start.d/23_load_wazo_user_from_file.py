@@ -6,10 +6,12 @@ import argparse
 import json
 import sys
 import os
+import psycopg2
 import urllib3
 
 import requests
 
+from contextlib import closing
 from xivo.chain_map import ChainMap
 from xivo.config_helper import read_config_file_hierarchy, parse_config_file
 from xivo_auth_client import Client as AuthClient
@@ -36,15 +38,22 @@ def _load_key_file(config):
                      'password': key_file['service_key']}}
 
 
-def _create_user(auth_client, tenant_uuid, user):
+def _create_user(auth_client, entity_to_tenant_map, user):
+    tenant_uuid = entity_to_tenant_map.get(user.get('entity_id'))
+    if not tenant_uuid:
+        print('The following user has no entity, skipping... ', user)
+        return
+
     try:
         auth_client.users.new(tenant_uuid=tenant_uuid, **user)
     except requests.HTTPError as e:
         error = e.response.json() or {}
         if error.get('error_id') == 'invalid_data':
-            if error.get('details', {}).get('email_address', {}).get('constraint_id') == 'email':
+            # The email address was allowed in the php web interface, but is
+            # not allowed in wazo-auth
+            if error.get('details', {}).get('email_address', {}).get('constraint') == 'email':
                 user['email_address'] = None
-                _create_user(auth_client, user)
+                _create_user(auth_client, entity_to_tenant_map, user)
                 return
         if error.get('error_id') == 'conflict':
             if error.get('details', {}).get('uuid', {}).get('constraint_id') == 'unique':
@@ -53,7 +62,17 @@ def _create_user(auth_client, tenant_uuid, user):
                 return
             elif error.get('details', {}).get('email_address', {}).get('constraint_id') == 'unique':
                 return
+
+        print('The user could not be migrated')
+        print('The user was:', user)
+        print('The error was:', error)
         raise
+
+
+def _build_entity_tenant_map(cursor):
+    qry = 'SELECT id, tenant_uuid FROM entity'
+    cursor.execute(qry)
+    return {entity_id: tenant_uuid for (entity_id, tenant_uuid) in cursor.fetchall()}
 
 
 def _import_wazo_user(users):
@@ -62,19 +81,17 @@ def _import_wazo_user(users):
     token = auth_client.token.new('xivo_service', expiration=36000)['token']
     auth_client.set_token(token)
 
-    print('creating temporary tenant', end='', flush=True)
-    # The top tenant will not be necessary when all users have a tenant_uuid to inherit from
-    top_tenant = [t for t in auth_client.tenants.list()['items'] if t['uuid'] == t['parent_uuid']][0]
-    tenant = auth_client.tenants.new(name='xivo-to-wazo-user-migration', parent_uuid=top_tenant['uuid'])
-    token = auth_client.token.new('xivo_service', expiration=36000)['token']
-    auth_client.set_token(token)
-    print(' done')
+    with closing(psycopg2.connect(config['db_uri'])) as conn:
+        cursor = conn.cursor()
+        entity_to_tenant_map = _build_entity_tenant_map(cursor)
 
-    print('migrate users to wazo-auth', end='', flush=True)
+    print('migrating users to wazo-auth', end='', flush=True)
     for user in users:
-        _create_user(auth_client, tenant['uuid'], user)
+        _create_user(auth_client, entity_to_tenant_map, user)
         print('.', end='', flush=True)
     print('\ndone')
+
+    auth_client.token.revoke(token)
 
 
 def main():
@@ -83,10 +100,14 @@ def main():
     if not args.force and os.getenv('XIVO_VERSION_INSTALLED') > '18.04':
         sys.exit(0)
 
-    migration_file = '/var/lib/xivo-upgrade/migrate_xivo_user_to_wazo_user'
-    if os.path.exists(migration_file):
+    if not os.path.exists('/var/lib/xivo-upgrade/entity_tenant_association_migration'):
+        print('Tenant migration should be completed first')
+        sys.exit(1)
+
+    sentinel_file = '/var/lib/xivo-upgrade/migrate_xivo_user_to_wazo_user'
+    if os.path.exists(sentinel_file):
         # migration already done
-        sys.exit(0)
+        sys.exit(1)
 
     user_file = '/var/lib/xivo-upgrade/xivo_user_dump.json'
     if not os.path.exists(user_file):
@@ -98,7 +119,7 @@ def main():
 
     _import_wazo_user(users)
 
-    with open(migration_file, 'w'):
+    with open(sentinel_file, 'w'):
         pass
 
     os.unlink(user_file)

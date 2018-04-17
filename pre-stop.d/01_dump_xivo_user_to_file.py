@@ -37,13 +37,19 @@ def _read_userfeatures(cur):
         'enableclient',
         'loginclient',
         'passwdclient',
+        'entityid',
     ]
 
     users = []
+    abort = False
 
     cur.execute('SELECT {} FROM "userfeatures"'.format(','.join(userfeatures_fields)))
     for row in cur.fetchall():
-        uuid, firstname, lastname, email, enableclient, loginclient, passwdclient = row
+        uuid, firstname, lastname, email, enableclient, loginclient, passwdclient, entity_id = row
+        if not entity_id:
+            print('User "{} {}" <{}> is not associated to an entity. Aborting...'.format(firstname, lastname, email))
+            abort = True
+
         users.append({
             'uuid': uuid,
             'firstname': firstname or None,
@@ -52,10 +58,14 @@ def _read_userfeatures(cur):
             'enabled': bool(enableclient),
             'username': loginclient or email or uuid,
             'password': passwdclient or None,
+            'entity_id': entity_id,
         })
 
     if not users:
         return []
+
+    if abort:
+        sys.exit(2)
 
     return users
 
