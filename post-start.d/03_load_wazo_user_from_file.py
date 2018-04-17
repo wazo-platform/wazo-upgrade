@@ -39,7 +39,7 @@ def _load_key_file(config):
 def _create_user(auth_client, entity_to_tenant_map, user):
     tenant_uuid = entity_to_tenant_map.get(user.get('entity_id'))
     if not tenant_uuid:
-        print('The following user has no entity skipping... ', user)
+        print('The following user has no entity, skipping... ', user)
         return
 
     try:
@@ -47,6 +47,8 @@ def _create_user(auth_client, entity_to_tenant_map, user):
     except requests.HTTPError as e:
         error = e.response.json() or {}
         if error.get('error_id') == 'invalid_data':
+            # The email address was allowed in the php web interface, but is
+            # not allowed in wazo-auth
             if error.get('details', {}).get('email_address', {}).get('constraint_id') == 'email':
                 user['email_address'] = None
                 _create_user(auth_client, entity_to_tenant_map, user)
@@ -77,7 +79,7 @@ def _import_wazo_user(users):
         cursor = conn.cursor()
         entity_to_tenant_map = _build_entity_tenant_map(cursor)
 
-    print('migrate users to wazo-auth', end='', flush=True)
+    print('migrating users to wazo-auth', end='', flush=True)
     for user in users:
         _create_user(auth_client, enityt_to_tenant_map, user)
         print('.', end='', flush=True)
