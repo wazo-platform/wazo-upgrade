@@ -63,7 +63,7 @@ def _build_tenant_bodies_from_entities(cursor):
 
 
 def _get_existing_tenants(auth_client):
-    tenants = auth_client.tenants.list(recurse=True)['items']
+    tenants = auth_client.tenants.list()['items']
     return {tenant['name']: tenant['uuid'] for tenant in tenants}
 
 
