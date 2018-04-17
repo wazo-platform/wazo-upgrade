@@ -6,10 +6,12 @@ import argparse
 import json
 import sys
 import os
+import psycopg2
 import urllib3
 
 import requests
 
+from contextlib import closing
 from xivo.chain_map import ChainMap
 from xivo.config_helper import read_config_file_hierarchy, parse_config_file
 from xivo_auth_client import Client as AuthClient
