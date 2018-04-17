@@ -81,7 +81,7 @@ def _import_wazo_user(users):
 
     print('migrating users to wazo-auth', end='', flush=True)
     for user in users:
-        _create_user(auth_client, enityt_to_tenant_map, user)
+        _create_user(auth_client, entity_to_tenant_map, user)
         print('.', end='', flush=True)
     print('\ndone')
 
