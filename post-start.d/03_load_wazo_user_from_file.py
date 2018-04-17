@@ -98,8 +98,8 @@ def main():
         print('Tenant migration should be completed first')
         sys.exit(1)
 
-    migration_file = '/var/lib/xivo-upgrade/migrate_xivo_user_to_wazo_user'
-    if os.path.exists(migration_file):
+    sentinel_file = '/var/lib/xivo-upgrade/migrate_xivo_user_to_wazo_user'
+    if os.path.exists(sentinel_file):
         # migration already done
         sys.exit(0)
 
@@ -113,7 +113,7 @@ def main():
 
     _import_wazo_user(users)
 
-    with open(migration_file, 'w'):
+    with open(sentinel_file, 'w'):
         pass
 
     os.unlink(user_file)
