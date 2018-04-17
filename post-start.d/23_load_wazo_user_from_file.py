@@ -51,7 +51,7 @@ def _create_user(auth_client, entity_to_tenant_map, user):
         if error.get('error_id') == 'invalid_data':
             # The email address was allowed in the php web interface, but is
             # not allowed in wazo-auth
-            if error.get('details', {}).get('email_address', {}).get('constraint_id') == 'email':
+            if error.get('details', {}).get('email_address', {}).get('constraint') == 'email':
                 user['email_address'] = None
                 _create_user(auth_client, entity_to_tenant_map, user)
                 return
@@ -62,6 +62,10 @@ def _create_user(auth_client, entity_to_tenant_map, user):
                 return
             elif error.get('details', {}).get('email_address', {}).get('constraint_id') == 'unique':
                 return
+
+        print('The user could not be migrated')
+        print('The user was:', user)
+        print('The error was:', error)
         raise
 
 
@@ -103,7 +107,7 @@ def main():
     sentinel_file = '/var/lib/xivo-upgrade/migrate_xivo_user_to_wazo_user'
     if os.path.exists(sentinel_file):
         # migration already done
-        sys.exit(0)
+        sys.exit(1)
 
     user_file = '/var/lib/xivo-upgrade/xivo_user_dump.json'
     if not os.path.exists(user_file):
