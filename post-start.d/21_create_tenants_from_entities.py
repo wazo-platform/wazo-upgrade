@@ -7,6 +7,7 @@ import os
 import sys
 
 from contextlib import closing
+from subprocess import check_call
 from xivo_auth_client import Client as AuthClient
 from xivo.chain_map import ChainMap
 from xivo.config_helper import read_config_file_hierarchy, parse_config_file
@@ -122,6 +123,9 @@ def main():
 
     with open(sentinel_file, 'w'):
         pass
+
+    # This restart is only necessary while the backend xivo_service is used.
+    check_call(['wazo-service', 'restart'])
 
 
 if __name__ == '__main__':
