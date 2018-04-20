@@ -101,7 +101,7 @@ def main():
         sys.exit(0)
 
     if not os.path.exists('/var/lib/xivo-upgrade/entity_tenant_association_migration'):
-        print('Tenant migration should be completed first')
+        print('22_entity_tenant_migration.py should be executed first')
         sys.exit(1)
 
     sentinel_file = '/var/lib/xivo-upgrade/migrate_xivo_user_to_wazo_user'
