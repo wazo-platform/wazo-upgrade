@@ -13,6 +13,7 @@ is_package_purgeable() {
 }
 
 renamed_packages="xivo-call-logs
+                  xivo-dird
                   xivo-restapi"
 
 for package in $renamed_packages; do
