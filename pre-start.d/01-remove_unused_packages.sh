@@ -1,4 +1,6 @@
 #!/bin/bash
+# Copyright 2018 The Wazo Authors  (see the AUTHORS file)
+# SPDX-License-Identifier: GPL-3.0+
 
 is_package_installed() {
     [ "$(dpkg-query -W -f '${Status}' "$1" 2>/dev/null)" = 'install ok installed' ]
@@ -26,6 +28,7 @@ done
 if is_package_installed xivo-dbms; then
    if is_package_purgeable postgresql-9.4; then
        apt-get purge -y --force-yes postgresql-9.4 postgresql-client-9.4 postgresql-plpython-9.4 postgresql-contrib-9.4
+       systemctl restart postgresql.service
    fi
 fi
 
