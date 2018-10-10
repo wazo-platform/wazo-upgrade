@@ -48,7 +48,7 @@ def _create_user(auth_client, entity_to_tenant_map, user):
         auth_client.users.new(tenant_uuid=tenant_uuid, **user)
     except requests.HTTPError as e:
         error = e.response.json() or {}
-        if error.get('error_id') == 'invalid_data':
+        if error.get('error_id') == 'invalid-data':
             # The email address was allowed in the php web interface, but is
             # not allowed in wazo-auth
             if error.get('details', {}).get('email_address', {}).get('constraint') == 'email':
