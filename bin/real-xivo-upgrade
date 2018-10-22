@@ -148,25 +148,25 @@ upgrading_system() {
 display_asterisk_notice() {
 	ast_version=$(dpkg-query -W -f '${Version}' asterisk 2>/dev/null)
 	case "$ast_version" in
-		8:13.*)
-			ast_major_version="13"
+		8:15.*)
+			ast_major_version="15"
 			;;
 		*)
 			ast_major_version="unknown"
 			;;
 	esac
-	if dpkg --compare-versions "$ast_version" le 8:14; then
+	if dpkg --compare-versions "$ast_version" le 8:16; then
 		cat <<-EOF
 
-		Asterisk will be upgraded from version $ast_major_version to 14. You might be impacted if you have:
+		Asterisk will be upgraded from version $ast_major_version to 16. You might be impacted if you have:
 
 		* custom Asterisk configuration (other than custom dialplan)
 		* custom application using AMI or ARI
 		* custom Asterisk modules (e.g. codec_g729a.so)
 
 		If you find yourself in one of these cases, you should make sure that
-		your customizations still work with Asterisk 14. Please refer to
-		http://documentation.wazo.community/en/stable/upgrade/16.14/asterisk_14.html
+		your customizations still work with Asterisk 16. Please refer to
+		http://documentation.wazo.community/en/stable/upgrade/18.12/asterisk_16.html
 		for more information.
 
 		EOF
@@ -181,10 +181,10 @@ display_asterisk_notice() {
 
 			$custom_modules
 
-			Since these modules will not work with Asterisk 14 and might cause major
+			Since these modules will not work with Asterisk 16 and might cause major
 			instability issues, they have been moved from /usr/lib/asterisk/modules to
 			/tmp. To continue using these modules, you will have to install (or recompile)
-			the Asterisk 14 version of these modules.
+			the Asterisk 16 version of these modules.
 
 		EOF
 		fi
