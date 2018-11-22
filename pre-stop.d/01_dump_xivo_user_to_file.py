@@ -13,7 +13,7 @@ from xivo.chain_map import ChainMap
 from xivo.config_helper import read_config_file_hierarchy
 from contextlib import closing
 
-logger = logging.getLogger('upgrade_admin_ui_official_plugins')
+logger = logging.getLogger('01_dump_xivo_user_to_file')
 logging.basicConfig(level=logging.INFO)
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -97,7 +97,7 @@ def main():
     user_filename = '/var/lib/xivo-upgrade/xivo_user_dump.json'
     if os.path.exists(user_filename):
         print('execute the following script before upgrading your wazo:')
-        print('/usr/share/xivo-upgrade/post-start.d/01_load_wazo_user_from_file.py -f')
+        print('/usr/share/xivo-upgrade/post-start.d/23_load_wazo_user_from_file.py -f')
         sys.exit(-1)
 
     with closing(psycopg2.connect(db_uri)) as conn:
