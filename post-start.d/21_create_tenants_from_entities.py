@@ -15,7 +15,7 @@ from xivo.config_helper import read_config_file_hierarchy, parse_config_file
 _DEFAULT_CONFIG = {
     'config_file': '/etc/wazo-upgrade/config.yml',
     'auth': {
-        'key_file': '/var/lib/xivo-auth-keys/wazo-upgrade-key.yml'
+        'key_file': '/var/lib/wazo-auth-keys/wazo-upgrade-key.yml'
     }
 }
 

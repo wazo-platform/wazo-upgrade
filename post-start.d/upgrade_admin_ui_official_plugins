@@ -17,7 +17,7 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 _DEFAULT_CONFIG = {
     'config_file': '/etc/wazo-upgrade/config.yml',
     'auth': {
-        'key_file': '/var/lib/xivo-auth-keys/wazo-upgrade-key.yml'
+        'key_file': '/var/lib/wazo-auth-keys/wazo-upgrade-key.yml'
     }
 }
 
