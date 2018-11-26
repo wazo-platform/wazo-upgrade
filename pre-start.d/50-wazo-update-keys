@@ -2,5 +2,7 @@
 # Copyright 2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
+systemctl start wazo-auth
 wazo-auth-keys service update
 wazo-auth-keys service clean --users
+systemctl stop wazo-auth
