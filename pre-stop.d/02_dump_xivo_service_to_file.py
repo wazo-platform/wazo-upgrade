@@ -82,6 +82,8 @@ def _save_to_file(services, filename):
 
     print('saving services access to {}'.format(filename), end=' ... ')
 
+    os.mknod(filename)
+    os.chmod(filename, 0o600)
     with open(filename, 'w') as f:
         json.dump(services, f)
 
