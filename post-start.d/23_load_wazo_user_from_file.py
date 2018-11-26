@@ -78,7 +78,7 @@ def _build_entity_tenant_map(cursor):
 def _import_wazo_user(users):
     config = _load_config()
     auth_client = AuthClient(**config['auth'])
-    token = auth_client.token.new('xivo_service', expiration=36000)['token']
+    token = auth_client.token.new(expiration=36000)['token']
     auth_client.set_token(token)
 
     with closing(psycopg2.connect(config['db_uri'])) as conn:

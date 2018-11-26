@@ -34,7 +34,7 @@ def _load_key_file(config):
 
 config = load_config()
 auth_client = AuthClient(**config['auth'])
-token_data = auth_client.token.new('xivo_service', expiration=300)
+token_data = auth_client.token.new(expiration=300)
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger('reset_unassociated_devices_to_autoprov')

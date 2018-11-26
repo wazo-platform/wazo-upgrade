@@ -7,7 +7,6 @@ import os
 import sys
 
 from contextlib import closing
-from subprocess import check_call
 from xivo_auth_client import Client as AuthClient
 from xivo.chain_map import ChainMap
 from xivo.config_helper import read_config_file_hierarchy, parse_config_file
@@ -83,7 +82,7 @@ def do_migration(config):
         tenants = _build_tenant_bodies_from_entities(conn.cursor())
 
     auth_client = AuthClient(**config['auth'])
-    token = auth_client.token.new('xivo_service', expiration=36000)['token']
+    token = auth_client.token.new(expiration=36000)['token']
     auth_client.set_token(token)
 
     existing_tenants = _get_existing_tenants(auth_client)
@@ -123,9 +122,6 @@ def main():
 
     with open(sentinel_file, 'w'):
         pass
-
-    # This restart is only necessary while the backend xivo_service is used.
-    check_call(['wazo-service', 'restart'])
 
 
 if __name__ == '__main__':
