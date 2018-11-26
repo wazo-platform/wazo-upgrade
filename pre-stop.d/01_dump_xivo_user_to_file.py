@@ -76,6 +76,8 @@ def _save_to_file(users, filename):
 
     print('saving users to {}'.format(filename), end=' ... ')
 
+    os.mknod(filename)
+    os.chmod(filename, 0o600)
     with open(filename, 'w') as f:
         json.dump(users, f)
 
