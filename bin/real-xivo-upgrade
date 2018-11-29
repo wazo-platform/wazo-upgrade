@@ -191,13 +191,8 @@ display_asterisk_notice() {
 	fi
 }
 
-list_packages_with_filter () {
-	filter="$1"
-	aptitude -q -F '%p' --disable-columns search "$filter"
-}
-
 xivo_package() {
-	list_packages_with_filter "?installed?name(\"^xivo$|^xivo-base$|^pf-xivo$\")" | head -n1
+	dpkg-query --show --showformat '${db:Status-Status} ${binary:Package}\n' pf-xivo xivo xivo-base | awk '{ if ($1 == "installed") print $2 }' | head -n 1
 }
 
 xivo_version_installed() {
