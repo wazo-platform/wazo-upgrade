@@ -10,7 +10,7 @@ from xivo.chain_map import ChainMap
 from xivo.config_helper import read_config_file_hierarchy, parse_config_file
 from xivo_auth_client import Client as AuthClient
 
-logger = logging.getLogger('upgrade_admin_ui_official_plugins')
+logger = logging.getLogger('upgrade_official_plugins')
 logging.basicConfig(level=logging.INFO)
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
