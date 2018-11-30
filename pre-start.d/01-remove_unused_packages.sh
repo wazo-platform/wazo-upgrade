@@ -18,7 +18,16 @@ renamed_packages="xivo-call-logs
                   xivo-dird
                   xivo-restapi"
 
+admin_ui_plugins=$(dpkg-query -W -f='${binary:Package}\n' | grep -E 'wazo-plugind-admin-ui-.*-official')
+
+
 for package in $renamed_packages; do
+    if is_package_purgeable $package; then
+        apt-get purge -y --force-yes $package
+    fi
+done
+
+for package in $admin_ui_plugins; do
     if is_package_purgeable $package; then
         apt-get purge -y --force-yes $package
     fi
