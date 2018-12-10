@@ -116,7 +116,7 @@ def main():
         if not version_installed:
             print('Variable XIVO_VERSION_INSTALLED must be set')
             sys.exit(1)
-        if version_installed > '18.14':
+        if version_installed > '18.13':
             sys.exit(0)
 
         if version_installed <= '18.04':

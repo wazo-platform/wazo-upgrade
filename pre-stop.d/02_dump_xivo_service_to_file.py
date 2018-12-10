@@ -96,7 +96,7 @@ def main():
         print('Variable XIVO_VERSION_INSTALLED must be set')
         sys.exit(-1)
 
-    if version_installed > '18.14':
+    if version_installed > '18.13':
         sys.exit(0)
 
     migration_file = '/var/lib/xivo-upgrade/migrate_xivo_service_to_wazo_user'
