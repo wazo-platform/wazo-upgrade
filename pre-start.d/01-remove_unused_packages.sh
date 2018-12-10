@@ -16,7 +16,8 @@ is_package_purgeable() {
 
 renamed_packages="xivo-call-logs
                   xivo-dird
-                  xivo-restapi"
+                  xivo-restapi
+                  wazo-admin-ui"
 
 admin_ui_plugins=$(dpkg-query -W -f='${binary:Package}\n' | grep -E 'wazo-plugind-admin-ui-.*-official')
 
