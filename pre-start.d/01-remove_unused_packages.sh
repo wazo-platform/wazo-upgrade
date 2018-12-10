@@ -16,10 +16,11 @@ is_package_purgeable() {
 
 renamed_packages="xivo-call-logs
                   xivo-dird
-                  xivo-restapi
-                  wazo-admin-ui"
+                  xivo-restapi"
 
-for package in $renamed_packages; do
+removed_packages="wazo-admin-ui"
+
+for package in $renamed_packages $removed_packages; do
     if is_package_purgeable $package; then
         apt-get purge -y --force-yes $package
     fi
