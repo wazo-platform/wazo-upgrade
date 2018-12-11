@@ -77,9 +77,6 @@ def _read_accesswebservice(cur):
 
 
 def _save_to_file(services, filename):
-    if not services:
-        return
-
     print('saving services access to {}'.format(filename), end=' ... ')
 
     os.mknod(filename)
