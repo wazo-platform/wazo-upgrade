@@ -127,7 +127,7 @@ def main():
     sentinel_file = '/var/lib/xivo-upgrade/migrate_xivo_service_to_wazo_user'
     if os.path.exists(sentinel_file):
         # migration already done
-        sys.exit(1)
+        sys.exit(0)
 
     user_file = '/var/lib/xivo-upgrade/xivo_service_dump.json'
     if not os.path.exists(user_file):
