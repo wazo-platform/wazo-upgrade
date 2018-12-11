@@ -14,6 +14,10 @@ is_package_purgeable() {
 
 for package in $admin_ui_plugins; do
     if is_package_purgeable $package; then
+        rules_file=$(dpkg -L "$package" | grep '/usr/lib/wazo-plugind/plugins/official/admin-ui-.*/wazo/rules$')
+        if [ -n "$rules_file" ] ; then
+            sed -i '/systemctl restart wazo-admin-ui/d' "$rules_file"
+        fi
         apt-get purge -y --force-yes $package
     fi
 done
