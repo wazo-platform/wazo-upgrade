@@ -71,9 +71,6 @@ def _read_userfeatures(cur):
 
 
 def _save_to_file(users, filename):
-    if not users:
-        return
-
     print('saving users to {}'.format(filename), end=' ... ')
 
     os.mknod(filename)
