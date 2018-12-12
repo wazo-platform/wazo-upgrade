@@ -47,8 +47,26 @@ post_start() {
 	differed_action post-start
 }
 
+wait_for_lock(){
+	WAIT_TIMEOUT=15
+	WAIT_INTERVAL=1
+	while fuser /var/lib/dpkg/lock > /dev/null 2>&1; do
+		sleep ${WAIT_INTERVAL}
+		WAIT_TIMEOUT=$((WAIT_TIMEOUT - WAIT_INTERVAL))
+		if [ "$WAIT_TIMEOUT" -eq 0 ]; then
+			echo "Could not get dpkg lock"
+			return 1
+		fi
+	done
+}
+
 execute() {
 	cmd=$*
+	wait_for_lock
+	if [ $? -ne 0 ]; then
+		start_xivo
+		exit -1
+	fi
 	$cmd
 	if [ $? -ne 0 ]; then
 		start_xivo
@@ -76,7 +94,7 @@ upgrade() {
 	execute apt-get install -o Dpkg::Options::="--force-confnew" -y xivo-config
 	execute apt-get install -o Dpkg::Options::="--force-confnew" -y xivo-libdao xivo-ctid
 	execute apt-get dist-upgrade -y
-	apt-get autoremove -y
+	execute apt-get autoremove -y
 	upgrade_dahdi_linux_modules 4.9
 	pre_start
 	start_xivo
@@ -88,7 +106,7 @@ upgrade_dahdi_linux_modules(){
 	VERSION=$1
 	kernel_release=$(ls /lib/modules/ | grep ^$VERSION)
 	for kr in $kernel_release; do
-		apt-get install -o Dpkg::Options::="--force-confnew" -y dahdi-linux-modules-${kr}
+		execute apt-get install -o Dpkg::Options::="--force-confnew" -y dahdi-linux-modules-${kr}
 	done
 }
 
