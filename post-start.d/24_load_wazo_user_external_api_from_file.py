@@ -54,7 +54,7 @@ def _create_user(auth_client, tenant_uuid, user):
         _print_user_migrated_error(user, error)
         raise
 
-    policy_name = str(uuid.uuid4())
+    policy_name = '{}-{}'.format(user['username'], str(uuid.uuid4()))
     try:
         policy = auth_client.policies.new(
             tenant_uuid=tenant_uuid,
