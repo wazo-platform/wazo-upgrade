@@ -93,7 +93,7 @@ def _import_wazo_user(users):
         cursor = conn.cursor()
         entity_to_tenant_map = _build_entity_tenant_map(cursor)
 
-    print('migrating services access to wazo-auth', end='', flush=True)
+    print('migrating admins access to wazo-auth', end='', flush=True)
     for user in users:
         _create_user(auth_client, entity_to_tenant_map, user)
         print('.', end='', flush=True)
