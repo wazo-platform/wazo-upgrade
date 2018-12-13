@@ -40,7 +40,7 @@ def _load_key_file(config):
                      'password': key_file['service_key']}}
 
 
-def _create_user(auth_client, entity_to_tenant_map, user):
+def _create_user(auth_client, entity_to_tenant_map, user, default_policy_uuid):
     tenant_uuid = entity_to_tenant_map.get(user.get('entity_id'))
 
     try:
@@ -57,12 +57,11 @@ def _create_user(auth_client, entity_to_tenant_map, user):
         print('The error was:', error)
         raise
 
-    policy_uuid = _find_admin_policy_uuid(auth_client)
-    if not policy_uuid:
+    if not default_policy_uuid:
         return
 
     try:
-        auth_client.users.add_policy(user['uuid'], policy_uuid)
+        auth_client.users.add_policy(user['uuid'], default_policy_uuid)
     except requests.HTTPError as e:
         error = e.response.json() or {}
         print('The user could not be migrated')
@@ -93,9 +92,11 @@ def _import_wazo_user(users):
         cursor = conn.cursor()
         entity_to_tenant_map = _build_entity_tenant_map(cursor)
 
+    default_policy_uuid = _find_admin_policy_uuid(auth_client)
+
     print('migrating admins access to wazo-auth', end='', flush=True)
     for user in users:
-        _create_user(auth_client, entity_to_tenant_map, user)
+        _create_user(auth_client, entity_to_tenant_map, user, default_policy_uuid)
         print('.', end='', flush=True)
     print('\ndone')
 
