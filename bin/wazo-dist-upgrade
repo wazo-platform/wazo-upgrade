@@ -9,7 +9,7 @@ export APT_LISTCHANGES_FRONTEND=none
 fetch_wazo_versions() {
     echo "Fetching Wazo versions..."
     apt-get update -qq
-    apt-get install -qq --yes --force-yes -o Dpkg::Options::="--force-confnew" xivo-dist
+    apt-get install -qq --yes -o Dpkg::Options::="--force-confnew" xivo-dist
     trap : SIGINT
     cp /etc/apt/sources.list.d/xivo-dist.list{,.bak}
     xivo-dist ${wazo_distribution}
@@ -78,7 +78,7 @@ migrate_systemd_system_conf() {
 upgrade_dahdi_linux_modules(){
     kernel_release=$(ls /lib/modules/ | grep ^4.9)
     for kr in $kernel_release; do
-        apt-get install --yes --force-yes -o Dpkg::Options::="--force-confnew" dahdi-linux-modules-${kr}
+        apt-get install --yes -o Dpkg::Options::="--force-confnew" dahdi-linux-modules-${kr}
     done
 }
 
@@ -95,16 +95,16 @@ dist_upgrade() {
     differed_action post-stop
 
     apt-get update -qq
-    apt-get install --yes --force-yes -o Dpkg::Options::="--force-confnew" xivo-dist
+    apt-get install --yes -o Dpkg::Options::="--force-confnew" xivo-dist
 
     xivo-dist ${wazo_distribution}
     change_sources_list 'jessie' 'stretch'
     apt-get update -qq
 
-    apt-get install --yes --force-yes -o Dpkg::Options::="--force-confnew" xivo-certs xivo-config
+    apt-get install --yes -o Dpkg::Options::="--force-confnew" xivo-certs xivo-config
     systemctl restart consul
-    apt-get upgrade --yes --force-yes -o Dpkg::Options::="--force-confnew"
-    apt-get dist-upgrade --yes --force-yes -o Dpkg::Options::="--force-confnew"
+    apt-get upgrade --yes -o Dpkg::Options::="--force-confnew"
+    apt-get dist-upgrade --yes -o Dpkg::Options::="--force-confnew"
     apt-get autoremove --yes
 
     migrate_systemd_system_conf

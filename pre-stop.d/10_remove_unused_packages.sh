@@ -18,6 +18,6 @@ for package in $admin_ui_plugins; do
         if [ -n "$rules_file" ] ; then
             sed -i '/systemctl restart wazo-admin-ui/d' "$rules_file"
         fi
-        apt-get purge -y --force-yes $package
+        apt-get purge -y $package
     fi
 done
