@@ -210,7 +210,7 @@ display_asterisk_notice() {
 }
 
 xivo_package() {
-	dpkg-query --show --showformat '${db:Status-Status} ${binary:Package}\n' pf-xivo xivo xivo-base | awk '{ if ($1 == "installed") print $2 }' | head -n 1
+	dpkg-query --show --showformat '${db:Status-Status} ${binary:Package}\n' xivo xivo-base | awk '{ if ($1 == "installed") print $2 }' | head -n 1
 }
 
 xivo_version_installed() {
@@ -223,13 +223,6 @@ xivo_version_candidate() {
 
 check_wizard_has_been_run() {
 
-	local xivo_package=$(xivo_package)
-	if [[ $(xivo_version_installed) < '13.03' && -f "/etc/$xivo_package/web-interface/xivo.ini" ]]; then
-		touch "/var/lib/$xivo_package/configured"
-		chmod 664 "/var/lib/$xivo_package/configured"
-
-	fi
-
 	if ! is_xivo_configured; then
 		echo "ERROR: You must configure Wazo by running the web wizard before using wazo-upgrade"
 		exit 1
@@ -237,9 +230,6 @@ check_wizard_has_been_run() {
 }
 
 is_xivo_configured() {
-	if [ -f "/var/lib/xivo/configured" -o -f "/var/lib/pf-xivo/configured" ] ; then
-		return 0
-	fi
 	if [ ! -f "/var/run/xivo-confd/xivo-confd.pid" ] ; then
 		echo "ERROR: xivo-confd is not running: cannot check if the web wizard has been run."
 		exit 1
