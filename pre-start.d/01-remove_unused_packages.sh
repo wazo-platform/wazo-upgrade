@@ -22,14 +22,14 @@ removed_packages="wazo-admin-ui"
 
 for package in $renamed_packages $removed_packages; do
     if is_package_purgeable $package; then
-        apt-get purge -y --force-yes $package
+        apt-get purge -y $package
     fi
 done
 
 # purge postgresql-X.X packages
 if is_package_installed xivo-dbms; then
    if is_package_purgeable postgresql-9.4; then
-       apt-get purge -y --force-yes postgresql-9.4 postgresql-client-9.4 postgresql-plpython-9.4 postgresql-contrib-9.4
+       apt-get purge -y postgresql-9.4 postgresql-client-9.4 postgresql-plpython-9.4 postgresql-contrib-9.4
        systemctl restart postgresql.service
    fi
 fi
@@ -37,6 +37,6 @@ fi
 # purge php5-common
 if ! is_package_installed php5-common; then
     if is_package_purgeable php5-common; then
-       apt-get purge -y --force-yes php5-common
+       apt-get purge -y php5-common
     fi
 fi
