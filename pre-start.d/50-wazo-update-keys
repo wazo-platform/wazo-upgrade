@@ -15,7 +15,7 @@ wait_until_ready(){
     done
 }
 
-systemctl start wazo-auth
+systemctl restart wazo-auth
 wait_until_ready
 if [ $? -ne 0 ]; then
     echo "Cannot update service key, please fix wazo-auth and re-run wazo-upgrade"
