@@ -8,10 +8,9 @@ import requests
 from xivo.chain_map import ChainMap
 from xivo_auth_client import Client as AuthClient
 from xivo.config_helper import read_config_file_hierarchy, parse_config_file
-from xivo_provd_client import new_provisioning_client
+from wazo_provd_client import Client as ProvdClient
 
 LOCAL_CONFD = "http://localhost:9487/1.1"
-LOCAL_PROVD = "http://localhost:8666/provd"
 _DEFAULT_CONFIG = {
     'config_file': '/etc/wazo-upgrade/config.yml',
     'auth': {
@@ -41,7 +40,7 @@ logger = logging.getLogger('reset_unassociated_devices_to_autoprov')
 
 logger.debug('Fetching wrongly configured devices...')
 
-provd_client = new_provisioning_client(LOCAL_PROVD)
+provd_client = ProvdClient(token=token_data['token'], **config['provd'])
 
 session = requests.Session()
 session.headers = {
@@ -50,9 +49,8 @@ session.headers = {
     'X-Auth-Token': token_data['token'],
 }
 
-device_manager = provd_client.device_manager()
+devices = provd_client.devices.list()['devices']
 
-devices = device_manager.find()
 line_response = session.get("{}/lines".format(LOCAL_CONFD), params={'recurse': True}).json()
 
 configured_device_ids = {device['id']

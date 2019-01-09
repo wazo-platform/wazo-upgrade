@@ -8,9 +8,11 @@ import random
 import sys
 from pwd import getpwnam
 
-from wazo_provd_client import Client
+from xivo.chain_map import ChainMap
+from xivo_auth_client import Client as AuthClient
+from xivo.config_helper import read_config_file_hierarchy, parse_config_file
+from wazo_provd_client import Client as ProvdClient
 
-LOCAL_PROVD = "http://localhost:8666/provd"
 SCRIPT_NAME = os.path.basename(sys.argv[0])
 SCRIPT_EXEC = os.path.join('/', 'var', 'lib', 'xivo-upgrade', SCRIPT_NAME)
 
@@ -20,6 +22,28 @@ logging.basicConfig(level=logging.INFO)
 if os.path.exists(SCRIPT_EXEC):
     logger.debug('Already executed')
     sys.exit(0)
+
+_DEFAULT_CONFIG = {
+    'config_file': '/etc/wazo-upgrade/config.yml',
+    'auth': {
+        'key_file': '/var/lib/wazo-auth-keys/wazo-upgrade-key.yml'
+    }
+}
+
+
+def load_config():
+    file_config = read_config_file_hierarchy(_DEFAULT_CONFIG)
+    key_config = _load_key_file(ChainMap(file_config, _DEFAULT_CONFIG))
+    return ChainMap(key_config, file_config, _DEFAULT_CONFIG)
+
+
+def _load_key_file(config):
+    key_file = parse_config_file(config['auth']['key_file'])
+    return {'auth': {'username': key_file['service_id'],
+                     'password': key_file['service_key']}}
+
+
+config = load_config()
 
 USERNAME_VALUES = '2346789bcdfghjkmnpqrtvwxyzBCDFGHJKLMNPQRTVWXYZ'
 USERNAME = 'ap{}'.format(''.join(random.choice(USERNAME_VALUES) for _ in range(8)))
@@ -63,7 +87,9 @@ except IOError as e:
     logger.warning('failed to create the Asterisk autoprov configuration file')
 
 logger.debug("Connecting to provd...")
-provd_client = Client('localhost', https=False, prefix='/provd')
+auth_client = AuthClient(**config['auth'])
+token_data = auth_client.token.new(expiration=300)
+provd_client = ProvdClient(token=token_data['token'], **config['provd'])
 
 to_update = []
 
@@ -84,7 +110,7 @@ for config in to_update:
         logger.warning('failed to update %s', config)
         continue
 
-    provd_client.configs.update(config['id'], config)
+    provd_client.configs.update(config)
 
 # Create empty file as a flag to avoid running the script again
 open(SCRIPT_EXEC, 'w').close()
