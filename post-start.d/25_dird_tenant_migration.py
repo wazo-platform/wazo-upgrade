@@ -51,7 +51,7 @@ def migrate_tenants():
     )
 
     if result.status_code != 200:
-        print('dird tenant migration filed, check /var/log/wazo-dird.log for more info')
+        print('dird tenant migration failed, check /var/log/wazo-dird.log for more info')
         sys.exit(2)
 
     try:
