@@ -10,6 +10,8 @@ import json
 import subprocess
 import time
 
+from contextlib import contextmanager
+from urllib3.exceptions import InsecureRequestWarning
 from xivo.chain_map import ChainMap
 from xivo.config_helper import read_config_file_hierarchy, parse_config_file
 from xivo_auth_client import Client as AuthClient
@@ -20,6 +22,8 @@ _DEFAULT_CONFIG = {
         'key_file': '/var/lib/wazo-auth-keys/wazo-upgrade-key.yml'
     }
 }
+
+requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
 
 
 def _load_config():
