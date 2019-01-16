@@ -7,6 +7,8 @@ import os
 import sys
 import requests
 import json
+import subprocess
+import time
 
 from xivo.chain_map import ChainMap
 from xivo.config_helper import read_config_file_hierarchy, parse_config_file
@@ -34,30 +36,52 @@ def _load_key_file(config):
 
 
 def migrate_tenants():
-    config = _load_config()
-    auth_client = AuthClient(**config['auth'])
-    token = auth_client.token.new('wazo_user', expiration=5*60)['token']
-    auth_client.set_token(token)
+    config_filename = '/etc/wazo-dird/conf.d/999-wazo-tenant-migration.yml'
+    config_file = '''\
+enabled_plugins:
+  views:
+    tenant_migration: true
+'''
 
-    auth_tenants = auth_client.tenants.list()
-    body = [{'uuid': t['uuid'], 'name': t['name']} for t in auth_tenants['items']]
-
-    url = 'https://{host}:{port}/{version}/phonebook_move_tenant'.format(**config['dird'])
-    result = requests.post(
-        url,
-        data=json.dumps(body),
-        headers={'X-Auth-Token': token, 'Content-Type': 'application/json'},
-        verify=False,
-    )
-
-    if result.status_code != 200:
-        print('dird tenant migration failed, check /var/log/wazo-dird.log for more info')
-        sys.exit(2)
+    with open(config_filename, 'w') as f:
+        f.write(config_file)
+    subprocess.Popen(['systemctl', 'restart', 'wazo-dird'])
 
     try:
-        os.unlink('/etc/wazo-dird/conf.d/999-wazo-tenant-migration.yml')
-    except OSError:
-        pass
+        config = _load_config()
+        auth_client = AuthClient(**config['auth'])
+        token = auth_client.token.new('wazo_user', expiration=5*60)['token']
+        auth_client.set_token(token)
+
+        auth_tenants = auth_client.tenants.list()
+        body = [{'uuid': t['uuid'], 'name': t['name']} for t in auth_tenants['items']]
+
+        url = 'https://{host}:{port}/{version}/phonebook_move_tenant'.format(**config['dird'])
+        # allow some time for wazo-dird to start
+        for _ in range(10):
+            try:
+                result = requests.post(
+                    url,
+                    data=json.dumps(body),
+                    headers={'X-Auth-Token': token, 'Content-Type': 'application/json'},
+                    verify=False,
+                )
+                break
+            except requests.exceptions.ConnectionError:
+                time.sleep(1.0)
+        else:
+            print('dird tenant migration failed, could not connect to wazo-dird')
+            sys.exit(2)
+
+        if result.status_code != 200:
+            print('dird tenant migration failed, check /var/log/wazo-dird.log for more info')
+            sys.exit(2)
+    finally:
+        try:
+            os.unlink(config_filename)
+        except OSError:
+            pass
+        subprocess.Popen(['systemctl', 'restart', 'wazo-dird'])
 
 
 def main():
