@@ -23,3 +23,9 @@ provd:
   port: 8666
   https: False
   prefix: '/provd'
+
+dird:
+  host: localhost
+  port: 9489
+  version: 0.1
+  verify_certificate: /usr/share/xivo-certs/server.crt
