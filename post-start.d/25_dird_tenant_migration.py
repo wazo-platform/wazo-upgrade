@@ -64,7 +64,7 @@ enabled_plugins:
 
     with open(config_filename, 'w') as f:
         f.write(config_file)
-    subprocess.Popen(['systemctl', 'restart', 'wazo-dird'])
+    subprocess.run(['systemctl', 'restart', 'wazo-dird'])
     _wait_for_dird(dird_config)
 
     try:
@@ -74,7 +74,7 @@ enabled_plugins:
             os.unlink(config_filename)
         except OSError:
             pass
-        subprocess.Popen(['systemctl', 'restart', 'wazo-dird'])
+        subprocess.run(['systemctl', 'restart', 'wazo-dird'])
 
 
 def migrate_tenants():
