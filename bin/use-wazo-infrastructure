@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
-# SPDX-License-Identifier: GPL-3.0+
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 # Note: this script needs to be python 2.6 compatible since it needs to be
 # able to run on XiVO 1.2.
