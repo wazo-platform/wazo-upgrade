@@ -56,6 +56,9 @@ def _wait_for_provd(provd_config):
 
 def migrate_tenants():
     config = _load_config()
+
+    _wait_for_provd(config['provd'])
+
     auth_client = AuthClient(**config['auth'])
     token = auth_client.token.new('wazo_user', expiration=5*60)
     auth_client.set_token(token['token'])
@@ -65,7 +68,7 @@ def migrate_tenants():
     print('Master tenant UUID:', master_tenant_uuid)
 
     for dir_entry in os.scandir(PROVD_JSONDB_DEVICES_DIR):
-        device_filename = dir_entry.name
+        device_filename = dir_entry.path
         with open(device_filename, 'r') as device:
             try:
                 device_content = json.load(device)
@@ -82,7 +85,7 @@ def migrate_tenants():
                     continue
                 raise
             line_tenant_uuid = master_tenant_uuid
-            if device_lines['total'] > 0:
+            if device_lines['items']:
                 first_line_id = device_lines['items'][0]['line_id']
                 line_info = confd.lines.get(first_line_id)
                 line_tenant_uuid = line_info['tenant_uuid']
@@ -90,6 +93,7 @@ def migrate_tenants():
             device_content['tenant_uuid'] = line_tenant_uuid
         with open(device_filename, 'w') as device:
             json.dump(device_content, device)
+
     subprocess.run(['systemctl', 'restart', 'xivo-provd'])
 
 
@@ -98,7 +102,7 @@ def main():
 
     if not args.force:
         version_installed = os.getenv('XIVO_VERSION_INSTALLED')
-        if version_installed > '19.04':
+        if version_installed and version_installed > '19.04':
             sys.exit(0)
 
     sentinel_file = '/var/lib/xivo-upgrade/55_provd_device_tenant_migration'
