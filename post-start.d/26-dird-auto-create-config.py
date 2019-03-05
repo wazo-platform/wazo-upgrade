@@ -90,6 +90,10 @@ def _make_publisher(config):
 
 
 def main():
+    version_installed = os.getenv('XIVO_VERSION_INSTALLED')
+    if version_installed and version_installed > '19.04':
+        sys.exit(0)
+
     sentinel_file = '/var/lib/xivo-upgrade/dird-auto-create-config'
     if os.path.exists(sentinel_file):
         # migration already done
