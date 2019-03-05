@@ -10,7 +10,6 @@ import subprocess
 import sys
 import time
 
-from requests.exceptions import HTTPError
 from urllib3.exceptions import InsecureRequestWarning
 from xivo_auth_client import Client as AuthClient
 from xivo_confd_client import Client as ConfdClient
