@@ -56,13 +56,12 @@ def _wait_for_provd(provd_config):
 
 def _migrate_device(device_id, tenant_uuid):
     device_path = os.path.join(PROVD_JSONDB_DEVICES_DIR, device_id)
-    with open(device_path) as device:
-        device_content = json.load(device)
-
-    device_content['tenant_uuid'] = tenant_uuid
-
-    with open(device_path, 'w') as device:
-        json.dump(device_content, device)
+    with open(device_path, 'r+') as file_:
+        device = json.load(file_)
+        device['tenant_uuid'] = tenant_uuid
+        file_.seek(0)
+        json.dump(device, file_)
+        file_.truncate()
 
 
 def migrate_tenants():
