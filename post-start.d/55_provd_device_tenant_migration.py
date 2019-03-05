@@ -54,9 +54,19 @@ def _wait_for_provd(provd_config):
     sys.exit(2)
 
 
+def _migrate_device(device_id, tenant_uuid):
+    device_path = os.path.join(PROVD_JSONDB_DEVICES_DIR, device_id)
+    with open(device_path) as device:
+        device_content = json.load(device)
+
+    device_content['tenant_uuid'] = tenant_uuid
+
+    with open(device_path, 'w') as device:
+        json.dump(device_content, device)
+
+
 def migrate_tenants():
     config = _load_config()
-
     _wait_for_provd(config['provd'])
 
     auth_client = AuthClient(**config['auth'])
@@ -65,34 +75,30 @@ def migrate_tenants():
     confd = ConfdClient(token=token['token'], **config['confd'])
 
     master_tenant_uuid = token['metadata']['tenant_uuid']
-    print('Master tenant UUID:', master_tenant_uuid)
 
-    for dir_entry in os.scandir(PROVD_JSONDB_DEVICES_DIR):
-        device_filename = dir_entry.path
-        with open(device_filename, 'r') as device:
+    # Migrate associated devices
+    devices_migrated = []
+    lines = confd.lines.list(recurse=True)['items']
+    for line in lines:
+        device_id = line['device_id']
+
+        if device_id and device_id not in devices_migrated:
             try:
-                device_content = json.load(device)
+                _migrate_device(device_id, line['tenant_uuid'])
             except json.JSONDecodeError:
-                print(device_filename, 'is not a valid JSON file. Skipping.')
+                print(device_id, 'is not a valid JSON file. Skipping.')
                 continue
+            devices_migrated.append(device_id)
 
-            device_id = device_content['id']
+    # Migrate autoprov devices
+    for dir_entry in os.scandir(PROVD_JSONDB_DEVICES_DIR):
+        device_id = dir_entry.name
+        if device_id not in devices_migrated:
             try:
-                device_lines = confd.devices(device_id).list_lines()
-            except HTTPError as e:
-                if e.response.status_code == 404:
-                    print(device_id, 'does not exist in confd. Skipping.')
-                    continue
-                raise
-            line_tenant_uuid = master_tenant_uuid
-            if device_lines['items']:
-                first_line_id = device_lines['items'][0]['line_id']
-                line_info = confd.lines.get(first_line_id)
-                line_tenant_uuid = line_info['tenant_uuid']
-            print('Device {} tenant_uuid will be set to {}'.format(device_id, line_tenant_uuid))
-            device_content['tenant_uuid'] = line_tenant_uuid
-        with open(device_filename, 'w') as device:
-            json.dump(device_content, device)
+                _migrate_device(device_id, master_tenant_uuid)
+            except json.JSONDecodeError:
+                print(device_id, 'is not a valid JSON file. Skipping.')
+                continue
 
     subprocess.run(['systemctl', 'restart', 'xivo-provd'])
 
