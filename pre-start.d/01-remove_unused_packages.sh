@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 is_package_installed() {
@@ -18,7 +18,9 @@ renamed_packages="xivo-call-logs
                   xivo-dird
                   xivo-restapi"
 
-removed_packages="wazo-admin-ui"
+removed_packages="wazo-admin-ui
+                  xivo-ctid
+                  xivo-ctid-client"
 
 for package in $renamed_packages $removed_packages; do
     if is_package_purgeable $package; then
