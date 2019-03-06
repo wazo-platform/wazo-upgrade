@@ -2,6 +2,7 @@
 # Copyright 2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+import argparse
 import os
 import sys
 
@@ -90,9 +91,11 @@ def _make_publisher(config):
 
 
 def main():
-    version_installed = os.getenv('XIVO_VERSION_INSTALLED')
-    if version_installed and version_installed > '19.04':
-        sys.exit(0)
+    args = parse_args()
+    if not args.force:
+        version_installed = os.getenv('XIVO_VERSION_INSTALLED')
+        if version_installed > '19.04':
+            sys.exit(0)
 
     sentinel_file = '/var/lib/xivo-upgrade/dird-auto-create-config'
     if os.path.exists(sentinel_file):
@@ -103,6 +106,17 @@ def main():
 
     with open(sentinel_file, 'w'):
         pass
+
+
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        '-f',
+        '--force',
+        action='store_true',
+        help="Do not check the variable XIVO_VERSION_INSTALLED. Default: %(default)s",
+    )
+    return parser.parse_args()
 
 
 if __name__ == '__main__':
