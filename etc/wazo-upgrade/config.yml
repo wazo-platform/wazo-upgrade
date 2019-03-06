@@ -13,6 +13,15 @@ auth:
   port: 9497
   verify_certificate: /usr/share/xivo-certs/server.crt
 
+bus:
+  username: guest
+  password: guest
+  host: localhost
+  port: 5672
+  exchange_name: xivo
+  exchange_type: topic
+  exchange_durable: True
+
 plugind:
   host: localhost
   port: 9503
