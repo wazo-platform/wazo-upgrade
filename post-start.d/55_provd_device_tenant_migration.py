@@ -86,6 +86,9 @@ def migrate_tenants():
             except json.JSONDecodeError:
                 print(device_id, 'is not a valid JSON file. Skipping.')
                 continue
+            except IOError as e:
+                print('Skipping device "{}": {}'.format(device_id, e))
+                continue
             devices_migrated.append(device_id)
 
     # Migrate autoprov devices
