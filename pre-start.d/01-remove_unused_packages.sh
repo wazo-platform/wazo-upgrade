@@ -18,7 +18,8 @@ renamed_packages="xivo-call-logs
                   xivo-dird
                   xivo-restapi"
 
-removed_packages="wazo-admin-ui
+removed_packages="python-alembic
+                  wazo-admin-ui
                   xivo-ctid
                   xivo-ctid-client"
 
