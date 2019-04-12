@@ -21,7 +21,8 @@ renamed_packages="xivo-call-logs
 removed_packages="python-alembic
                   wazo-admin-ui
                   xivo-ctid
-                  xivo-ctid-client"
+                  xivo-ctid-client
+                  xivo-web-interface"
 
 for package in $renamed_packages $removed_packages; do
     if is_package_purgeable $package; then
