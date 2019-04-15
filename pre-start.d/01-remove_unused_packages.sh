@@ -22,6 +22,7 @@ removed_packages="python-alembic
                   wazo-admin-ui
                   xivo-ctid
                   xivo-ctid-client
+                  xivo-ctid-client-python3
                   xivo-web-interface"
 
 for package in $renamed_packages $removed_packages; do
