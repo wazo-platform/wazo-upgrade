@@ -7,8 +7,6 @@ import os
 import sys
 import requests
 
-from requests import HTTPError
-
 from xivo.chain_map import ChainMap
 from xivo.config_helper import (
     read_config_file_hierarchy,
@@ -35,7 +33,6 @@ DEFAULT_DISPLAY_COLUMNS = [
 ]
 PERSONAL_SOURCE_BODY = {
     'name': 'personal',
-    'db_uri': 'postgresql://asterisk:proformatique@localhost/asterisk',
     'format_columns': {
         'phone': '{number}',
         'name': '{firstname} {lastname}',
