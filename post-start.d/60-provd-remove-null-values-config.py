@@ -70,7 +70,7 @@ def remove_null_values():
     auth_client.set_token(token['token'])
     provd_client.set_token(token['token'])
 
-    configs = provd_client.configs.list()['configs']
+    configs = provd_client.configs.list_device()['configs']
 
     for config in configs:
         provd_client.configs.update(_remove_null_value(config))
