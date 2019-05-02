@@ -5,7 +5,6 @@
 import argparse
 import os
 import requests
-import subprocess
 import sys
 import time
 
@@ -73,8 +72,6 @@ def remove_null_values():
 
     for config in configs:
         provd_client.configs.update(_remove_null_value(config))
-
-    subprocess.run(['systemctl', 'restart', 'xivo-provd'])
 
 
 def main():
