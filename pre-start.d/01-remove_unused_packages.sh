@@ -15,6 +15,7 @@ is_package_purgeable() {
 }
 
 renamed_packages="xivo-call-logs
+                  xivo-ctid-ng
                   xivo-dird
                   xivo-restapi"
 
