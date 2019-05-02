@@ -67,7 +67,6 @@ def remove_null_values():
     auth_client = AuthClient(**config['auth'])
     provd_client = ProvdClient(**config['provd'])
     token = auth_client.token.new('wazo_user', expiration=5*60)
-    auth_client.set_token(token['token'])
     provd_client.set_token(token['token'])
 
     configs = provd_client.configs.list_device()['configs']
