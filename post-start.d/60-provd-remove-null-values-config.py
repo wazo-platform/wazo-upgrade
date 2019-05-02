@@ -11,6 +11,7 @@ import time
 from urllib3.exceptions import InsecureRequestWarning
 from xivo_auth_client import Client as AuthClient
 from wazo_provd_client import Client as ProvdClient
+from wazo_provd_client.exceptions import ProvdError
 from xivo.chain_map import ChainMap
 from xivo.config_helper import read_config_file_hierarchy, parse_config_file
 
@@ -37,11 +38,12 @@ def _load_key_file(config):
     }
 
 
-def _wait_for_provd(provd_config):
-    url = 'https://{host}:{port}{prefix}/configure'.format(**provd_config)
+def _wait_for_provd(provd_client):
     for _ in range(30):
         try:
-            requests.get(url, verify=False)
+            provd_client.params.list()
+            return
+        except ProvdError:
             return
         except requests.exceptions.ConnectionError:
             time.sleep(1.0)
@@ -61,10 +63,10 @@ def _remove_null_value(config):
 
 def remove_null_values():
     config = _load_config()
-    _wait_for_provd(config['provd'])
+    provd_client = ProvdClient(**config['provd'])
+    _wait_for_provd(provd_client)
 
     auth_client = AuthClient(**config['auth'])
-    provd_client = ProvdClient(**config['provd'])
     token = auth_client.token.new('wazo_user', expiration=5*60)
     provd_client.set_token(token['token'])
 
