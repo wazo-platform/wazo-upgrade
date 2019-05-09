@@ -28,7 +28,7 @@ CONFERENCE_SOURCE_BODY = {
         'host': 'localhost',
         'port': 9497,
         'verify_certificate': '/usr/share/xivo-certs/server.crt',
-        'key_file': '/var/lib/wazo-auth-keys/wazo-dird-wazo-backend-key.yml',
+        'key_file': '/var/lib/wazo-auth-keys/wazo-dird-conference-backend-key.yml',
         'version': '0.1',
     },
     'confd': {
@@ -39,10 +39,9 @@ CONFERENCE_SOURCE_BODY = {
         'version': '1.1',
     },
     'format_columns': {
-        'phone': '{exten}',
-        'name': '{firstname} {lastname}',
+        'phone': '{extensions[0]}',
     },
-    'searched_columns': ['firstname', 'lastname', 'exten'],
+    'searched_columns': ['name', 'extensions'],
     'first_matched_columns': [],
 }
 
