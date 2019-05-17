@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Copyright 2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
@@ -8,10 +8,10 @@ import random
 import sys
 from pwd import getpwnam
 
-from xivo.chain_map import ChainMap
-from xivo_auth_client import Client as AuthClient
-from xivo.config_helper import read_config_file_hierarchy, parse_config_file
+from wazo_auth_client import Client as AuthClient
 from wazo_provd_client import Client as ProvdClient
+from xivo.chain_map import ChainMap
+from xivo.config_helper import read_config_file_hierarchy, parse_config_file
 
 SCRIPT_NAME = os.path.basename(sys.argv[0])
 SCRIPT_EXEC = os.path.join('/', 'var', 'lib', 'xivo-upgrade', SCRIPT_NAME)

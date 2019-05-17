@@ -12,9 +12,9 @@ import time
 
 from contextlib import contextmanager
 from urllib3.exceptions import InsecureRequestWarning
+from wazo_auth_client import Client as AuthClient
 from xivo.chain_map import ChainMap
 from xivo.config_helper import read_config_file_hierarchy, parse_config_file
-from xivo_auth_client import Client as AuthClient
 
 _DEFAULT_CONFIG = {
     'config_file': '/etc/wazo-upgrade/config.yml',

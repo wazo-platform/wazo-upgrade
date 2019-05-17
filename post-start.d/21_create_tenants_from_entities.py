@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Copyright 2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import psycopg2
@@ -7,7 +7,7 @@ import os
 import sys
 
 from contextlib import closing
-from xivo_auth_client import Client as AuthClient
+from wazo_auth_client import Client as AuthClient
 from xivo.chain_map import ChainMap
 from xivo.config_helper import read_config_file_hierarchy, parse_config_file
 

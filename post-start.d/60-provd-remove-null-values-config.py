@@ -9,7 +9,7 @@ import sys
 import time
 
 from urllib3.exceptions import InsecureRequestWarning
-from xivo_auth_client import Client as AuthClient
+from wazo_auth_client import Client as AuthClient
 from wazo_provd_client import Client as ProvdClient
 from wazo_provd_client.exceptions import ProvdError
 from xivo.chain_map import ChainMap

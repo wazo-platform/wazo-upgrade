@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
-# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
 import urllib3
 
+from wazo_auth_client import Client as AuthClient
 from wazo_plugind_client import Client as PlugindClient
 from xivo.chain_map import ChainMap
 from xivo.config_helper import read_config_file_hierarchy, parse_config_file
-from xivo_auth_client import Client as AuthClient
 
 logger = logging.getLogger('upgrade_official_plugins')
 logging.basicConfig(level=logging.INFO)

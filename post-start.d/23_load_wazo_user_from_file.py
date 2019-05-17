@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import argparse
@@ -12,9 +12,9 @@ import urllib3
 import requests
 
 from contextlib import closing
+from wazo_auth_client import Client as AuthClient
 from xivo.chain_map import ChainMap
 from xivo.config_helper import read_config_file_hierarchy, parse_config_file
-from xivo_auth_client import Client as AuthClient
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
