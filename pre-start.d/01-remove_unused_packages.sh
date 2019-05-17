@@ -17,7 +17,8 @@ is_package_purgeable() {
 renamed_packages="xivo-call-logs
                   xivo-ctid-ng
                   xivo-dird
-                  xivo-restapi"
+                  xivo-restapi
+                  xivo-websocketd"
 
 removed_packages="python-alembic
                   wazo-admin-ui
