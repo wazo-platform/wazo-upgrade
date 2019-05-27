@@ -212,7 +212,9 @@ display_asterisk_notice() {
 }
 
 xivo_package() {
-	dpkg-query --show --showformat '${db:Status-Status} ${binary:Package}\n' xivo xivo-base wazo-platform | awk '{ if ($1 == "installed") print $2 }' | head -n 1
+	for package in xivo xivo-base wazo-platform ; do
+		apt-cache policy -q $package | awk '{ if ($1 == "Installed:" && $2 != "(none)") print "'"$package"'"}'
+	done | head -n 1
 }
 
 xivo_version_installed() {
