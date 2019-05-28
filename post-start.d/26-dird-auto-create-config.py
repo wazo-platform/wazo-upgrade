@@ -31,6 +31,27 @@ DEFAULT_DISPLAY_COLUMNS = [
     {'field': 'favorite', 'title': 'Favoris', 'type': 'favorite'},
     {'field': 'email', 'title': 'E-mail', 'type': 'email'},
 ]
+CONFERENCE_SOURCE_BODY = {
+    'auth': {
+        'host': 'localhost',
+        'port': 9497,
+        'verify_certificate': '/usr/share/xivo-certs/server.crt',
+        'key_file': '/var/lib/wazo-auth-keys/wazo-dird-conference-backend-key.yml',
+        'version': '0.1',
+    },
+    'confd': {
+        'host': 'localhost',
+        'port': 9486,
+        'https': True,
+        'verify_certificate': '/usr/share/xivo-certs/server.crt',
+        'version': '1.1',
+    },
+    'format_columns': {
+        'phone': '{extensions[0]}',
+    },
+    'searched_columns': ['name', 'extensions'],
+    'first_matched_columns': [],
+}
 PERSONAL_SOURCE_BODY = {
     'name': 'personal',
     'format_columns': {
@@ -112,11 +133,13 @@ def _auto_create_config():
     base_url = 'https://{host}:{port}/{version}'.format(
         **config['dird']
     )
+    conference_url = '{}/backends/conference/sources'.format(base_url)
     profiles_url = '{}/profiles'.format(base_url)
     displays_url = '{}/displays'.format(base_url)
     personal_url = '{}/backends/personal/sources'.format(base_url)
     wazo_url = '{}/backends/wazo/sources'.format(base_url)
     office365_url = '{}/backends/office365/sources'.format(base_url)
+    sources_url = '{}/sources'.format(base_url)
     headers = {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
@@ -137,54 +160,74 @@ def _auto_create_config():
                 **kwargs
             )
 
-        personal_body = PERSONAL_SOURCE_BODY
-        personal = post(personal_url, json=personal_body)
-        if personal.status_code == 409:
-            # Default configuration already exists
-            return
-
+        post(conference_url, json=CONFERENCE_SOURCE_BODY)
+        post(personal_url, json=PERSONAL_SOURCE_BODY)
         wazo_body = dict(name='auto_wazo_{}'.format(name), **WAZO_SOURCE_BODY)
-        wazo = post(wazo_url, json=wazo_body)
-
-        sources = [personal.json(), wazo.json()]
+        post(wazo_url, json=wazo_body)
 
         # add office365 is the plugin is installed
         office365_body = dict(name='auto_office365_{}'.format(name), **OFFICE_365_SOURCE_BODY)
-        office365 = post(office365_url, json=office365_body)
-        if office365.status_code == 201:
-            sources.append(office365)
+        post(office365_url, json=office365_body)
 
+        display_name = 'auto_{}'.format(name)
         display_body = {
-            'name': 'auto_{}'.format(name),
+            'name': display_name,
             'columns': DEFAULT_DISPLAY_COLUMNS,
         }
-        display = post(displays_url, json=display_body).json()
+        post(displays_url, json=display_body).json()
 
-        contexts = confd_client.contexts.list(tenant_uuid=tenant['uuid'])['items']
-        for context in contexts:
-            if context['type'] != 'internal':
-                continue
+        # GET all auto created sources before or during this migration
+        response = requests.get(
+            sources_url,
+            headers=headers,
+            verify=config['dird']['verify_certificate'],
+        )
+        sources = []
+        if response.status_code == 200:
+            for source in response.json()['items']:
+                if source['name'] == 'personal':
+                    sources.append(source)
+                    continue
 
-            profile_body = {
-                'name': context['name'],
-                'display': display,
-                'services': {
-                    'lookup': {'sources': sources},
-                    'favorites': {'sources': sources},
-                    'reverse': {'sources': sources, 'timeout': 0.5},
-                },
-            }
-            post(profiles_url, json=profile_body)
+                if not source['name'].startswith('auto_'):
+                    continue
+                if not source['name'].endswith(name):
+                    continue
+                sources.append(source)
+
+        # GET the display because the POST could return a 409 if it already exists
+        response = requests.get(
+            displays_url,
+            headers=headers,
+            verify=config['dird']['verify_certificate'],
+        )
+        display = None
+        if response.status_code == 200:
+            for d in response.json()['items']:
+                if d['name'] == display_name:
+                    display = d
+                    break
+
+        profile_body = {
+            'name': 'default',
+            'display': display,
+            'services': {
+                'lookup': {'sources': sources},
+                'favorites': {'sources': sources},
+                'reverse': {'sources': sources, 'timeout': 0.5},
+            },
+        }
+        post(profiles_url, json=profile_body)
 
 
 def main():
     args = parse_args()
     if not args.force:
         version_installed = os.getenv('XIVO_VERSION_INSTALLED')
-        if version_installed >= '19.06':
+        if version_installed >= '19.08':
             sys.exit(0)
 
-    sentinel_file = '/var/lib/xivo-upgrade/dird-auto-create-config-v2'
+    sentinel_file = '/var/lib/xivo-upgrade/dird-auto-create-config-v3'
     if os.path.exists(sentinel_file):
         # migration already done
         sys.exit(1)
