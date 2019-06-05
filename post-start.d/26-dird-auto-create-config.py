@@ -13,7 +13,6 @@ from xivo.config_helper import (
     read_config_file_hierarchy,
     parse_config_file,
 )
-from xivo_confd_client import Client as ConfdClient
 
 _DEFAULT_CONFIG = {
     'uuid': os.getenv('XIVO_UUID'),
@@ -126,7 +125,6 @@ def _auto_create_config():
     auth_client = AuthClient(**config['auth'])
     token = auth_client.token.new('wazo_user', expiration=36000)['token']
     auth_client.set_token(token)
-    confd_client = ConfdClient(token=token, **config['confd'])
 
     tenants = auth_client.tenants.list()['items']
 
