@@ -97,11 +97,11 @@ def migrate_tenants():
         )
 
         if result.status_code != 200:
-            print('webhookd tenant migration failed, status-code %s:\n'
-                  '%s\n'
-                  'check /var/log/wazo-webhookd.log for more info'
-                  % (result.status_code, result.text)
-                  )
+            print(
+                'webhookd tenant migration failed, status-code {}:\n'
+                '{}\ncheck /var/log/wazo-webhookd.log for more info'
+                .format(result.status_code, result.text)
+            )
             sys.exit(2)
 
 
