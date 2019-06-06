@@ -84,7 +84,7 @@ def migrate_tenants():
 
     body = [
         {"owner_user_uuid": user['uuid'], "owner_tenant_uuid": user['tenant_uuid']}
-        for user in auth_client.users.list()["items"]
+        for user in auth_client.users.list(recurse=True)["items"]
     ]
 
     with _migration_plugin(config['webhookd']):
