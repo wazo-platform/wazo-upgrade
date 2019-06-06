@@ -12,7 +12,7 @@ import time
 
 from urllib3.exceptions import InsecureRequestWarning
 from wazo_auth_client import Client as AuthClient
-from xivo_confd_client import Client as ConfdClient
+from wazo_confd_client import Client as ConfdClient
 from xivo.chain_map import ChainMap
 from xivo.config_helper import read_config_file_hierarchy, parse_config_file
 
