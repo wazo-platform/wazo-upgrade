@@ -5,7 +5,7 @@
 PATH=/bin:/usr/bin:/sbin:/usr/sbin
 lib_directory="/usr/share/xivo-upgrade"
 mirror_xivo="http://mirror.wazo.community"
-: ${XIVO_CONFD_PORT:='9486'}
+: ${WAZO_CONFD_PORT:='9486'}
 
 # force all debian upgrade to non interactive mode
 export DEBIAN_FRONTEND=noninteractive
@@ -238,7 +238,7 @@ is_xivo_configured() {
 		echo "ERROR: xivo-confd is not running: cannot check if the web wizard has been run."
 		exit 1
 	fi
-	[ -n "$(curl -skX GET --header 'Accept: application/json' "https://localhost:$XIVO_CONFD_PORT/1.1/wizard" | grep '\"configured\"[[:space:]]*:[[:space:]]*true')" ]
+	[ -n "$(curl -skX GET --header 'Accept: application/json' "https://localhost:$WAZO_CONFD_PORT/1.1/wizard" | grep '\"configured\"[[:space:]]*:[[:space:]]*true')" ]
 }
 
 usage() {
