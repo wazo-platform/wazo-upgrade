@@ -234,8 +234,8 @@ check_wizard_has_been_run() {
 }
 
 is_xivo_configured() {
-	if [ ! -f "/var/run/xivo-confd/xivo-confd.pid" ] ; then
-		echo "ERROR: xivo-confd is not running: cannot check if the web wizard has been run."
+	if [ ! -f "/var/run/xivo-confd/xivo-confd.pid" ] && [ ! -f "/var/run/wazo-confd/wazo-confd.pid" ]; then
+		echo "ERROR: wazo-confd is not running: cannot check if the web wizard has been run."
 		exit 1
 	fi
 	[ -n "$(curl -skX GET --header 'Accept: application/json' "https://localhost:$WAZO_CONFD_PORT/1.1/wizard" | grep '\"configured\"[[:space:]]*:[[:space:]]*true')" ]
