@@ -21,7 +21,8 @@ renamed_packages="xivo-call-logs
                   xivo-websocketd
                   xivo-dird-phoned
                   xivo
-                  xivo-base"
+                  xivo-base
+                  xivo-confd"
 
 removed_packages="python-alembic
                   wazo-admin-ui
