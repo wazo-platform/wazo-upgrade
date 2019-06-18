@@ -22,7 +22,8 @@ renamed_packages="xivo-call-logs
                   xivo-dird-phoned
                   xivo
                   xivo-base
-                  xivo-confd"
+                  xivo-confd
+                  xivo-agentd"
 
 removed_packages="python-alembic
                   wazo-admin-ui
