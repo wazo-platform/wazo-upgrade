@@ -48,3 +48,9 @@ webhookd:
   port: 9300
   version: 1.0
   verify_certificate: /usr/share/xivo-certs/server.crt
+
+call_logd:
+  host: localhost
+  port: 9298
+  version: 1.0
+  verify_certificate: /usr/share/xivo-certs/server.crt
