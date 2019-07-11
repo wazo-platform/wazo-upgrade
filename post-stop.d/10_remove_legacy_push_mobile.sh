@@ -2,7 +2,9 @@
 # Copyright 2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-sentinel="/var/lib/xivo-upgrade/10_remove_legacy_push_mobile"
+set -euo pipefail
+
+sentinel="/var/lib/xivo-upgrade/10_remove_legacy_push_mobile_v2"
 
 [ -e "$sentinel" ] && exit 0
 
@@ -18,6 +20,11 @@ rm -f /etc/wazo-calld/conf.d/push-mobile.yml \
 pkg_name="wazo-plugind-wazo-push-mobile-official"
 output=$(dpkg-query -W -f '${Status}' "$pkg_name")
 if [ "$output" == "install ok installed" ]; then
+    # NOTE(sileht): The push mobile prerm hook restarts
+    # wazo-auth, wazo-webhookd, wazo-calld and asterisk
+    # as we just stopped them we don't that.
+    # We can safely remove this script as workaround
+    rm -f /var/lib/dpkg/info/wazo-plugind-wazo-push-mobile-official.prerm
     apt-get remove -y "$pkg_name"
 fi
 
