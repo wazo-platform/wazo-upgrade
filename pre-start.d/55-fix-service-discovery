@@ -1,0 +1,17 @@
+#!/bin/bash
+
+CONFIG_FILE=50-engine-api.yml
+
+SERVICES=(wazo-auth wazo-calld wazo-confd)
+
+for service in "${SERVICES[@]}"
+do
+    filename="/etc/$service/conf.d/$CONFIG_FILE"
+    if [ -f "$filename" ]
+    then
+        sed -i '/service_discovery/ {
+            N
+            s/service_discovery:\n.*//
+        }' "$filename"
+    fi
+done
