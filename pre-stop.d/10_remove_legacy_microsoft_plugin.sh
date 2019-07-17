@@ -13,6 +13,7 @@ sentinel="/var/lib/xivo-upgrade/10_remove_legacy_microsoft_plugin"
 pkg_name="wazo-plugind-wazo-microsoft-official"
 output=$(dpkg-query -W -f '${Status}' "$pkg_name" 2>/dev/null || true)
 if [ "$output" == "install ok installed" ]; then
+    rm -f /var/lib/dpkg/info/wazo-plugind-wazo-microsoft-official.postrm
     apt-get purge -y "$pkg_name"
 fi
 
