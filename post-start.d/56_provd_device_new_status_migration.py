@@ -19,6 +19,9 @@ _DEFAULT_CONFIG = {
     'config_file': '/etc/wazo-upgrade/config.yml',
     'auth': {
         'key_file': '/var/lib/wazo-auth-keys/wazo-upgrade-key.yml'
+    },
+    'provd': {
+        'prefix': '',
     }
 }
 PROVD_JSONDB_DEVICES_DIR = '/var/lib/xivo-provd/jsondb/devices'
