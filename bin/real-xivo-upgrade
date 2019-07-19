@@ -271,6 +271,12 @@ force="${force:-"0"}"
 
 check_wizard_has_been_run
 
+if [ $(xivo_version_installed) \< '18.04' ]; then
+    echo "Switching to pelican-stretch distribution"
+    wazo-dist pelican-stretch
+    apt-get update > /dev/null
+fi
+
 if [ $download_only -eq 0 ]; then
 	upgrading_system
 else
