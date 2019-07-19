@@ -23,7 +23,8 @@ renamed_packages="xivo-call-logs
                   xivo
                   xivo-base
                   xivo-confd
-                  xivo-agentd"
+                  xivo-agentd
+                  xivo-purge-db"
 
 removed_packages="python-alembic
                   wazo-admin-ui
