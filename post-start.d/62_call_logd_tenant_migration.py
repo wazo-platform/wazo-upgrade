@@ -82,7 +82,7 @@ def migrate_tenants():
     auth_client = AuthClient(**config['auth'])
     token = auth_client.token.new(expiration=5 * 60)['token']
     auth_client.set_token(token)
-    confd = ConfdClient(token=token['token'], **config['confd'])
+    confd = ConfdClient(token=token, **config['confd'])
 
     body = {
         'contexts': [
