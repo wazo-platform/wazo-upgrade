@@ -114,7 +114,7 @@ def main():
 
     if not args.force:
         version_installed = os.getenv('XIVO_VERSION_INSTALLED')
-        if version_installed > '19.09':
+        if version_installed > '19.10':
             sys.exit(0)
 
     sentinel_file = '/var/lib/xivo-upgrade/62_call_logd_tenant_migration'
