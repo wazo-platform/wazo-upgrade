@@ -80,7 +80,7 @@ enabled_plugins:
 def migrate_tenants():
     config = _load_config()
     auth_client = AuthClient(**config['auth'])
-    token = auth_client.token.new('wazo_user', expiration=5 * 60)['token']
+    token = auth_client.token.new(expiration=5 * 60)['token']
     auth_client.set_token(token)
     confd = ConfdClient(token=token['token'], **config['confd'])
 
