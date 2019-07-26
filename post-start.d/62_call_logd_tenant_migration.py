@@ -75,7 +75,8 @@ enabled_plugins:
         except OSError:
             pass
         subprocess.run(['systemctl', 'restart', 'wazo-call-logd'])
-_wait_for_call_logd(call_logd_config)
+        _wait_for_call_logd(call_logd_config)
+
 
 def migrate_tenants():
     config = _load_config()
