@@ -1,5 +1,9 @@
 #!/bin/bash
 
+sentinel="/var/lib/xivo-upgrade/55-fix-service-discovery"
+
+[ -e "$sentinel" ] && exit 0
+
 CONFIG_FILE=50-engine-api.yml
 
 rm -f "/etc/wazo-auth/conf.d/$CONFIG_FILE"
@@ -27,3 +31,5 @@ do
         }' "$filename"
     fi
 done
+
+touch $sentinel
