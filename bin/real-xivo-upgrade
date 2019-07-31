@@ -241,6 +241,10 @@ is_xivo_configured() {
 	[ -n "$(curl -skX GET --header 'Accept: application/json' "https://localhost:$WAZO_CONFD_PORT/1.1/wizard" | grep '\"configured\"[[:space:]]*:[[:space:]]*true')" ]
 }
 
+is_wazo_dev_or_rc_stretch() {
+    return $(grep -Eq "^deb http://mirror.wazo.community/debian/ wazo-(dev|rc)-stretch main" /etc/apt/sources.list.d/xivo-dist.list)
+}
+
 usage() {
 	cat <<-EOF
 	usage: wazo-upgrade [-d] [-f] [-h]
@@ -272,8 +276,10 @@ force="${force:-"0"}"
 check_wizard_has_been_run
 
 if [ $(xivo_version_installed) \< '18.04' ]; then
-    echo "Switching to pelican-stretch distribution"
-    wazo-dist -m pelican-stretch
+    if ! is_wazo_dev_or_rc_stretch; then
+        echo "Switching to pelican-stretch distribution"
+        wazo-dist -m pelican-stretch
+    fi
     apt-get update > /dev/null
 fi
 
