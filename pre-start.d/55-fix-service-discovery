@@ -30,6 +30,8 @@ do
             s/.*\n.*//
         }' "$filename"
     fi
+    # Remove empty lines at the end of file
+    sed -i -e :a -e '/^\n*$/{$d;N;};/\n$/ba' $filename
 done
 
 touch $sentinel
