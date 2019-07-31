@@ -273,7 +273,7 @@ check_wizard_has_been_run
 
 if [ $(xivo_version_installed) \< '18.04' ]; then
     echo "Switching to pelican-stretch distribution"
-    wazo-dist pelican-stretch
+    wazo-dist -m pelican-stretch
     apt-get update > /dev/null
 fi
 
