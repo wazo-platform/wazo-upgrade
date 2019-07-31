@@ -23,7 +23,7 @@ do
     then
         sed -i '/service_discovery/ {
             N
-            s/service_discovery:\n.*//
+            s/.*\n.*//
         }' "$filename"
     fi
 done
