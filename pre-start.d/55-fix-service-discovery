@@ -1,0 +1,37 @@
+#!/bin/bash
+
+sentinel="/var/lib/xivo-upgrade/55-fix-service-discovery"
+
+[ -e "$sentinel" ] && exit 0
+
+CONFIG_FILE=50-engine-api.yml
+
+rm -f "/etc/wazo-auth/conf.d/$CONFIG_FILE"
+
+filename="/etc/wazo-calld/conf.d/$CONFIG_FILE"
+if [ -f "$filename" ]
+then
+    sed -i '/reconnection_delay/ {
+        N
+        N
+        s/.*\n.*\n.*//
+    }' "$filename"
+fi
+
+SERVICES=(wazo-calld wazo-confd)
+
+for service in "${SERVICES[@]}"
+do
+    filename="/etc/$service/conf.d/$CONFIG_FILE"
+    if [ -f "$filename" ]
+    then
+        sed -i '/service_discovery/ {
+            N
+            s/.*\n.*//
+        }' "$filename"
+    fi
+    # Remove empty lines at the end of file
+    sed -i -e :a -e '/^\n*$/{$d;N;};/\n$/ba' $filename
+done
+
+touch $sentinel
