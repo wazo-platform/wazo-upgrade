@@ -29,9 +29,10 @@ do
             N
             s/.*\n.*//
         }' "$filename"
+
+        # Remove empty lines at the end of file
+        sed -i -e :a -e '/^\n*$/{$d;N;};/\n$/ba' $filename
     fi
-    # Remove empty lines at the end of file
-    sed -i -e :a -e '/^\n*$/{$d;N;};/\n$/ba' $filename
 done
 
 touch $sentinel
