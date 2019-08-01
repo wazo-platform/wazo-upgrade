@@ -13,21 +13,19 @@ export APT_LISTCHANGES_FRONTEND=none
 
 differed_action() {
 	local state=$1
-	local dir="$lib_directory/$state.d"
-	echo "Executing $state upgrade action..."
-	for script in $(ls $dir); do
-		$dir/$script
+	for script in "$lib_directory/$state.d"/*; do
+		echo "Executing upgrade script $script..."
+		$script
 	done
 }
 
 pre_stop() {
-	local dir="$lib_directory/pre-stop.d"
-	echo "Executing pre-stop upgrade action..."
-	for script in $(ls $dir); do
-		$dir/$script
+	for script in "$lib_directory/pre-stop.d"/*; do
+		echo "Executing upgrade script $script..."
+		$script
 		if [ $? -ne 0 ]; then
 			cat <<-EOF
-			Fail to execute $dir/$script
+			Failed to execute $script
 			Please, fix this issue before re-executing wazo-upgrade
 			EOF
 			exit -1
