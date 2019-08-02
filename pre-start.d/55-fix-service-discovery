@@ -11,6 +11,7 @@ rm -f "/etc/wazo-auth/conf.d/$CONFIG_FILE"
 filename="/etc/wazo-calld/conf.d/$CONFIG_FILE"
 if [ -f "$filename" ]
 then
+    # Remove block reconnection_delay
     sed -i '/reconnection_delay/ {
         N
         N
@@ -25,6 +26,7 @@ do
     filename="/etc/$service/conf.d/$CONFIG_FILE"
     if [ -f "$filename" ]
     then
+        # Remove block service_discovery
         sed -i '/service_discovery/ {
             N
             s/.*\n.*//
