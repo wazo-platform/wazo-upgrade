@@ -19,9 +19,7 @@ then
     }' "$filename"
 fi
 
-SERVICES=(wazo-calld wazo-confd)
-
-for service in "${SERVICES[@]}"
+for service in wazo-calld wazo-confd
 do
     filename="/etc/$service/conf.d/$CONFIG_FILE"
     if [ -f "$filename" ]
