@@ -14,10 +14,8 @@ is_package_purgeable() {
     [ "$?" -eq 0 -a "$output" != 'unknown ok not-installed' ]
 }
 
-renamed_packages="xivo-call-logs
-                  xivo-ctid-ng
+renamed_packages="xivo-ctid-ng
                   xivo-dird
-                  xivo-restapi
                   xivo-websocketd
                   xivo-dird-phoned
                   xivo

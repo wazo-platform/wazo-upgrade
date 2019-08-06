@@ -13,21 +13,19 @@ export APT_LISTCHANGES_FRONTEND=none
 
 differed_action() {
 	local state=$1
-	local dir="$lib_directory/$state.d"
-	echo "Executing $state upgrade action..."
-	for script in $(ls $dir); do
-		$dir/$script
+	for script in "$lib_directory/$state.d"/*; do
+		echo "Executing upgrade script $script..."
+		$script
 	done
 }
 
 pre_stop() {
-	local dir="$lib_directory/pre-stop.d"
-	echo "Executing pre-stop upgrade action..."
-	for script in $(ls $dir); do
-		$dir/$script
+	for script in "$lib_directory/pre-stop.d"/*; do
+		echo "Executing upgrade script $script..."
+		$script
 		if [ $? -ne 0 ]; then
 			cat <<-EOF
-			Fail to execute $dir/$script
+			Failed to execute $script
 			Please, fix this issue before re-executing wazo-upgrade
 			EOF
 			exit -1
@@ -241,6 +239,10 @@ is_xivo_configured() {
 	[ -n "$(curl -skX GET --header 'Accept: application/json' "https://localhost:$WAZO_CONFD_PORT/1.1/wizard" | grep '\"configured\"[[:space:]]*:[[:space:]]*true')" ]
 }
 
+is_wazo_dev_or_rc_stretch() {
+    return $(grep -Eq "^deb http://mirror.wazo.community/debian/ wazo-(dev|rc)-stretch main" /etc/apt/sources.list.d/xivo-dist.list)
+}
+
 usage() {
 	cat <<-EOF
 	usage: wazo-upgrade [-d] [-f] [-h]
@@ -270,6 +272,14 @@ download_only="${download_only:-"0"}"
 force="${force:-"0"}"
 
 check_wizard_has_been_run
+
+if [ $(xivo_version_installed) \< '18.04' ]; then
+    if ! is_wazo_dev_or_rc_stretch; then
+        echo "Switching to pelican-stretch distribution"
+        wazo-dist -m pelican-stretch
+    fi
+    apt-get update > /dev/null
+fi
 
 if [ $download_only -eq 0 ]; then
 	upgrading_system
