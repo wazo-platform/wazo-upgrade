@@ -2,7 +2,9 @@
 # Copyright 2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-set -euo pipefail
+set -e
+set -u  # fail if variable is undefined
+set -o pipefail  # fail if command before pipe fails
 
 wait_until_ready(){
     WAIT_TIMEOUT=60
@@ -17,7 +19,7 @@ wait_until_ready(){
     done
 }
 
-if [ -n $XIVO_VERSION_INSTALLED ] && [ $XIVO_VERSION_INSTALLED \< '18.04' ]
+if [ $XIVO_VERSION_INSTALLED \< '18.04' ]
 then
     cd /usr/share/xivo-manage-db
     alembic upgrade 01b4c79b3d47
