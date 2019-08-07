@@ -23,7 +23,8 @@ renamed_packages="xivo-ctid-ng
                   xivo-confd
                   xivo-agentd
                   xivo-purge-db
-                  xivo-agid"
+                  xivo-agid
+                  xivo-provd"
 
 removed_packages="python-alembic
                   wazo-admin-ui
