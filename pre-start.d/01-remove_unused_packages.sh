@@ -24,7 +24,8 @@ renamed_packages="xivo-ctid-ng
                   xivo-agentd
                   xivo-purge-db
                   xivo-agid
-                  xivo-provd"
+                  xivo-provd
+                  xivo-provd-cli"
 
 removed_packages="python-alembic
                   wazo-admin-ui
