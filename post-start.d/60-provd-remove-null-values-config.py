@@ -48,7 +48,7 @@ def _wait_for_provd(provd_client):
         except requests.exceptions.ConnectionError:
             time.sleep(1.0)
 
-    print('provd config null values removal failed, could not connect to xivo-provd')
+    print('provd config null values removal failed, could not connect to wazo-provd')
     sys.exit(2)
 
 
