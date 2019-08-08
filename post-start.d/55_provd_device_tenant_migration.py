@@ -25,7 +25,7 @@ _DEFAULT_CONFIG = {
         'prefix': '',
     }
 }
-PROVD_JSONDB_DEVICES_DIR = '/var/lib/xivo-provd/jsondb/devices'
+PROVD_JSONDB_DEVICES_DIR = '/var/lib/wazo-provd/jsondb/devices'
 
 requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
 
@@ -52,7 +52,7 @@ def _wait_for_provd(provd_config):
         except requests.exceptions.ConnectionError:
             time.sleep(1.0)
 
-    print('provd tenant migration failed, could not connect to xivo-provd')
+    print('provd tenant migration failed, could not connect to wazo-provd')
     sys.exit(2)
 
 
@@ -104,7 +104,7 @@ def migrate_tenants():
                 print(device_id, 'is not a valid JSON file. Skipping.')
                 continue
 
-    subprocess.run(['systemctl', 'restart', 'xivo-provd'])
+    subprocess.run(['systemctl', 'restart', 'wazo-provd'])
 
 
 def main():
