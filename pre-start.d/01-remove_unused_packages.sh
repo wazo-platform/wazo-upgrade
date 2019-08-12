@@ -14,7 +14,8 @@ is_package_purgeable() {
     [ "$?" -eq 0 -a "$output" != 'unknown ok not-installed' ]
 }
 
-renamed_packages="xivo-ctid-ng
+renamed_packages="wazo-dird-phoned
+                  xivo-ctid-ng
                   xivo-dird
                   xivo-websocketd
                   xivo-dird-phoned
