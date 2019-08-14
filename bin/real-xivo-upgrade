@@ -239,6 +239,10 @@ is_xivo_configured() {
 	[ -n "$(curl -skX GET --header 'Accept: application/json' "https://localhost:$WAZO_CONFD_PORT/1.1/wizard" | grep '\"configured\"[[:space:]]*:[[:space:]]*true')" ]
 }
 
+is_wazo_dev_or_rc_buster() {
+    return $(grep -Eq "^deb http://mirror.wazo.community/debian/ wazo-(dev|rc)-buster main" /etc/apt/sources.list.d/xivo-dist.list)
+}
+
 is_wazo_dev_or_rc_stretch() {
     return $(grep -Eq "^deb http://mirror.wazo.community/debian/ wazo-(dev|rc)-stretch main" /etc/apt/sources.list.d/xivo-dist.list)
 }
@@ -277,6 +281,14 @@ if [ $(xivo_version_installed) \< '18.04' ]; then
     if ! is_wazo_dev_or_rc_stretch; then
         echo "Switching to pelican-stretch distribution"
         wazo-dist -m pelican-stretch
+    fi
+    apt-get update > /dev/null
+fi
+
+if [ $(xivo_version_installed) \< '19.12' ]; then
+    if ! is_wazo_dev_or_rc_buster; then
+        echo "Switching to pelican-buster distribution"
+        wazo-dist -m pelican-buster
     fi
     apt-get update > /dev/null
 fi

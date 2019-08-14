@@ -33,11 +33,11 @@ display_upgrade_notice() {
     cat <<-EOF
 	*****************************************************************************
 	*                                                                           *
-	*  The Debian GNU/Linux system will be upgraded from version 8 (jessie)     *
-	*  to 9 (stretch). Hence, this upgrade will be longer than other upgrades.  *
+	*  The Debian GNU/Linux system will be upgraded from version 9 (stretch)    *
+	*  to 10 (buster). Hence, this upgrade will be longer than other upgrades.  *
 	*                                                                           *
 	*  Please make sure you have read the upgrade notes:                        *
-	*  http://documentation.wazo.community/en/latest/upgrade/18.01/stretch.html *
+	*  http://documentation.wazo.community/en/latest/upgrade/19.12/buster.html  *
 	*                                                                           *
 	*  You must RESTART the machine after the upgrade.                          *
 	*                                                                           *
@@ -98,7 +98,7 @@ dist_upgrade() {
     apt-get install --yes -o Dpkg::Options::="--force-confnew" xivo-dist
 
     xivo-dist ${wazo_distribution}
-    change_sources_list 'jessie' 'stretch'
+    change_sources_list 'stretch' 'buster'
     apt-get update -qq
 
     apt-get install --yes -o Dpkg::Options::="--force-confnew" xivo-certs xivo-config
@@ -154,7 +154,7 @@ usage() {
 	    -d: only download packages
 	    -f: force yes
 	    -h: print usage
-	    -t: specify target distribution (default: phoenix-stretch)
+	    -t: specify target distribution (default: phoenix-buster)
 	EOF
 }
 
@@ -162,29 +162,29 @@ debian_version_installed() {
     cut -c1 /etc/debian_version
 }
 
-is_stretch() {
-    [ $(debian_version_installed) -eq 9 ]
+is_buster() {
+    [ $(debian_version_installed) -eq 10 ]
 }
 
 download_packages() {
-    if is_stretch; then
+    if is_buster; then
         return 0
     fi
 
     trap : SIGINT
     echo "deb http://mirror.wazo.community/debian/ $wazo_distribution main" > /etc/apt/sources.list.d/wazo-dist-upgrade.list
-    change_sources_list 'jessie' 'stretch'
+    change_sources_list 'stretch' 'buster'
     apt-get update -qq
 
     apt-get -y -d dist-upgrade
 
-    change_sources_list 'stretch' 'jessie'
+    change_sources_list 'buster' 'stretch'
     rm /etc/apt/sources.list.d/wazo-dist-upgrade.list
     apt-get update -qq
 }
 
 download_only=1
-wazo_distribution=phoenix-stretch
+wazo_distribution=phoenix-buster
 while getopts :dfht: opt
 do
     case ${opt} in
