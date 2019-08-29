@@ -75,6 +75,19 @@ change_sources_list() {
     sed -i "s/$from/$to/" /etc/apt/sources.list
 }
 
+migrate_systemd_system_conf() {
+    if [ ! -f /etc/systemd/system.conf.dpkg-old ] ; then
+        return 0
+    fi
+
+    old_default_environment=$(grep ^DefaultEnvironment /etc/systemd/system.conf.dpkg-old)
+    sed -i "s/^#DefaultEnvironment=.*/${old_default_environment}/" /etc/systemd/system.conf
+
+    if diff <(grep -v '^#' /etc/systemd/system.conf) <(grep -v '^#' /etc/systemd/system.conf.dpkg-old) ; then
+        rm /etc/systemd/system.conf.dpkg-old
+    fi
+}
+
 dist_upgrade() {
     differed_action pre-stop
     wazo-service stop
@@ -93,6 +106,7 @@ dist_upgrade() {
     apt-get dist-upgrade --yes -o Dpkg::Options::="--force-confnew"
     apt-get autoremove --yes
 
+    migrate_systemd_system_conf
     upgrade_dahdi_linux_modules
 
     differed_action pre-start
