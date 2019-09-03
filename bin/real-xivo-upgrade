@@ -114,6 +114,15 @@ display_xivo_version() {
 	echo "installed version : $(xivo_version_installed)"
 	echo "proposed update	: $(xivo_version_candidate)"
 }
+debian_version_installed() {
+	cut -d. -f1 /etc/debian_version
+}
+is_stretch() {
+	[ $(debian_version_installed) -eq 9 ]
+}
+is_last_stretch() {
+	is_stretch && [ "$(xivo_version_installed)" = 19.12 -o "$(xivo_version_installed)" = 19.13 ]
+}
 
 is_grub_broken() {
 	if [ -f /boot/grub/device.map ]; then
@@ -153,6 +162,10 @@ check_if_grub_is_broken() {
 upgrading_system() {
 	display_xivo_version
 	display_asterisk_notice
+	if is_last_stretch && [ $force -eq 0 ] ; then
+		display_buster_notice
+		return
+	fi
 	if [ $force -eq 0 ]; then
 		read -p 'Would you like to upgrade your system (all services will be restarted) [Y/n]? ' answer
 		answer="${answer:-Y}"
@@ -209,6 +222,26 @@ display_asterisk_notice() {
 	fi
 }
 
+display_buster_notice() {
+	cat <<-EOF
+
+	****************************************************************************
+	*                                                                          *
+	*  The Debian GNU/Linux system must be upgraded from version 9 (Stretch)    *
+	*  to 10 (Buster). This is mandatory to upgrade to newer versions of Wazo. *
+	*  To do this, you must run the following command:                         *
+	*                                                                          *
+	*    wazo-dist-upgrade                                                     *
+	*                                                                          *
+	*  To keep Debian Stretch and Wazo $(xivo_version_installed) but benefit from security updates: *
+	*                                                                          *
+	*    wazo-upgrade -f                                                       *
+	*                                                                          *
+	****************************************************************************
+
+EOF
+}
+
 xivo_package() {
 	for package in xivo xivo-base wazo-platform ; do
 		apt-cache policy -q $package | awk '{ if ($1 == "Installed:" && $2 != "(none)") print "'"$package"'"}'
@@ -237,6 +270,10 @@ is_xivo_configured() {
 		exit 1
 	fi
 	[ -n "$(curl -skX GET --header 'Accept: application/json' "https://localhost:$WAZO_CONFD_PORT/1.1/wizard" | grep '\"configured\"[[:space:]]*:[[:space:]]*true')" ]
+}
+
+is_wazo_dev_or_rc_buster() {
+    return $(grep -Eq "^deb http://mirror.wazo.community/debian/ wazo-(dev|rc)-buster main" /etc/apt/sources.list.d/xivo-dist.list)
 }
 
 is_wazo_dev_or_rc_stretch() {
@@ -277,6 +314,14 @@ if [ $(xivo_version_installed) \< '18.04' ]; then
     if ! is_wazo_dev_or_rc_stretch; then
         echo "Switching to pelican-stretch distribution"
         wazo-dist -m pelican-stretch
+    fi
+    apt-get update > /dev/null
+fi
+
+if [ $(xivo_version_installed) \< '19.12' ]; then
+    if ! is_wazo_dev_or_rc_buster; then
+        echo "Switching to pelican-buster distribution"
+        wazo-dist -m pelican-buster
     fi
     apt-get update > /dev/null
 fi
