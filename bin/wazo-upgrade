@@ -33,9 +33,9 @@ run_upgrade()
     check_debian_mirror_is_available || return 1
     check_wazo_mirror_is_available || return 1
     echo "Upgrading wazo-upgrade"
-    apt-get install -y xivo-upgrade
+    apt-get install -y wazo-upgrade
 
-    /usr/bin/real-xivo-upgrade "$@"
+    /usr/bin/real-wazo-upgrade "$@"
 }
 
 append_log_start()
