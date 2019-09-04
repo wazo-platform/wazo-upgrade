@@ -2,7 +2,7 @@
 
 PATH=/bin:/usr/bin:/sbin:/usr/sbin
 
-LOGFILE="/var/log/xivo-upgrade.log"
+LOGFILE="/var/log/wazo-upgrade.log"
 DATEFORMAT="%Y-%m-%d_%H:%M:%S"
 
 check_package_is_available()

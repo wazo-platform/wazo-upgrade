@@ -8,6 +8,7 @@ set -e
 case "$1" in
     configure)
         [ -d "/var/lib/xivo-upgrade" ] && mv /var/lib/xivo-upgrade /var/lib/wazo-upgrade
+        [ -f "/var/log/xivo-upgrade.log" ] && mv /var/log/xivo-upgrade.log /var/log/wazo-upgrade.log
         rm -f /var/lib/wazo-upgrade/02_rebuild_provd_config_registrar.sh
         rm -f /var/lib/wazo-upgrade/03_migrate_contact_center.sh
         rm -f /var/lib/wazo-upgrade/30_set_default_dtmf_mode
