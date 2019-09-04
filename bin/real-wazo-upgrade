@@ -99,7 +99,7 @@ upgrade() {
 	pre_start
 	start_xivo
 	post_start
-	xivo-check-conffiles
+	wazo-check-conffiles
 }
 
 upgrade_dahdi_linux_modules(){

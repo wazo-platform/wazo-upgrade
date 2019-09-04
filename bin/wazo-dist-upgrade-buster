@@ -131,7 +131,7 @@ maybe_dist_upgrade() {
         return
     fi
     dist_upgrade
-    xivo-check-conffiles
+    wazo-check-conffiles
     display_reboot_notice
 }
 

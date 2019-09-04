@@ -130,7 +130,7 @@ maybe_dist_upgrade() {
     display_wazo_versions
     if /usr/lib/xivo-upgrade/wazo-dist-upgrade-stretch-check $force ; then
         dist_upgrade
-        xivo-check-conffiles
+        wazo-check-conffiles
         display_reboot_notice
     fi
 }
