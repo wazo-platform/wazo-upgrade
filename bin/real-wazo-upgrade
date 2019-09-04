@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 PATH=/bin:/usr/bin:/sbin:/usr/sbin
-lib_directory="/usr/share/xivo-upgrade"
+lib_directory="/usr/share/wazo-upgrade"
 mirror_xivo="http://mirror.wazo.community"
 : ${WAZO_CONFD_PORT:='9486'}
 
