@@ -1,0 +1,5 @@
+etc/wazo-upgrade/conf.d
+var/lib/wazo
+var/lib/wazo-upgrade
+usr/lib/wazo-upgrade
+usr/share/wazo-upgrade
