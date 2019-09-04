@@ -202,7 +202,7 @@ display_asterisk_notice() {
 
 		EOF
 
-		custom_modules=$(xivo-asterisk-custom-modules)
+		custom_modules=$(wazo-asterisk-custom-modules)
 		if [ -n "$custom_modules" ]; then
 			for module in $custom_modules; do
 				mv "/usr/lib/asterisk/modules/$module" /tmp
