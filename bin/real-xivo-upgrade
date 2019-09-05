@@ -318,14 +318,6 @@ if [ $(xivo_version_installed) \< '18.04' ]; then
     apt-get update > /dev/null
 fi
 
-if [ $(xivo_version_installed) \< '19.12' ]; then
-    if ! is_wazo_dev_or_rc_buster; then
-        echo "Switching to pelican-buster distribution"
-        wazo-dist -m pelican-buster
-    fi
-    apt-get update > /dev/null
-fi
-
 if [ $download_only -eq 0 ]; then
 	upgrading_system
 else
