@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 debian_version_installed() {
-    cut -c1 /etc/debian_version
+    cut -f1 -d. /etc/debian_version
 }
 
 is_jessie() {
