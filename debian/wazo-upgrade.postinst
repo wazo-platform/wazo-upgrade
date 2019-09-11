@@ -1,5 +1,5 @@
 #!/bin/sh
-# postinst script for xivo-upgrade
+# postinst script for wazo-upgrade
 #
 # see: dh_installdeb(1)
 
