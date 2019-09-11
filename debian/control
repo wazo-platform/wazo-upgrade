@@ -7,12 +7,9 @@ Standards-Version: 3.9.6
 
 Package: wazo-upgrade
 Architecture: all
+Provides: xivo-upgrade
+Conflicts: xivo-upgrade
+Replaces: xivo-upgrade
 Depends: ${misc:Depends}, rename
 Description: Wazo upgrade tools
  This package provide Wazo upgrading tools
-
-Package: xivo-upgrade
-Architecture: all
-Depends: ${misc:Depends}, wazo-upgrade
-Description: Wazo upgrade tools (dummy package)
- dummy package to automatically update to wazo-upgrade
