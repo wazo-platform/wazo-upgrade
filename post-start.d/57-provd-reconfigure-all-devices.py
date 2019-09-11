@@ -76,7 +76,7 @@ def main():
         if version_installed >= '19.13':
             sys.exit(0)
 
-    sentinel_file = '/var/lib/xivo-upgrade/57-provd-reconfigure-all-devices'
+    sentinel_file = '/var/lib/wazo-upgrade/57-provd-reconfigure-all-devices'
     if os.path.exists(sentinel_file):
         # migration already done
         sys.exit(1)
