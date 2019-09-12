@@ -273,11 +273,11 @@ is_xivo_configured() {
 }
 
 is_wazo_dev_or_rc_buster() {
-    return $(grep -Eq "^deb http://mirror.wazo.community/debian/ wazo-(dev|rc)-buster main" /etc/apt/sources.list.d/xivo-dist.list)
+    return $(grep -Eq "^deb http://mirror.wazo.community/debian/ wazo-(dev|rc)-buster main" /etc/apt/sources.list.d/wazo-dist.list)
 }
 
 is_wazo_dev_or_rc_stretch() {
-    return $(grep -Eq "^deb http://mirror.wazo.community/debian/ wazo-(dev|rc)-stretch main" /etc/apt/sources.list.d/xivo-dist.list)
+    return $(grep -Eq "^deb http://mirror.wazo.community/debian/ wazo-(dev|rc)-stretch main" /etc/apt/sources.list.d/wazo-dist.list)
 }
 
 usage() {

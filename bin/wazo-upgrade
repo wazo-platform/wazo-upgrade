@@ -22,7 +22,7 @@ check_debian_mirror_is_available()
 check_wazo_mirror_is_available()
 {
     if ! check_package_is_available wazo-upgrade ; then
-        echo 'Could not find any Wazo repository to download "wazo-upgrade" from. Check your /etc/apt/sources.list.d or run "xivo-dist phoenix".'
+        echo 'Could not find any Wazo repository to download "wazo-upgrade" from. Check your /etc/apt/sources.list.d or run "wazo-dist -m pelican-buster".'
         return 1
     fi
 }
