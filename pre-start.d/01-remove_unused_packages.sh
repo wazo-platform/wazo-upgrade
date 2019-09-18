@@ -15,6 +15,7 @@ is_package_purgeable() {
 }
 
 renamed_packages="wazo-dird-phoned
+                  xivo-confgend
                   xivo-ctid-ng
                   xivo-dird
                   xivo-websocketd
