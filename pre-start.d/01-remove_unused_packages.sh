@@ -30,7 +30,8 @@ renamed_packages="wazo-dird-phoned
                   xivo-provd
                   xivo-provd-cli
                   xivo-dhcpd-update
-                  xivo-dxtora"
+                  xivo-dxtora
+                  xivo-dxtorc"
 
 removed_packages="python-alembic
                   wazo-admin-ui
