@@ -32,7 +32,12 @@ renamed_packages="wazo-dird-phoned
                   xivo-dhcpd-update
                   xivo-dxtora
                   xivo-dxtorc
-                  xivo-amid"
+                  xivo-amid
+                  xivo-sounds-fr-fr
+                  xivo-sounds-fr-ca
+                  xivo-sounds-en-us
+                  xivo-sounds-de-de
+                  xivo-sounds-nl-nl"
 
 removed_packages="python-alembic
                   wazo-admin-ui
