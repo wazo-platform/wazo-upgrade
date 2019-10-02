@@ -5,7 +5,7 @@
 set -e
 set -u
 
-OUTPUT_FILE='/var/lib/wazo-upgrade/dird_sources.yml'
+OUTPUT_FILE='/var/backups/xivo/wazo_dird_sources.yml'
 
 if dpkg --compare-versions "${XIVO_VERSION_INSTALLED}" "gt" "19.14"; then
     exit 0
@@ -22,4 +22,4 @@ else
 fi
 
 "${CONFGEN}" dird/sources.yml > "${OUTPUT_FILE}"
-echo "dird sources dumped to ${OUTPUT_FILE}"
+echo "wazo-dird configuration for sources dumped to ${OUTPUT_FILE}"
