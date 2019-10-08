@@ -2,7 +2,6 @@
 # Copyright 2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-import argparse
 import os
 import requests
 import sys
@@ -69,33 +68,14 @@ def reconfigure_all_devices():
 
 
 def main():
-    args = parse_args()
-
-    if not args.force:
-        version_installed = os.getenv('WAZO_VERSION_INSTALLED')
-        if version_installed >= '19.13':
-            sys.exit(0)
-
-    sentinel_file = '/var/lib/wazo-upgrade/57-provd-reconfigure-all-devices'
+    sentinel_file = '/var/lib/wazo-upgrade/provd-reconfigure-all-devices'
     if os.path.exists(sentinel_file):
-        # migration already done
         sys.exit(1)
 
     reconfigure_all_devices()
 
     with open(sentinel_file, 'w'):
         pass
-
-
-def parse_args():
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        '-f',
-        '--force',
-        action='store_true',
-        help="Do not check the variable WAZO_VERSION_INSTALLED. Default: %(default)s",
-    )
-    return parser.parse_args()
 
 
 if __name__ == '__main__':

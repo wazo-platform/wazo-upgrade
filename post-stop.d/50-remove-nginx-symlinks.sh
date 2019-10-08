@@ -9,4 +9,10 @@ set -o pipefail  # fail if command before pipe fails
 # This symlink is left over, after removing wazo-admin-ui and prevents nginx
 # from loading correctly.
 
+SENTINEL="/var/lib/wazo-upgrade/remove-nginx-symlinks"
+
+[ -e "$SENTINEL" ] && exit 0
+
 rm -f /etc/nginx/locations/https-enabled/wazo-admin-ui
+
+touch $SENTINEL

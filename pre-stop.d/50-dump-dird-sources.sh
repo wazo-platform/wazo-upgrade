@@ -5,11 +5,11 @@
 set -e
 set -u  # fail if variable is undefined
 
-OUTPUT_FILE='/var/backups/xivo/wazo_dird_sources.yml'
+SENTINEL="/var/lib/wazo-upgrade/dump-dird-sources"
 
-if dpkg --compare-versions "${WAZO_VERSION_INSTALLED}" "gt" "19.14"; then
-    exit 0
-fi
+[ -e "$SENTINEL" ] && exit 0
+
+OUTPUT_FILE='/var/backups/xivo/wazo_dird_sources.yml'
 
 if [ -e "${OUTPUT_FILE}" ]; then
     exit 0
@@ -23,3 +23,5 @@ fi
 
 "${CONFGEN}" dird/sources.yml > "${OUTPUT_FILE}"
 echo "wazo-dird configuration for sources dumped to ${OUTPUT_FILE}"
+
+touch $SENTINEL

@@ -19,3 +19,4 @@
   set -u  # fail if variable is undefined
   set -o pipefail  # fail if command before pipe fails
   ```
+* sentinel file should not start with digits
