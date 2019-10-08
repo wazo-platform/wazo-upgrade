@@ -72,7 +72,7 @@ def main():
     args = parse_args()
 
     if not args.force:
-        version_installed = os.getenv('XIVO_VERSION_INSTALLED')
+        version_installed = os.getenv('WAZO_VERSION_INSTALLED')
         if version_installed >= '19.13':
             sys.exit(0)
 
@@ -93,7 +93,7 @@ def parse_args():
         '-f',
         '--force',
         action='store_true',
-        help="Do not check the variable XIVO_VERSION_INSTALLED. Default: %(default)s",
+        help="Do not check the variable WAZO_VERSION_INSTALLED. Default: %(default)s",
     )
     return parser.parse_args()
 

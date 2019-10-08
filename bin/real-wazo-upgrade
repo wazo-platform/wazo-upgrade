@@ -82,8 +82,10 @@ start_wazo() {
 }
 
 upgrade() {
-	export XIVO_VERSION_INSTALLED=$(wazo_version_installed)
-	export XIVO_VERSION_CANDIDATE=$(wazo_version_candidate)
+	export WAZO_VERSION_INSTALLED=$(wazo_version_installed)
+	export WAZO_VERSION_CANDIDATE=$(wazo_version_candidate)
+	export XIVO_VERSION_INSTALLED=$WAZO_VERSION_INSTALLED
+	export XIVO_VERSION_CANDIDATE=$WAZO_VERSION_CANDIDATE
 	pre_stop
 	stop_wazo
 	post_stop
