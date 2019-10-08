@@ -14,22 +14,8 @@ is_package_purgeable() {
     [ "$?" -eq 0 -a "$output" != 'unknown ok not-installed' ]
 }
 
-renamed_packages="wazo-dird-phoned
-                  xivo-confgend
+renamed_packages="xivo-confgend
                   xivo-confgend-client
-                  xivo-ctid-ng
-                  xivo-dird
-                  xivo-websocketd
-                  xivo-dird-phoned
-                  xivo
-                  xivo-base
-                  xivo-confd
-                  xivo-agentd
-                  xivo-purge-db
-                  xivo-agid
-                  xivo-provd
-                  xivo-provd-cli
-                  xivo-dhcpd-update
                   xivo-dxtora
                   xivo-dxtorc
                   xivo-amid
@@ -39,12 +25,7 @@ renamed_packages="wazo-dird-phoned
                   xivo-sounds-de-de
                   xivo-sounds-nl-nl"
 
-removed_packages="python-alembic
-                  wazo-admin-ui
-                  xivo-ctid
-                  xivo-ctid-client
-                  xivo-ctid-client-python3
-                  xivo-web-interface"
+removed_packages=""
 
 for package in $renamed_packages $removed_packages; do
     if is_package_purgeable $package; then
@@ -58,11 +39,4 @@ if is_package_installed xivo-dbms; then
        apt-get purge -y postgresql-9.4 postgresql-client-9.4 postgresql-plpython-9.4 postgresql-contrib-9.4
        systemctl restart postgresql.service
    fi
-fi
-
-# purge php5-common
-if ! is_package_installed php5-common; then
-    if is_package_purgeable php5-common; then
-       apt-get purge -y php5-common
-    fi
 fi
