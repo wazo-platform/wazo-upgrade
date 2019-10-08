@@ -61,31 +61,31 @@ execute() {
 	cmd=$*
 	wait_for_lock
 	if [ $? -ne 0 ]; then
-		start_xivo
+		start_wazo
 		exit -1
 	fi
 	$cmd
 	if [ $? -ne 0 ]; then
-		start_xivo
+		start_wazo
 		exit -1
 	fi
 }
 
-stop_xivo() {
+stop_wazo() {
 	wazo-service stop
 	wazo-service disable
 }
 
-start_xivo() {
+start_wazo() {
 	wazo-service enable
 	wazo-service restart
 }
 
 upgrade() {
-	export XIVO_VERSION_INSTALLED=$(xivo_version_installed)
-	export XIVO_VERSION_CANDIDATE=$(xivo_version_candidate)
+	export XIVO_VERSION_INSTALLED=$(wazo_version_installed)
+	export XIVO_VERSION_CANDIDATE=$(wazo_version_candidate)
 	pre_stop
-	stop_xivo
+	stop_wazo
 	post_stop
 	echo "Upgrading wazo..."
 	execute apt-get install -o Dpkg::Options::="--force-confnew" -y postgresql-11
@@ -98,7 +98,7 @@ upgrade() {
 	execute apt-get autoremove -y
 	upgrade_dahdi_linux_modules 4.9
 	pre_start
-	start_xivo
+	start_wazo
 	post_start
 	wazo-check-conffiles
 }
@@ -111,9 +111,9 @@ upgrade_dahdi_linux_modules(){
 	done
 }
 
-display_xivo_version() {
-	echo "installed version : $(xivo_version_installed)"
-	echo "proposed update	: $(xivo_version_candidate)"
+display_wazo_version() {
+	echo "installed version : $(wazo_version_installed)"
+	echo "proposed update	: $(wazo_version_candidate)"
 }
 
 debian_version_installed() {
@@ -121,7 +121,7 @@ debian_version_installed() {
 }
 
 upgrading_system() {
-	display_xivo_version
+	display_wazo_version
 	display_asterisk_notice
 	if [ $force -eq 0 ]; then
 		read -p 'Would you like to upgrade your system (all services will be restarted) [Y/n]? ' answer
@@ -179,23 +179,23 @@ display_asterisk_notice() {
 	fi
 }
 
-xivo_version_installed() {
+wazo_version_installed() {
 	echo "$(LANG='C' apt-cache policy wazo-platform | grep Installed | grep -oE '[0-9]{2}\.[0-9]+(\.[0-9]+)?' | head -n1)"
 }
 
-xivo_version_candidate() {
+wazo_version_candidate() {
 	echo "$(LANG='C' apt-cache policy wazo-platform | grep Candidate | grep -oE '[0-9]{2}\.[0-9]+(\.[0-9]+)?' | head -n1)"
 }
 
 check_wizard_has_been_run() {
 
-	if ! is_xivo_configured; then
+	if ! is_wazo_configured; then
 		echo "ERROR: You must configure Wazo by running the web wizard before using wazo-upgrade"
 		exit 1
 	fi
 }
 
-is_xivo_configured() {
+is_wazo_configured() {
 	if [ ! -f "/var/run/wazo-confd/wazo-confd.pid" ]; then
 		echo "ERROR: wazo-confd is not running: cannot check if the web wizard has been run."
 		exit 1
