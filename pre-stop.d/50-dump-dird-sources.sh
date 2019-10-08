@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 set -e
-set -u
+set -u  # fail if variable is undefined
 
 OUTPUT_FILE='/var/backups/xivo/wazo_dird_sources.yml'
 
