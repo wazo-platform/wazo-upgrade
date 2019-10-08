@@ -35,8 +35,8 @@ done
 
 # purge postgresql-X.X packages
 if is_package_installed xivo-dbms; then
-   if is_package_purgeable postgresql-9.4; then
-       apt-get purge -y postgresql-9.4 postgresql-client-9.4 postgresql-plpython-9.4 postgresql-contrib-9.4
+   if is_package_purgeable postgresql-9.6; then
+       apt-get purge -y postgresql-9.6 postgresql-client-9.6 postgresql-plpython-9.6 postgresql-contrib-9.6
        systemctl restart postgresql.service
    fi
 fi
