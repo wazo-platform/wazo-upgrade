@@ -11,7 +11,6 @@ case "$1" in
             find /var/lib/xivo-upgrade/ -mindepth 1 -maxdepth 1 -exec mv {} /var/lib/wazo-upgrade/ \;
             rmdir --ignore-fail-on-non-empty /var/lib/xivo-upgrade
         fi
-        [ -f "/var/log/xivo-upgrade.log" ] && rename 's/xivo-upgrade/wazo-upgrade/g' /var/log/xivo-upgrade.log*
         rm -f /var/lib/wazo-upgrade/02_rebuild_provd_config_registrar.sh
         rm -f /var/lib/wazo-upgrade/03_migrate_contact_center.sh
         rm -f /var/lib/wazo-upgrade/30_set_default_dtmf_mode
