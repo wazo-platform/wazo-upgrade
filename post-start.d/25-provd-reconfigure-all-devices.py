@@ -48,20 +48,11 @@ def _wait_for_provd(provd_client):
         except requests.exceptions.ConnectionError:
             time.sleep(1.0)
 
-    print('provd config null values removal failed, could not connect to wazo-provd')
+    print('provd reconfigure all devices failed, could not connect to wazo-provd')
     sys.exit(2)
 
 
-def _remove_null_value(config):
-    if isinstance(config, list):
-        return [_remove_null_value(x) for x in config]
-    elif isinstance(config, dict):
-        return {k: _remove_null_value(v) for k, v in config.items() if v is not None}
-    else:
-        return config
-
-
-def remove_null_values():
+def reconfigure_all_devices():
     config = _load_config()
     provd_client = ProvdClient(**config['provd'])
     _wait_for_provd(provd_client)
@@ -70,26 +61,27 @@ def remove_null_values():
     token = auth_client.token.new('wazo_user', expiration=5*60)
     provd_client.set_token(token['token'])
 
-    configs = provd_client.configs.list_device()['configs']
+    devices = provd_client.devices.list(recurse=True)['devices']
 
-    for config in configs:
-        provd_client.configs.update(_remove_null_value(config))
+    for device in devices:
+        provd_client.devices.reconfigure(device['id'])
+        provd_client.devices.synchronize(device['id'])
 
 
 def main():
     args = parse_args()
 
     if not args.force:
-        version_installed = os.getenv('XIVO_VERSION_INSTALLED')
-        if version_installed >= '19.07':
+        version_installed = os.getenv('WAZO_VERSION_INSTALLED')
+        if version_installed >= '19.13':
             sys.exit(0)
 
-    sentinel_file = '/var/lib/wazo-upgrade/60-provd-remove-null-values-config'
+    sentinel_file = '/var/lib/wazo-upgrade/57-provd-reconfigure-all-devices'
     if os.path.exists(sentinel_file):
         # migration already done
         sys.exit(1)
 
-    remove_null_values()
+    reconfigure_all_devices()
 
     with open(sentinel_file, 'w'):
         pass
@@ -101,7 +93,7 @@ def parse_args():
         '-f',
         '--force',
         action='store_true',
-        help="Do not check the variable XIVO_VERSION_INSTALLED. Default: %(default)s",
+        help="Do not check the variable WAZO_VERSION_INSTALLED. Default: %(default)s",
     )
     return parser.parse_args()
 

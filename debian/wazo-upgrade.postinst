@@ -11,12 +11,27 @@ case "$1" in
             find /var/lib/xivo-upgrade/ -mindepth 1 -maxdepth 1 -exec mv {} /var/lib/wazo-upgrade/ \;
             rmdir --ignore-fail-on-non-empty /var/lib/xivo-upgrade
         fi
-        rm -f /var/lib/wazo-upgrade/02_rebuild_provd_config_registrar.sh
-        rm -f /var/lib/wazo-upgrade/03_migrate_contact_center.sh
-        rm -f /var/lib/wazo-upgrade/30_set_default_dtmf_mode
-        rm -f /var/lib/wazo-upgrade/provd_add_remote_state_sip.sh
-        rm -f /var/lib/wazo-upgrade/provd_sync_needed_device.sh
-        rm -f /var/lib/wazo-upgrade/rebuild_provd_config_label_null.sh
+
+        rm -f /var/lib/wazo-upgrade/10_remove_legacy_google_plugin
+        rm -f /var/lib/wazo-upgrade/10_remove_legacy_microsoft_plugin
+        rm -f /var/lib/wazo-upgrade/10_remove_legacy_push_mobile_v2
+        rm -f /var/lib/wazo-upgrade/25_dird_tenant_migration
+        rm -f /var/lib/wazo-upgrade/30_provd_default_passwords
+        rm -f /var/lib/wazo-upgrade/50-autoprov-generate-config.py
+        rm -f /var/lib/wazo-upgrade/55-fix-service-discovery
+        rm -f /var/lib/wazo-upgrade/55_provd_device_tenant_migration
+        rm -f /var/lib/wazo-upgrade/56_provd_device_new_status_migration
+        rm -f /var/lib/wazo-upgrade/60-provd-remove-null-values-config
+        rm -f /var/lib/wazo-upgrade/61_webhookd_tenant_migration
+        rm -f /var/lib/wazo-upgrade/62_call_logd_tenant_migration
+        rm -f /var/lib/wazo-upgrade/dird-auto-create-config-v3
+        rm -f /var/lib/wazo-upgrade/entity_tenant_migration
+        rm -f /var/lib/wazo-upgrade/migrate_xivo_admin_to_wazo_user
+        rm -f /var/lib/wazo-upgrade/migrate_xivo_service_to_wazo_user
+        rm -f /var/lib/wazo-upgrade/migrate_xivo_user_to_wazo_user
+        rm -f /var/lib/wazo-upgrade/xivo_admin_dump.json
+        rm -f /var/lib/wazo-upgrade/xivo_service_dump.json
+        rm -f /var/lib/wazo-upgrade/xivo_user_dump.json
     ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)

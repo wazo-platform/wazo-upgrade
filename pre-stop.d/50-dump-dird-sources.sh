@@ -7,7 +7,7 @@ set -u
 
 OUTPUT_FILE='/var/backups/xivo/wazo_dird_sources.yml'
 
-if dpkg --compare-versions "${XIVO_VERSION_INSTALLED}" "gt" "19.14"; then
+if dpkg --compare-versions "${WAZO_VERSION_INSTALLED}" "gt" "19.14"; then
     exit 0
 fi
 
