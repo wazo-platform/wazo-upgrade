@@ -2,6 +2,10 @@
 # Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+set -e
+set -u  # fail if variable is undefined
+set -o pipefail  # fail if command before pipe fails
+
 is_package_installed() {
     [ "$(dpkg-query -W -f '${Status}' "$1" 2>/dev/null)" = 'install ok installed' ]
 }

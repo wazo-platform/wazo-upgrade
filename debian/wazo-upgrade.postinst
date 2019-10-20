@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # postinst script for wazo-upgrade
 #
 # see: dh_installdeb(1)
@@ -32,6 +32,22 @@ case "$1" in
         rm -f /var/lib/wazo-upgrade/xivo_admin_dump.json
         rm -f /var/lib/wazo-upgrade/xivo_service_dump.json
         rm -f /var/lib/wazo-upgrade/xivo_user_dump.json
+
+        if [ -f /var/backups/xivo/wazo_dird_sources.yml ]; then
+            touch /var/lib/wazo-upgrade/dump-dird-sources
+        fi
+
+        if [ -f /var/lib/wazo-upgrade/57-provd-reconfigure-all-devices ]; then
+            touch /var/lib/wazo-upgrade/provd-reconfigure-all-devices
+            rm /var/lib/wazo-upgrade/57-provd-reconfigure-all-devices
+        fi
+
+        previous_version="$2"
+        if [[ -z "${previous_version}" ]]; then
+            touch /var/lib/wazo-upgrade/dump-dird-sources
+            touch /var/lib/wazo-upgrade/remove-nginx-symlinks
+            touch /var/lib/wazo-upgrade/provd-reconfigure-all-devices
+        fi
     ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)

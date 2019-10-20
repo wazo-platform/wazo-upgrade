@@ -1,6 +1,10 @@
 #!/bin/bash
-# Copyright 2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
+
+set -e
+set -u  # fail if variable is undefined
+set -o pipefail  # fail if command before pipe fails
 
 wait_until_ready(){
     WAIT_TIMEOUT=60
