@@ -24,16 +24,25 @@ renamed_packages="xivo-confgend
                   xivo-dxtorc
                   xivo-amid
                   xivo-sounds-fr-fr
-                  xivo-sounds-fr-ca
-                  xivo-sounds-en-us
-                  xivo-sounds-de-de
-                  xivo-sounds-nl-nl"
+                  xivo-sounds-en-us"
 
 removed_packages=""
 
 for package in $renamed_packages $removed_packages; do
     if is_package_purgeable $package; then
         apt-get purge -y $package
+    fi
+done
+
+# migrate xivo-sounds which are installed manually
+sounds_renamed_packages="xivo-sounds-fr-ca
+                         xivo-sounds-de-de
+                         xivo-sounds-nl-nl"
+for old_package in $sounds_renamed_packages; do
+    new_package=$(echo $old_package | sed 's/xivo/wazo/')
+    if is_package_installed $old_package; then
+        apt-get install -o Dpkg::Options::="--force-confnew" -y $new_package
+        apt-get purge -y $old_package
     fi
 done
 
