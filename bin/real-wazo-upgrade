@@ -108,8 +108,13 @@ upgrade() {
 upgrade_dahdi_linux_modules(){
 	VERSION=$1
 
-	is_installed=$(dpkg -l | grep -q "^ii.*dahdi-linux-modules-$(uname -r)" && echo 1)
-	if [ "${is_installed}" -ne "1" ]; then
+	if ! grep -q "^ii dahdi$" <(dpkg -l | awk '{ print $1 " " $2 }'); then
+		# dahdi is not installed
+		return
+	fi
+
+	if grep -q "^ii.*dahdi-linux-modules-$(uname -r)" <(dpkg -l); then
+		# dahdi-linux-modules is already installed with the good version
 		return
 	fi
 
