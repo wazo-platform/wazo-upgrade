@@ -9,11 +9,6 @@ SENTINEL="/var/lib/wazo-upgrade/install-dahdi"
 
 [ -e "${SENTINEL}" ] && exit 0
 
-if dpkg --compare-versions "${WAZO_VERSION_INSTALLED}" "gt" "19.17"; then
-    touch "${SENTINEL}"
-    exit 0
-fi
-
 echo "Installing Dahdi dependencies"
 apt-get install wazo-asterisk-extra-modules
 
