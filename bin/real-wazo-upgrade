@@ -10,6 +10,10 @@ lib_directory="/usr/share/wazo-upgrade"
 export DEBIAN_FRONTEND=noninteractive
 export APT_LISTCHANGES_FRONTEND=none
 
+is_package_installed() {
+	[ "$(dpkg-query -W -f '${Status}' "$1" 2>/dev/null)" = 'install ok installed' ]
+}
+
 differed_action() {
 	local state=$1
 	for script in "$lib_directory/$state.d"/*; do
@@ -108,13 +112,11 @@ upgrade() {
 upgrade_dahdi_linux_modules(){
 	VERSION=$1
 
-	if ! grep -q "^ii dahdi$" <(dpkg -l | awk '{ print $1 " " $2 }'); then
-		# dahdi is not installed
+	if ! is_package_installed "dahdi"; then
 		return
 	fi
 
-	if grep -q "^ii.*dahdi-linux-modules-$(uname -r)" <(dpkg -l); then
-		# dahdi-linux-modules is already installed with the good version
+	if is_package_installed "dahdi-linux-modules-$(uname -r)"; then
 		return
 	fi
 
