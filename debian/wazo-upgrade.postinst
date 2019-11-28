@@ -47,6 +47,7 @@ case "$1" in
             touch /var/lib/wazo-upgrade/dump-dird-sources
             touch /var/lib/wazo-upgrade/remove-nginx-symlinks
             touch /var/lib/wazo-upgrade/provd-reconfigure-all-devices
+            touch /var/lib/wazo-upgrade/install-dahdi
         fi
     ;;
 
