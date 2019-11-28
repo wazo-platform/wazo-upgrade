@@ -116,10 +116,6 @@ upgrade_dahdi_linux_modules(){
 		return
 	fi
 
-	if is_package_installed "dahdi-linux-modules-$(uname -r)"; then
-		return
-	fi
-
 	kernel_release=$(ls /lib/modules/ | grep ^$VERSION)
 	for kr in $kernel_release; do
 		execute apt-get install -o Dpkg::Options::="--force-confnew" -y dahdi-linux-modules-${kr}
