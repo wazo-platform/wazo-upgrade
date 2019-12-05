@@ -13,7 +13,7 @@ SENTINEL="/var/lib/wazo-upgrade/install-dahdi"
 if [ -e "/etc/asterisk/dahdi-channels.conf" ]; then
 
     echo "Installing DAHDI dependencies"
-    apt-get install wazo-asterisk-extra-modules
+    apt-get install -y wazo-asterisk-extra-modules
 
     echo "Enabling DAHDI module"
     cat << EOF > /etc/wazo-confgend/conf.d/50_enable_chan_dahdi.yml
