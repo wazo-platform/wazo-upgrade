@@ -29,6 +29,6 @@ EOF
 # Add HBA for master host, if we're a slave
 grep '^host asterisk postgres' /etc/postgresql/11/main/pg_hba.conf >> $new_hba_file || true
 
-# Apply new config
-mv $new_hba_file /etc/postgresql/11/main/pg_hba.conf
+# Apply new config and keep permissions
+cat $new_hba_file > /etc/postgresql/11/main/pg_hba.conf
 systemctl reload postgresql
