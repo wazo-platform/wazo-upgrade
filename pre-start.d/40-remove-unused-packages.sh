@@ -23,6 +23,7 @@ renamed_packages="xivo-confgend
                   xivo-dxtora
                   xivo-dxtorc
                   xivo-amid
+                  xivo-keyring
                   xivo-sounds-fr-fr
                   xivo-sounds-en-us"
 
