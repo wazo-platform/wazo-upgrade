@@ -11,7 +11,8 @@ db_uri: postgresql://asterisk:proformatique@localhost/asterisk
 auth:
   host: localhost
   port: 9497
-  verify_certificate: /usr/share/xivo-certs/server.crt
+  prefix: null
+  https: false
 
 bus:
   username: guest
