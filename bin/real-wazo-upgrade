@@ -207,7 +207,7 @@ check_wizard_has_been_run() {
 }
 
 is_wazo_configured() {
-	if [ ! -f "/run/wazo-confd/wazo-confd.pid" ]; then
+    if ! systemctl is-active --quiet wazo-confd; then
 		echo "ERROR: wazo-confd is not running: cannot check if the web wizard has been run."
 		exit 1
 	fi
