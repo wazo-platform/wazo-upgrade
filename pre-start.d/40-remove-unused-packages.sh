@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 set -e
@@ -23,6 +23,8 @@ renamed_packages="xivo-confgend
                   xivo-dxtora
                   xivo-dxtorc
                   xivo-amid
+                  xivo-amid-client
+                  xivo-amid-client-python3
                   xivo-keyring
                   xivo-sounds-fr-fr
                   xivo-sounds-en-us"
