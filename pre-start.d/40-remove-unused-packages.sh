@@ -27,7 +27,8 @@ renamed_packages="xivo-confgend
                   xivo-amid-client-python3
                   xivo-keyring
                   xivo-sounds-fr-fr
-                  xivo-sounds-en-us"
+                  xivo-sounds-en-us
+                  xivo-stat"
 
 removed_packages=""
 
