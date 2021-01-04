@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2011-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2011-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 PATH=/bin:/usr/bin:/sbin:/usr/sbin
@@ -154,7 +154,39 @@ display_asterisk_notice() {
 			ast_major_version="unknown"
 			;;
 	esac
-	if dpkg --compare-versions "$ast_version" le 8:16; then
+	if dpkg --compare-versions "$ast_version" le 8:18; then
+		cat <<-EOF
+
+		Asterisk will be upgraded from version $ast_major_version to 18. You might be impacted if you have:
+
+		* custom Asterisk configuration (other than custom dialplan)
+		* custom application using AMI or ARI
+		* custom Asterisk modules (e.g. codec_g729a.so)
+
+		If you find yourself in one of these cases, you should make sure that
+		your customizations still work with Asterisk 16. Please refer to the
+		Wazo upgrade notes for more information.
+
+		EOF
+
+		custom_modules=$(wazo-asterisk-custom-modules)
+		if [ -n "$custom_modules" ]; then
+			for module in $custom_modules; do
+				mv "/usr/lib/asterisk/modules/$module" /tmp
+			done
+			cat <<-EOF
+			WARNING: custom Asterisk modules detected:
+
+			$custom_modules
+
+			Since these modules will not work with Asterisk 18 and might cause major
+			instability issues, they have been moved from /usr/lib/asterisk/modules to
+			/tmp. To continue using these modules, you will have to install (or recompile)
+			the Asterisk 18 version of these modules.
+
+		EOF
+		fi
+	elif dpkg --compare-versions "$ast_version" le 8:16; then
 		cat <<-EOF
 
 		Asterisk will be upgraded from version $ast_major_version to 16. You might be impacted if you have:
@@ -164,9 +196,8 @@ display_asterisk_notice() {
 		* custom Asterisk modules (e.g. codec_g729a.so)
 
 		If you find yourself in one of these cases, you should make sure that
-		your customizations still work with Asterisk 16. Please refer to
-		http://documentation.wazo.community/en/stable/upgrade/18.12/asterisk_16.html
-		for more information.
+		your customizations still work with Asterisk 16. Please refer to the
+		Wazo upgrade notes for more information.
 
 		EOF
 

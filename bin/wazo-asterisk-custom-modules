@@ -1,4 +1,6 @@
 #!/bin/sh
+# Copyright 2011-2021 The Wazo Authors  (see the AUTHORS file)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 set -e
 
@@ -9,7 +11,13 @@ list_installed_modules() {
 list_standard_modules() {
 	grep 'modules' /var/lib/dpkg/info/asterisk.md5sums | cut -c 60-
 	echo 'chan_sccp.so'
+	echo 'res_amqp.so'
+	echo 'res_ari_amqp.so'
+	echo 'res_consul_discovery.so'
+	echo 'res_consul_stasis_app.so'
+	echo 'res_consul.so'
 	echo 'res_freeze_check.so'
+	echo 'res_stasis_amqp.so'
 }
 
 tmpdir=$(mktemp -d)
