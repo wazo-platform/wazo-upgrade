@@ -164,7 +164,7 @@ display_asterisk_notice() {
 		* custom Asterisk modules (e.g. codec_g729a.so)
 
 		If you find yourself in one of these cases, you should make sure that
-		your customizations still work with Asterisk 16. Please refer to the
+		your customizations still work with Asterisk 18. Please refer to the
 		Wazo upgrade notes for more information.
 
 		EOF
