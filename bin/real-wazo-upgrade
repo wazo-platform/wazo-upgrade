@@ -102,24 +102,10 @@ upgrade() {
 	execute apt-mark auto postgresql-11 xivo-config rabbitmq-server xivo-libdao
 	execute apt-get dist-upgrade -y
 	execute apt-get autoremove -y
-	upgrade_dahdi_linux_modules 4.9
 	pre_start
 	start_wazo
 	post_start
 	wazo-check-conffiles
-}
-
-upgrade_dahdi_linux_modules(){
-	VERSION=$1
-
-	if ! is_package_installed "dahdi"; then
-		return
-	fi
-
-	kernel_release=$(ls /lib/modules/ | grep ^$VERSION)
-	for kr in $kernel_release; do
-		execute apt-get install -o Dpkg::Options::="--force-confnew" -y dahdi-linux-modules-${kr}
-	done
 }
 
 display_wazo_version() {
