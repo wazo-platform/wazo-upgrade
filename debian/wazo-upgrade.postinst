@@ -49,6 +49,7 @@ case "$1" in
             touch /var/lib/wazo-upgrade/provd-reconfigure-all-devices
             touch /var/lib/wazo-upgrade/install-dahdi
             touch /var/lib/wazo-upgrade/restrict-postgres-hba
+            touch /var/lib/wazo-upgrade/remove-dahdi-packages
         fi
     ;;
 
