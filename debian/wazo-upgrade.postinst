@@ -50,6 +50,8 @@ case "$1" in
             touch /var/lib/wazo-upgrade/install-dahdi
             touch /var/lib/wazo-upgrade/restrict-postgres-hba
             touch /var/lib/wazo-upgrade/remove-dahdi-packages
+            touch /var/lib/wazo-upgrade/migration-call-log-index
+            touch /var/lib/wazo-upgrade/migration-call-log-tables
         fi
     ;;
 
