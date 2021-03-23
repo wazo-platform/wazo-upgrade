@@ -10,6 +10,16 @@ lib_directory="/usr/share/wazo-upgrade"
 export DEBIAN_FRONTEND=noninteractive
 export APT_LISTCHANGES_FRONTEND=none
 
+fatal_error() {
+	message=$1
+	echo "******************* ERROR *************************"
+	echo "An error occurred during the upgrade."
+	echo "Please check /var/log/wazo-upgrade.log for details."
+	[ -n "$message" ] && echo -e "Error: $message"
+	echo "******************* ERROR *************************"
+	exit -1
+}
+
 is_package_installed() {
 	[ "$(dpkg-query -W -f '${Status}' "$1" 2>/dev/null)" = 'install ok installed' ]
 }
@@ -27,11 +37,7 @@ pre_stop() {
 		echo "Executing upgrade script $script..."
 		$script
 		if [ $? -ne 0 ]; then
-			cat <<-EOF
-			Failed to execute $script
-			Please, fix this issue before re-executing wazo-upgrade
-			EOF
-			exit -1
+			fatal_error "Failed to execute $script\nPlease, fix this issue before re-executing wazo-upgrade"
 		fi
 	done
 }
@@ -66,12 +72,12 @@ execute() {
 	wait_for_lock
 	if [ $? -ne 0 ]; then
 		start_wazo
-		exit -1
+		fatal_error
 	fi
 	$cmd
 	if [ $? -ne 0 ]; then
 		start_wazo
-		exit -1
+		fatal_error
 	fi
 }
 
