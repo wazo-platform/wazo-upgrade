@@ -1,4 +1,6 @@
 etc/* etc/
+bin/apt-get-warning usr/bin/
+bin/apt-warning usr/bin/
 bin/real-wazo-upgrade usr/bin/
 bin/use-wazo-infrastructure usr/lib/wazo-upgrade/
 bin/wazo-upgrade usr/bin/
