@@ -1,0 +1,17 @@
+#!/bin/bash
+set -e
+set -o pipefail  # fail if command before pipe fails
+
+ACTION="$1"
+
+if [ "$ACTION" == "upgrade" -o "$ACTION" == "dist-upgrade" ]; then
+    echo "WARNING: This command is not supported to upgrade Wazo."
+    read -p 'Do you want to force it (and maybe break your installation) [y/N]? ' answer
+
+    answer="${answer:-N}"
+    if [ "$answer" != 'y' -a "$answer" != 'Y' ]; then
+        exit 1
+    fi
+fi
+
+apt-get $@
