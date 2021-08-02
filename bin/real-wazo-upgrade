@@ -224,14 +224,14 @@ wazo_version_candidate() {
 check_wizard_has_been_run() {
 
 	if ! is_wazo_configured; then
-		echo "ERROR: You must configure Wazo by running the web wizard before using wazo-upgrade"
+  		echo "ERROR: You must configure Wazo by running the wizard (POST /api/confd/1.1/wizard) before using wazo-upgrade"
 		exit 1
 	fi
 }
 
 is_wazo_configured() {
     if ! systemctl is-active --quiet wazo-confd; then
-		echo "ERROR: wazo-confd is not running: cannot check if the web wizard has been run."
+		echo "ERROR: wazo-confd is not running: cannot check if the wizard has been run."
 		exit 1
 	fi
 	# wazo-confd has no HTTPS since wazo-20.07
