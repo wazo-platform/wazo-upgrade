@@ -229,6 +229,13 @@ check_wizard_has_been_run() {
 	fi
 }
 
+fix_apt_update_buster() {
+  current_debian_version=$(cat /etc/debian_version)
+  if dpkg --compare-versions "${current_debian_version}" le 10.10; then
+      apt-get update --allow-releaseinfo-change > /dev/null
+  fi
+}
+
 is_wazo_configured() {
     if ! systemctl is-active --quiet wazo-confd; then
 		echo "ERROR: wazo-confd is not running: cannot check if the wizard has been run."
@@ -272,6 +279,7 @@ download_only="${download_only:-"0"}"
 force="${force:-"0"}"
 
 check_wizard_has_been_run
+fix_apt_update_buster
 
 if [ $download_only -eq 0 ]; then
 	upgrading_system
