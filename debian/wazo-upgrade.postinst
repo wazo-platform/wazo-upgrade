@@ -52,6 +52,7 @@ case "$1" in
             touch /var/lib/wazo-upgrade/remove-dahdi-packages
             touch /var/lib/wazo-upgrade/migration-call-log-index
             touch /var/lib/wazo-upgrade/migration-call-log-tables
+            touch /var/lib/wazo-upgrade/remove-installation-gpg-key
         fi
     ;;
 
