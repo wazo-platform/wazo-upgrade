@@ -45,14 +45,14 @@ case "$1" in
         previous_version="$2"
         if [[ -z "${previous_version}" ]]; then
             touch /var/lib/wazo-upgrade/dump-dird-sources
-            touch /var/lib/wazo-upgrade/remove-nginx-symlinks
-            touch /var/lib/wazo-upgrade/provd-reconfigure-all-devices
             touch /var/lib/wazo-upgrade/install-dahdi
-            touch /var/lib/wazo-upgrade/restrict-postgres-hba
-            touch /var/lib/wazo-upgrade/remove-dahdi-packages
             touch /var/lib/wazo-upgrade/migration-call-log-index
             touch /var/lib/wazo-upgrade/migration-call-log-tables
+            touch /var/lib/wazo-upgrade/provd-reconfigure-all-devices
+            touch /var/lib/wazo-upgrade/remove-dahdi-packages
             touch /var/lib/wazo-upgrade/remove-installation-gpg-key
+            touch /var/lib/wazo-upgrade/remove-nginx-symlinks
+            touch /var/lib/wazo-upgrade/restrict-postgres-hba
         fi
     ;;
 
