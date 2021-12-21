@@ -10,6 +10,6 @@ SENTINEL="/var/lib/wazo-upgrade/remove-installation-gpg-key"
 
 [ -e "${SENTINEL}" ] && exit 0
 
-apt-key remove --keyring /etc/apt/trusted.gpg 2769B67EDBFF423F6874D7663F1BF7FC527FBC6A
+apt-key --keyring /etc/apt/trusted.gpg del 2769B67EDBFF423F6874D7663F1BF7FC527FBC6A
 
 touch "${SENTINEL}"
