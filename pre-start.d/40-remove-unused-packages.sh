@@ -53,7 +53,7 @@ for old_package in $sounds_renamed_packages; do
 done
 
 # purge postgresql-X.X packages
-if is_package_installed xivo-dbms; then
+if is_package_installed wazo-dbms || is_package_installed xivo-dbms; then
    if is_package_purgeable postgresql-9.6; then
        apt-get purge -y postgresql-9.6 postgresql-client-9.6 postgresql-plpython-9.6 postgresql-contrib-9.6
        systemctl restart postgresql.service
