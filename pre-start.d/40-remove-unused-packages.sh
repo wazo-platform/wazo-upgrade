@@ -21,6 +21,7 @@ is_package_purgeable() {
 renamed_packages="xivo-confgend
                   xivo-confgend-client
                   xivo-dev-ssh-pubkeys
+                  xivo-dbms
                   xivo-dxtora
                   xivo-dxtorc
                   xivo-amid
