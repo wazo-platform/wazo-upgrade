@@ -8,6 +8,12 @@ extra_config_files: '/etc/wazo-upgrade/conf.d'
 
 db_uri: postgresql://asterisk:proformatique@localhost/asterisk
 
+amid:
+    host: localhost
+    port: 9491
+    prefix: null
+    https: false
+
 auth:
   host: localhost
   port: 9497
