@@ -53,6 +53,7 @@ case "$1" in
             touch /var/lib/wazo-upgrade/remove-installation-gpg-key
             touch /var/lib/wazo-upgrade/remove-nginx-symlinks
             touch /var/lib/wazo-upgrade/restrict-postgres-hba
+            touch /var/lib/wazo-upgrade/set-mobile-hints
         fi
     ;;
 
