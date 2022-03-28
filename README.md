@@ -20,3 +20,4 @@
   set -o pipefail  # fail if command before pipe fails
   ```
 * sentinel file should not start with digits
+* sentinel file should also be created by `debian/wazo-upgrade.postinst`
