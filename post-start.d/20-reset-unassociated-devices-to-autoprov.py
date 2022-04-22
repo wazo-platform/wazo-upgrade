@@ -31,6 +31,11 @@ def _load_key_file(config):
                      'password': key_file['service_key']}}
 
 
+def is_slave(confd_client):
+    ha_config = confd_client.ha.get()
+    return ha_config['node_type'] == 'slave'
+
+
 config = load_config()
 auth_client = AuthClient(**config['auth'])
 token_data = auth_client.token.new(expiration=300)
@@ -38,10 +43,14 @@ token_data = auth_client.token.new(expiration=300)
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger('reset_unassociated_devices_to_autoprov')
 
-logger.debug('Fetching wrongly configured devices...')
-
 confd_client = ConfdClient(token=token_data['token'], **config['confd'])
 provd_client = ProvdClient(token=token_data['token'], **config['provd'])
+
+if is_slave(confd_client):
+    logger.debug('This script cannot run on a slave instance. Skipping.')
+    exit(0)
+
+logger.debug('Fetching wrongly configured devices...')
 
 session = requests.Session()
 session.headers = {
