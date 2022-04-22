@@ -52,15 +52,7 @@ if is_slave(confd_client):
 
 logger.debug('Fetching wrongly configured devices...')
 
-session = requests.Session()
-session.headers = {
-    'Accept': 'application/json',
-    'Content-Type': 'application/json',
-    'X-Auth-Token': token_data['token'],
-}
-
 devices = provd_client.devices.list()['devices']
-
 lines = confd_client.lines.list(recurse=True)['items']
 
 configured_device_ids = {device['id']
