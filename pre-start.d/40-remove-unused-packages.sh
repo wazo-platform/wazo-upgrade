@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2018-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 set -e
@@ -18,7 +18,8 @@ is_package_purgeable() {
     [ "$?" -eq 0 -a "$output" != 'unknown ok not-installed' ]
 }
 
-renamed_packages="xivo-confgend
+renamed_packages="xivo-backup
+                  xivo-confgend
                   xivo-confgend-client
                   xivo-dev-ssh-pubkeys
                   xivo-dbms
