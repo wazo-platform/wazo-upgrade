@@ -18,19 +18,19 @@ is_package_purgeable() {
     [ "$?" -eq 0 -a "$output" != 'unknown ok not-installed' ]
 }
 
-renamed_packages="xivo-backup
-                  xivo-confgend
-                  xivo-confgend-client
-                  xivo-dev-ssh-pubkeys
-                  xivo-dbms
-                  xivo-dxtora
-                  xivo-dxtorc
-                  xivo-amid
+renamed_packages="xivo-amid
                   xivo-amid-client
                   xivo-amid-client-python3
+                  xivo-backup
+                  xivo-confgend
+                  xivo-confgend-client
+                  xivo-dbms
+                  xivo-dev-ssh-pubkeys
+                  xivo-dxtora
+                  xivo-dxtorc
                   xivo-keyring
-                  xivo-sounds-fr-fr
                   xivo-sounds-en-us
+                  xivo-sounds-fr-fr
                   xivo-stat
                   xivo-sysconfd"
 
