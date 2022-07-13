@@ -54,6 +54,7 @@ case "$1" in
             touch /var/lib/wazo-upgrade/remove-nginx-symlinks
             touch /var/lib/wazo-upgrade/restrict-postgres-hba
             touch /var/lib/wazo-upgrade/set-mobile-hints
+            touch /var/lib/wazo-upgrade/move-admins-to-group
         fi
     ;;
 
