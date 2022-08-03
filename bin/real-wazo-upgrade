@@ -142,6 +142,15 @@ display_asterisk_notice() {
 		8:15.*)
 			ast_major_version="15"
 			;;
+		8:16.*)
+			ast_major_version="16"
+			;;
+		8:17.*)
+			ast_major_version="17"
+			;;
+		8:18.*)
+			ast_major_version="18"
+			;;
 		*)
 			ast_major_version="unknown"
 			;;
