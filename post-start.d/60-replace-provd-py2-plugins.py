@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 import logging
 import os
+import sys
 from time import sleep
 
 from wazo_auth_client import Client as AuthClient
@@ -22,6 +23,7 @@ _DEFAULT_CONFIG = {
     }
 }
 PLUGIN_CACHE_DIR = '/var/cache/wazo-provd/'
+SENTINEL_FILE = '/var/lib/wazo-upgrade/replace-provd-py2-plugins'
 
 
 def _load_key_file(config):
@@ -82,6 +84,9 @@ def remove_and_reinstall_plugins(client: ProvdClient):
 
 
 def main():
+    if os.path.exists(SENTINEL_FILE):
+        sys.exit(0)
+
     config = load_config()
     provd_config = config['provd']
     auth_client = AuthClient(**config['auth'])
@@ -91,6 +96,9 @@ def main():
     delete_cached_plugins()
     update_plugin_repo_url(provd_client)
     remove_and_reinstall_plugins(provd_client)
+
+    with open(SENTINEL_FILE, 'w'):
+        pass
 
 
 if __name__ == '__main__':
