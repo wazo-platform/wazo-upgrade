@@ -100,8 +100,9 @@ def remove_and_reinstall_plugins(client: ProvdClient, plugin_dir: str):
     # Update devices that were linked to old plugin names
     if xivo_plugins:
         for device in client.devices.list()['devices']:
-            if device['plugin'] in xivo_plugins:
-                device['plugin'] = device['plugin'].replace('xivo-', 'wazo-')
+            current_plugin = device.get('plugin', None)
+            if current_plugin and current_plugin in xivo_plugins:
+                device['plugin'] = current_plugin.replace('xivo-', 'wazo-')
                 client.devices.update(device)
 
 
