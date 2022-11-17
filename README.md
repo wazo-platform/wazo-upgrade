@@ -19,5 +19,6 @@
   set -u  # fail if variable is undefined
   set -o pipefail  # fail if command before pipe fails
   ```
-* sentinel file should not start with digits
-* sentinel file should also be created by `debian/wazo-upgrade.postinst`
+* each script should check for sentinel file before running and create one at the end.
+* sentinel files should not start with digits
+* sentinel files should also be created by `debian/wazo-upgrade.postinst` 
