@@ -6,6 +6,7 @@ import os
 import re
 import shutil
 import sys
+from distutils.dir_util import copy_tree
 from time import sleep
 
 from wazo_auth_client import Client as AuthClient
@@ -63,7 +64,12 @@ def rename_xivo_plugins(plugins, plugin_dir):
                 if file_name == 'common' and old_plugin_name == 'xivo-gigaset':
                     file_name = 'common-c'
                     os.rename(os.path.join(source_dir, 'common'), os.path.join(source_dir, 'common-c'))
-                shutil.move(os.path.join(source_dir, file_name), target_dir)
+                source = os.path.join(source_dir, file_name)
+                target = os.path.join(target_dir, file_name)
+                if os.path.isdir(source) and os.path.exists(target):
+                    copy_tree(source, target)
+                else:
+                    shutil.move(source, target_dir)
             shutil.rmtree(source_dir)
         else:
             os.rename(source_dir, target_dir)
