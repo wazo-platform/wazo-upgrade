@@ -66,8 +66,10 @@ def rename_xivo_plugins(plugins, plugin_dir):
                     os.rename(os.path.join(source_dir, 'common'), os.path.join(source_dir, 'common-c'))
                 source = os.path.join(source_dir, file_name)
                 target = os.path.join(target_dir, file_name)
-                if os.path.isdir(source) and os.path.exists(target):
+                if os.path.isdir(source) and os.path.exists(target) and os.path.isdir(target):
                     copy_tree(source, target)
+                elif not os.path.isdir(target):
+                    continue
                 else:
                     shutil.move(source, target_dir)
             shutil.rmtree(source_dir)
