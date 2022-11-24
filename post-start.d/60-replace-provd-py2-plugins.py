@@ -4,9 +4,7 @@
 import logging
 import os
 import re
-import shutil
 import sys
-from distutils.dir_util import copy_tree
 from time import sleep
 
 from wazo_auth_client import Client as AuthClient
@@ -50,33 +48,6 @@ def delete_cached_plugins(cache_dir):
             os.remove(file_path)
 
 
-def rename_xivo_plugins(plugins, plugin_dir):
-    for old_plugin_name in plugins:
-        new_plugin_name = old_plugin_name.replace('xivo-', 'wazo-')
-        source_dir = os.path.join(plugin_dir, old_plugin_name)
-        target_dir = os.path.join(plugin_dir, new_plugin_name)
-        if os.path.exists(source_dir):
-            # If there was both a wazo- and a xivo- version copy the contents from the xivo one
-            for file_name in os.listdir(source_dir):
-                if file_name == 'build.py':
-                    # Skip this file, it will be replaced anyway on upgrade
-                    continue
-                if file_name == 'common' and old_plugin_name == 'xivo-gigaset':
-                    file_name = 'common-c'
-                    os.rename(os.path.join(source_dir, 'common'), os.path.join(source_dir, 'common-c'))
-                source = os.path.join(source_dir, file_name)
-                target = os.path.join(target_dir, file_name)
-                if os.path.isdir(source) and os.path.exists(target) and os.path.isdir(target):
-                    copy_tree(source, target)
-                elif not os.path.isdir(target):
-                    continue
-                else:
-                    shutil.move(source, target_dir)
-            shutil.rmtree(source_dir)
-        else:
-            os.rename(source_dir, target_dir)
-
-
 def wait_until_completed(oip: OperationInProgress, wait=30):
     if oip.state == OIP_SUCCESS:
         return True
@@ -98,14 +69,10 @@ def update_plugin_repo_url(client: ProvdClient):
         client.params.update('plugin_server', f'{proto}://provd.wazo.community/plugins/2/{variant}/')
 
 
-def remove_and_reinstall_plugins(client: ProvdClient, plugin_dir: str):
+def update_plugins(client: ProvdClient, plugin_dir: str):
     # Get all installed plugins that are still installable (i.e. skip old packages that are no longer available)
-    installable_plugins = list(client.plugins.list_installable()['pkgs'])
+    installable_plugins = client.plugins.list_installable()['pkgs']
     plugins = [p for p in client.plugins.list_installed()['pkgs'] if p in installable_plugins]
-    xivo_plugins = [p for p in plugins if p.startswith('xivo-')]
-
-    # Rename old plugins if it exists
-    rename_xivo_plugins(xivo_plugins, plugin_dir)
 
     # Update plugin registry
     if wait_until_completed(client.plugins.update()) is False:
@@ -120,12 +87,11 @@ def remove_and_reinstall_plugins(client: ProvdClient, plugin_dir: str):
             sys.exit(1)
 
     # Update devices that were linked to old plugin names
-    if xivo_plugins:
-        for device in client.devices.list()['devices']:
-            current_plugin = device.get('plugin', None)
-            if current_plugin and current_plugin in xivo_plugins:
-                device['plugin'] = current_plugin.replace('xivo-', 'wazo-')
-                client.devices.update(device)
+    for device in client.devices.list()['devices']:
+        current_plugin = device.get('plugin', None)
+        if current_plugin and current_plugin.startswith('xivo-'):
+            device['plugin'] = current_plugin.replace('xivo-', 'wazo-')
+            client.devices.update(device)
 
 
 def main():
@@ -143,7 +109,7 @@ def main():
 
     delete_cached_plugins(cache_dir)
     update_plugin_repo_url(provd_client)
-    remove_and_reinstall_plugins(provd_client, plugin_dir)
+    update_plugins(provd_client, plugin_dir)
 
     with open(SENTINEL_FILE, 'w'):
         pass

@@ -55,6 +55,7 @@ case "$1" in
             touch /var/lib/wazo-upgrade/restrict-postgres-hba
             touch /var/lib/wazo-upgrade/set-mobile-hints
             touch /var/lib/wazo-upgrade/move-admins-to-group
+            touch /var/lib/wazo-upgrade/pre-replace-provd-py2-plugins
             touch /var/lib/wazo-upgrade/replace-provd-py2-plugins
         fi
     ;;
