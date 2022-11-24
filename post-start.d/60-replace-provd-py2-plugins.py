@@ -26,7 +26,7 @@ _DEFAULT_CONFIG = {
         'key_file': '/var/lib/wazo-auth-keys/wazo-upgrade-key.yml'
     }
 }
-REPO_REGEX = re.compile(r'^(https?)://provd.wazo.community/plugins/1/(testing|stable|archive)/$')
+REPO_REGEX = re.compile(r'^(https?)://provd.wazo.community/plugins/1/(testing|stable|archive)/?$')
 DEFAULT_PLUGIN_CACHE_DIR = '/var/cache/wazo-provd/'
 DEFAULT_PLUGIN_DIR = '/var/lib/wazo-provd/plugins/'
 SENTINEL_FILE = '/var/lib/wazo-upgrade/replace-provd-py2-plugins'
