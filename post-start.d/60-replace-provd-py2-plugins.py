@@ -100,7 +100,7 @@ def update_plugin_repo_url(client: ProvdClient):
     else:
         print(f'''
         WARNING: Your provisioning repository URL is not the default value.
-        If the upgrade script fails, please upgrade your custom provisiong repository
+        If the upgrade script fails, please upgrade your custom provisioning repository
         to include recent changes or set the URL to the default.
 
         Current provisioning URL: {current_url}
