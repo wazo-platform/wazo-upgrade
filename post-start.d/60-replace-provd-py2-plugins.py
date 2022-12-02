@@ -96,6 +96,11 @@ def update_plugin_repo_url(client: ProvdClient):
     if match:
         proto, variant = match.groups()
         client.params.update('plugin_server', f'{proto}://provd.wazo.community/plugins/2/{variant}/')
+    else:
+        print('''
+        Your provisioning mirror URL is custom. If the upgrade script fails, please upgrade your custom mirror
+        with recent changes in the main branch or set it to a Wazo-supported URL.
+        ''')
 
 
 def remove_and_reinstall_plugins(client: ProvdClient, plugin_dir: str):
