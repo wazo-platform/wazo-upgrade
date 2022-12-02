@@ -12,7 +12,7 @@ from time import sleep
 
 from wazo_auth_client import Client as AuthClient
 from wazo_provd_client import Client as ProvdClient
-from provd.operation import OIP_WAITING, OIP_PROGRESS, OIP_SUCCESS, OIP_FAIL, OperationInProgress
+from provd.operation import OIP_SUCCESS, OIP_FAIL, OperationInProgress
 from xivo.chain_map import ChainMap
 from xivo.config_helper import read_config_file_hierarchy, parse_config_file
 
