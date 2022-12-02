@@ -12,7 +12,7 @@ from time import sleep
 
 from wazo_auth_client import Client as AuthClient
 from wazo_provd_client import Client as ProvdClient
-from provd.operation import OIP_WAITING, OIP_PROGRESS, OIP_SUCCESS, OIP_FAIL, OperationInProgress
+from provd.operation import OIP_SUCCESS, OIP_FAIL, OperationInProgress
 from xivo.chain_map import ChainMap
 from xivo.config_helper import read_config_file_hierarchy, parse_config_file
 
@@ -26,6 +26,7 @@ _DEFAULT_CONFIG = {
         'key_file': '/var/lib/wazo-auth-keys/wazo-upgrade-key.yml'
     }
 }
+DEFAULT_REPO = 'https://provd.wazo.community/plugins/2/stable/'
 REPO_REGEX = re.compile(r'^(https?)://provd.wazo.community/plugins/1/(testing|stable|archive)/?$')
 DEFAULT_PLUGIN_CACHE_DIR = '/var/cache/wazo-provd/'
 DEFAULT_PLUGIN_DIR = '/var/lib/wazo-provd/plugins/'
@@ -96,6 +97,15 @@ def update_plugin_repo_url(client: ProvdClient):
     if match:
         proto, variant = match.groups()
         client.params.update('plugin_server', f'{proto}://provd.wazo.community/plugins/2/{variant}/')
+    else:
+        print(f'''
+        WARNING: Your provisioning repository URL is not the default value.
+        If the upgrade script fails, please upgrade your custom provisioning repository
+        to include recent changes or set the URL to the default.
+
+        Current provisioning URL: {current_url}
+        Default provisioning URL: {DEFAULT_REPO}
+        ''')
 
 
 def remove_and_reinstall_plugins(client: ProvdClient, plugin_dir: str):
