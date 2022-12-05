@@ -18,7 +18,8 @@ is_package_purgeable() {
     [ "$?" -eq 0 -a "$output" != 'unknown ok not-installed' ]
 }
 
-renamed_packages="xivo-amid
+renamed_packages="consul
+                  xivo-amid
                   xivo-amid-client
                   xivo-amid-client-python3
                   xivo-backup
@@ -32,7 +33,8 @@ renamed_packages="xivo-amid
                   xivo-sounds-en-us
                   xivo-sounds-fr-fr
                   xivo-stat
-                  xivo-sysconfd"
+                  xivo-sysconfd
+                  wazo-consul-config"
 
 removed_packages=""
 
