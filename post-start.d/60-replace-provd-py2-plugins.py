@@ -28,6 +28,7 @@ _DEFAULT_CONFIG = {
 }
 DEFAULT_REPO = 'https://provd.wazo.community/plugins/2/stable/'
 REPO_REGEX = re.compile(r'^(https?)://provd.wazo.community/plugins/1/(testing|stable|archive)/?$')
+NEW_REPO_REGEX = re.compile(r'^(https?)://provd.wazo.community/plugins/2/(testing|stable|archive)/?$')
 DEFAULT_PLUGIN_CACHE_DIR = '/var/cache/wazo-provd/'
 DEFAULT_PLUGIN_DIR = '/var/lib/wazo-provd/plugins/'
 SENTINEL_FILE = '/var/lib/wazo-upgrade/replace-provd-py2-plugins'
@@ -93,6 +94,11 @@ def update_plugin_repo_url(client: ProvdClient):
     current_url = client.params.get('plugin_server')['value']
     if not current_url:
         return
+
+    new_repo_already_present = NEW_REPO_REGEX.match(current_url)
+    if new_repo_already_present:
+        return
+
     match = REPO_REGEX.match(current_url)
     if match:
         proto, variant = match.groups()
