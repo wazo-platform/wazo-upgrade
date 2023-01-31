@@ -21,4 +21,4 @@
   ```
 * each script should check for sentinel file before running and create one at the end.
 * sentinel files should not start with digits
-* sentinel files should also be created by `debian/wazo-upgrade.postinst` 
+* sentinel files should also be created by `debian/wazo-upgrade.postinst`

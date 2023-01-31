@@ -32,6 +32,7 @@ case "$1" in
         rm -f /var/lib/wazo-upgrade/xivo_admin_dump.json
         rm -f /var/lib/wazo-upgrade/xivo_service_dump.json
         rm -f /var/lib/wazo-upgrade/xivo_user_dump.json
+        rm -f /var/lib/wazo-upgrade/install-dahdi
 
         if [ -f /var/backups/xivo/wazo_dird_sources.yml ]; then
             touch /var/lib/wazo-upgrade/dump-dird-sources
@@ -45,7 +46,6 @@ case "$1" in
         previous_version="$2"
         if [[ -z "${previous_version}" ]]; then
             touch /var/lib/wazo-upgrade/dump-dird-sources
-            touch /var/lib/wazo-upgrade/install-dahdi
             touch /var/lib/wazo-upgrade/migration-call-log-index
             touch /var/lib/wazo-upgrade/migration-call-log-tables
             touch /var/lib/wazo-upgrade/provd-reconfigure-all-devices
