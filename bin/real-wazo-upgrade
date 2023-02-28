@@ -182,7 +182,7 @@ display_asterisk_notice() {
 			Since these modules will not work with Asterisk 19 and might cause major
 			instability issues, they have been moved from /usr/lib/asterisk/modules to
 			/tmp. To continue using these modules, you will have to install (or recompile)
-			the Asterisk 18 version of these modules.
+			the Asterisk 19 version of these modules.
 
 		EOF
 		fi
