@@ -150,11 +150,46 @@ display_asterisk_notice() {
 		8:18.*)
 			ast_major_version="18"
 			;;
+		8:19.*)
+			ast_major_version="19"
+			;;
 		*)
 			ast_major_version="unknown"
 			;;
 	esac
-	if dpkg --compare-versions "$ast_version" le 8:19; then
+	if dpkg --compare-versions "$ast_version" le 8:20; then
+		cat <<-EOF
+
+		Asterisk will be upgraded from version $ast_major_version to 20. You might be impacted if you have:
+
+		* custom Asterisk configuration (other than custom dialplan)
+		* custom application using AMI or ARI
+		* custom Asterisk modules (e.g. codec_g729a.so)
+
+		If you find yourself in one of these cases, you should make sure that
+		your customizations still work with Asterisk 20. Please refer to the
+		Wazo upgrade notes for more information.
+
+		EOF
+
+		custom_modules=$(wazo-asterisk-custom-modules)
+		if [ -n "$custom_modules" ]; then
+			for module in $custom_modules; do
+				mv "/usr/lib/asterisk/modules/$module" /tmp
+			done
+			cat <<-EOF
+			WARNING: custom Asterisk modules detected:
+
+			$custom_modules
+
+			Since these modules will not work with Asterisk 20 and might cause major
+			instability issues, they have been moved from /usr/lib/asterisk/modules to
+			/tmp. To continue using these modules, you will have to install (or recompile)
+			the Asterisk 20 version of these modules.
+
+		EOF
+		fi
+	elif dpkg --compare-versions "$ast_version" le 8:19; then
 		cat <<-EOF
 
 		Asterisk will be upgraded from version $ast_major_version to 19. You might be impacted if you have:
@@ -182,7 +217,7 @@ display_asterisk_notice() {
 			Since these modules will not work with Asterisk 19 and might cause major
 			instability issues, they have been moved from /usr/lib/asterisk/modules to
 			/tmp. To continue using these modules, you will have to install (or recompile)
-			the Asterisk 18 version of these modules.
+			the Asterisk 19 version of these modules.
 
 		EOF
 		fi
