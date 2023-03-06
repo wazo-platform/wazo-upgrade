@@ -2,7 +2,7 @@ Source: wazo-upgrade
 Section: admin
 Priority: extra
 Maintainer: Wazo Maintainers <dev@wazo.community>
-Build-Depends: debhelper (>= 9)
+Build-Depends: debhelper (>= 12)
 Standards-Version: 3.9.6
 
 Package: wazo-upgrade
@@ -10,6 +10,6 @@ Architecture: all
 Provides: xivo-upgrade
 Conflicts: xivo-upgrade
 Replaces: xivo-upgrade
-Depends: ${misc:Depends}, curl, rename, python, python3
+Depends: ${misc:Depends}, curl, rename, python3
 Description: Wazo upgrade tools
  This package provide Wazo upgrading tools
