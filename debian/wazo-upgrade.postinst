@@ -7,11 +7,6 @@ set -e
 
 case "$1" in
     configure)
-        if [ -d /var/lib/xivo-upgrade ] ; then
-            find /var/lib/xivo-upgrade/ -mindepth 1 -maxdepth 1 -exec mv {} /var/lib/wazo-upgrade/ \;
-            rmdir --ignore-fail-on-non-empty /var/lib/xivo-upgrade
-        fi
-
         rm -f /var/lib/wazo-upgrade/10_remove_legacy_google_plugin
         rm -f /var/lib/wazo-upgrade/10_remove_legacy_microsoft_plugin
         rm -f /var/lib/wazo-upgrade/10_remove_legacy_push_mobile_v2
