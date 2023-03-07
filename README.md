@@ -2,7 +2,7 @@
 
 ## Branches
 
-* branch `master`: builds package for Wazo current (distribution wazo-dev-buster/pelican-buster)
+* branch `master`: builds package for Wazo current (distribution wazo-dev-bullseye/pelican-bullseye)
 
 ## Upgrade scripts
 
