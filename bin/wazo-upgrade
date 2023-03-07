@@ -69,9 +69,4 @@ log_and_upgrade()
     append_log_end $LOGFILE
 }
 
-
-if [ "$(basename "$0")" == 'xivo-upgrade' ]; then
-    echo 'Warning: xivo-upgrade is a deprecated alias to wazo-upgrade: use wazo-upgrade instead' >&2
-fi
-
 log_and_upgrade "$@"
