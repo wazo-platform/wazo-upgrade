@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2018-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 set -e
@@ -56,10 +56,10 @@ for old_package in $sounds_renamed_packages; do
     fi
 done
 
-# purge postgresql-X.X packages
-if is_package_installed wazo-dbms || is_package_installed xivo-dbms; then
-   if is_package_purgeable postgresql-9.6; then
-       apt-get purge -y postgresql-9.6 postgresql-client-9.6 postgresql-plpython-9.6 postgresql-contrib-9.6
+# purge postgresql-XX packages
+if is_package_installed wazo-dbms; then
+   if is_package_purgeable postgresql-11; then
+       apt-get purge -y postgresql-11 postgresql-client-11 postgresql-plpython-11 postgresql-contrib-11
        systemctl restart postgresql.service
    fi
 fi
