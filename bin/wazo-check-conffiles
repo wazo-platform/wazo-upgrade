@@ -1,15 +1,13 @@
 #!/bin/bash
 
 DPKG_OLD_SUFFIX=".dpkg-old"
-IGNORE_LIST="\
-1921d42edcaab6d1fd5ccb890f9430bd  /etc/asterisk/extconfig.conf.dpkg-old
-972fb43cc55d66f71e7c6ca4037c81fe  /etc/asterisk/modules.conf.dpkg-old
-a4a0f3987a8c80f6e6632937df9969d2  /etc/asterisk/res_pgsql.conf.dpkg-old
-a78356b642e25fdf58ebccab535fa874  /etc/asterisk/res_pgsql.conf.dpkg-old
-fae430275a23fde477895f64fe4e98fe  /etc/xivo/asterisk/xivo_fax.conf.dpkg-old
-feccc48af6d49c0eeb4a350acf999179  /etc/xivo/asterisk/xivo_globals.conf.dpkg-old
-bd9f841cf1dfc3d110d88f1f06fa5b60  /etc/xivo/asterisk/xivo_ring.conf.dpkg-old
-"
+
+
+# Example:
+# IGNORE_LIST="\
+# bd9f841cf1dfc3d110d88f1f06fa5b60  /etc/xivo/asterisk/xivo_ring.conf.dpkg-old
+# "
+IGNORE_LIST=""
 
 list_modified_conffiles() {
     for conffile in $(sort /var/lib/dpkg/info/xivo-config.conffiles) /etc/systemd/system.conf; do
