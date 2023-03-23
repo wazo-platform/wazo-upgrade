@@ -26,13 +26,16 @@ is_package_installed() {
 
 differed_action() {
 	local state=$1
+	shopt -qs nullglob  # avoid failing when action directory has no scripts
 	for script in "$lib_directory/$state.d"/*; do
 		echo "Executing upgrade script $script..."
 		$script
 	done
+	shopt -qu nullglob
 }
 
 pre_stop() {
+	shopt -qs nullglob  # avoid failing when pre-stop directory has no scripts
 	for script in "$lib_directory/pre-stop.d"/*; do
 		echo "Executing upgrade script $script..."
 		$script
@@ -40,6 +43,7 @@ pre_stop() {
 			fatal_error "Failed to execute $script\nPlease, fix this issue before re-executing wazo-upgrade"
 		fi
 	done
+	shopt -qu nullglob
 }
 
 post_stop() {
