@@ -6,11 +6,12 @@ set -e
 set -u
 set -o pipefail
 
-HA_CONF=/etc/xivo/ha.conf
 UPGRADE_SENTINEL=/var/lib/wazo-upgrade/install-ha-sentinel
-if [ -f "$UPGRADE_SENTINEL" ]; then
-    exit 0
-elif [ -f "$HA_CONF" ]; then
+
+[ -e "${UPGRADE_SENTINEL}" ] && exit 0
+
+HA_CONF=/etc/xivo/ha.conf
+if [ -f "$HA_CONF" ]; then
     node_type=$(jq -r '.node_type' $HA_CONF)
     if [ "$node_type" = "slave" ]; then
         rm -f /var/lib/wazo/is-primary
@@ -20,5 +21,5 @@ elif [ -f "$HA_CONF" ]; then
         touch /var/lib/wazo/is-primary
     fi
 fi
-touch "$UPGRADE_SENTINEL"
 
+touch "$UPGRADE_SENTINEL"
