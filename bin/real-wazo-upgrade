@@ -26,13 +26,16 @@ is_package_installed() {
 
 differed_action() {
 	local state=$1
+	shopt -qs nullglob  # avoid failing when action directory has no scripts
 	for script in "$lib_directory/$state.d"/*; do
 		echo "Executing upgrade script $script..."
 		$script
 	done
+	shopt -qu nullglob
 }
 
 pre_stop() {
+	shopt -qs nullglob  # avoid failing when pre-stop directory has no scripts
 	for script in "$lib_directory/pre-stop.d"/*; do
 		echo "Executing upgrade script $script..."
 		$script
@@ -40,6 +43,7 @@ pre_stop() {
 			fatal_error "Failed to execute $script\nPlease, fix this issue before re-executing wazo-upgrade"
 		fi
 	done
+	shopt -qu nullglob
 }
 
 post_stop() {
@@ -100,11 +104,11 @@ upgrade() {
 	stop_wazo
 	post_stop
 	echo "Upgrading wazo..."
-	execute apt-get install -o Dpkg::Options::="--force-confnew" -y postgresql-11
+	execute apt-get install -o Dpkg::Options::="--force-confnew" -y postgresql-13
 	execute apt-get install -o Dpkg::Options::="--force-confnew" -y wazo-platform
 	execute apt-get install -o Dpkg::Options::="--force-confnew" -y xivo-config
 	execute apt-get install -o Dpkg::Options::="--force-confnew" -y rabbitmq-server
-	execute apt-mark auto postgresql-11 xivo-config rabbitmq-server
+	execute apt-mark auto postgresql-13 xivo-config rabbitmq-server
 	execute apt-get dist-upgrade -y
 	execute apt-get autoremove -y
 	pre_start
@@ -304,13 +308,6 @@ check_wizard_has_been_run() {
 	fi
 }
 
-fix_apt_update_buster() {
-  current_debian_version=$(cat /etc/debian_version)
-  if dpkg --compare-versions "${current_debian_version}" le 10.10; then
-      apt-get update --allow-releaseinfo-change > /dev/null
-  fi
-}
-
 is_wazo_configured() {
     if ! systemctl is-active --quiet wazo-confd; then
 		echo "ERROR: wazo-confd is not running: cannot check if the wizard has been run."
@@ -354,7 +351,6 @@ download_only="${download_only:-"0"}"
 force="${force:-"0"}"
 
 check_wizard_has_been_run
-fix_apt_update_buster
 
 if [ $download_only -eq 0 ]; then
 	upgrading_system

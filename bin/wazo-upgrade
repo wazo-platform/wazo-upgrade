@@ -22,7 +22,7 @@ check_debian_mirror_is_available()
 check_wazo_mirror_is_available()
 {
     if ! check_package_is_available wazo-upgrade ; then
-        echo 'Could not find any Wazo repository to download "wazo-upgrade" from. Check your /etc/apt/sources.list.d or run "wazo-dist -m pelican-buster".'
+        echo 'Could not find any Wazo repository to download "wazo-upgrade" from. Check your /etc/apt/sources.list.d or run "wazo-dist -m pelican-bullseye".'
         return 1
     fi
 }
@@ -68,10 +68,5 @@ log_and_upgrade()
     run_upgrade "$@" |& tee -a $LOGFILE
     append_log_end $LOGFILE
 }
-
-
-if [ "$(basename "$0")" == 'xivo-upgrade' ]; then
-    echo 'Warning: xivo-upgrade is a deprecated alias to wazo-upgrade: use wazo-upgrade instead' >&2
-fi
 
 log_and_upgrade "$@"

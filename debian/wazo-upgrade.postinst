@@ -7,56 +7,25 @@ set -e
 
 case "$1" in
     configure)
-        if [ -d /var/lib/xivo-upgrade ] ; then
-            find /var/lib/xivo-upgrade/ -mindepth 1 -maxdepth 1 -exec mv {} /var/lib/wazo-upgrade/ \;
-            rmdir --ignore-fail-on-non-empty /var/lib/xivo-upgrade
-        fi
-
-        rm -f /var/lib/wazo-upgrade/10_remove_legacy_google_plugin
-        rm -f /var/lib/wazo-upgrade/10_remove_legacy_microsoft_plugin
-        rm -f /var/lib/wazo-upgrade/10_remove_legacy_push_mobile_v2
-        rm -f /var/lib/wazo-upgrade/25_dird_tenant_migration
-        rm -f /var/lib/wazo-upgrade/30_provd_default_passwords
-        rm -f /var/lib/wazo-upgrade/50-autoprov-generate-config.py
-        rm -f /var/lib/wazo-upgrade/55-fix-service-discovery
-        rm -f /var/lib/wazo-upgrade/55_provd_device_tenant_migration
-        rm -f /var/lib/wazo-upgrade/56_provd_device_new_status_migration
-        rm -f /var/lib/wazo-upgrade/60-provd-remove-null-values-config
-        rm -f /var/lib/wazo-upgrade/61_webhookd_tenant_migration
-        rm -f /var/lib/wazo-upgrade/62_call_logd_tenant_migration
-        rm -f /var/lib/wazo-upgrade/dird-auto-create-config-v3
-        rm -f /var/lib/wazo-upgrade/entity_tenant_migration
-        rm -f /var/lib/wazo-upgrade/migrate_xivo_admin_to_wazo_user
-        rm -f /var/lib/wazo-upgrade/migrate_xivo_service_to_wazo_user
-        rm -f /var/lib/wazo-upgrade/migrate_xivo_user_to_wazo_user
-        rm -f /var/lib/wazo-upgrade/xivo_admin_dump.json
-        rm -f /var/lib/wazo-upgrade/xivo_service_dump.json
-        rm -f /var/lib/wazo-upgrade/xivo_user_dump.json
-        rm -f /var/lib/wazo-upgrade/install-dahdi
-
-        if [ -f /var/backups/xivo/wazo_dird_sources.yml ]; then
-            touch /var/lib/wazo-upgrade/dump-dird-sources
-        fi
-
-        if [ -f /var/lib/wazo-upgrade/57-provd-reconfigure-all-devices ]; then
-            touch /var/lib/wazo-upgrade/provd-reconfigure-all-devices
-            rm /var/lib/wazo-upgrade/57-provd-reconfigure-all-devices
-        fi
+        # Removing sentinel files from previous debian migration
+        rm -f /var/lib/wazo-upgrade/dump-dird-sources
+        rm -f /var/lib/wazo-upgrade/migration-call-log-index
+        rm -f /var/lib/wazo-upgrade/migration-call-log-tables
+        rm -f /var/lib/wazo-upgrade/provd-reconfigure-all-devices
+        rm -f /var/lib/wazo-upgrade/remove-dahdi-packages
+        rm -f /var/lib/wazo-upgrade/remove-installation-gpg-key
+        rm -f /var/lib/wazo-upgrade/remove-nginx-symlinks
+        rm -f /var/lib/wazo-upgrade/restrict-postgres-hba
+        rm -f /var/lib/wazo-upgrade/set-mobile-hints
+        rm -f /var/lib/wazo-upgrade/move-admins-to-group
+        rm -f /var/lib/wazo-upgrade/replace-provd-py2-plugins
+        rm -f /var/lib/wazo-upgrade/install-ha-sentinel
 
         previous_version="$2"
         if [[ -z "${previous_version}" ]]; then
-            touch /var/lib/wazo-upgrade/dump-dird-sources
-            touch /var/lib/wazo-upgrade/migration-call-log-index
-            touch /var/lib/wazo-upgrade/migration-call-log-tables
-            touch /var/lib/wazo-upgrade/provd-reconfigure-all-devices
-            touch /var/lib/wazo-upgrade/remove-dahdi-packages
-            touch /var/lib/wazo-upgrade/remove-installation-gpg-key
-            touch /var/lib/wazo-upgrade/remove-nginx-symlinks
-            touch /var/lib/wazo-upgrade/restrict-postgres-hba
-            touch /var/lib/wazo-upgrade/set-mobile-hints
-            touch /var/lib/wazo-upgrade/move-admins-to-group
-            touch /var/lib/wazo-upgrade/replace-provd-py2-plugins
-            touch /var/lib/wazo-upgrade/install-ha-sentinel
+            # Create sentinel file to avoid running script on new install
+            # touch /var/lib/wazo-upgrade/sentinel-file
+            :
         fi
     ;;
 
