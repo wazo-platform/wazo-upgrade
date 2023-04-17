@@ -112,6 +112,7 @@ upgrade() {
 	execute apt-get dist-upgrade -y
 	execute apt-get autoremove -y
 	pre_start
+	/usr/bin/wazo-pg-config-update
 	start_wazo
 	post_start
 	wazo-check-conffiles
