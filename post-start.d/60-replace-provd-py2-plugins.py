@@ -129,11 +129,16 @@ def remove_and_reinstall_plugins(client: ProvdClient, plugin_dir: str):
         sys.exit(1)
 
     # remove old plugins
+    all_succeeded = True
     for plugin in plugins:
         plugin_name = plugin.replace('xivo-', 'wazo-')
         if wait_until_completed(client.plugins.upgrade(plugin_name)) is False:
             print(f'Failed to install plugin {plugin_name}. Maybe it is already installed?', file=sys.stderr)
+            all_succeeded = False
             continue
+    if not all_succeeded:
+        print('Some plugins failed to install. Aborting.')
+        sys.exit(1)
 
     # Update devices that were linked to old plugin names
     if xivo_plugins:
