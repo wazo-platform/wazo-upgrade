@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Copyright 2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2022-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 import logging
 import os
@@ -117,7 +117,7 @@ def update_plugin_repo_url(client: ProvdClient):
 def remove_and_reinstall_plugins(client: ProvdClient, plugin_dir: str):
     # Get all installed plugins that are still installable (i.e. skip old packages that are no longer available)
     installable_plugins = list(client.plugins.list_installable()['pkgs'])
-    plugins = [p for p in client.plugins.list_installed()['pkgs'] if p in installable_plugins]
+    plugins = [p for p in client.plugins.list_installed()['pkgs'] if p.replace('xivo-', 'wazo-') in installable_plugins]
     xivo_plugins = [p for p in plugins if p.startswith('xivo-')]
 
     # Rename old plugins if it exists
@@ -132,16 +132,18 @@ def remove_and_reinstall_plugins(client: ProvdClient, plugin_dir: str):
     for plugin in plugins:
         plugin_name = plugin.replace('xivo-', 'wazo-')
         if wait_until_completed(client.plugins.upgrade(plugin_name)) is False:
-            print(f'Failed to install plugin {plugin_name}', file=sys.stderr)
-            sys.exit(1)
+            print(f'Failed to install plugin {plugin_name}. Maybe it is already installed?', file=sys.stderr)
+            continue
 
     # Update devices that were linked to old plugin names
     if xivo_plugins:
         for device in client.devices.list(recurse=True)['devices']:
             current_plugin = device.get('plugin', None)
             if current_plugin and current_plugin in xivo_plugins:
-                device['plugin'] = current_plugin.replace('xivo-', 'wazo-')
-                client.devices.update(device)
+                new_plugin_name = current_plugin.replace('xivo-', 'wazo-')
+                if new_plugin_name in installable_plugins:
+                    device['plugin'] = current_plugin.replace('xivo-', 'wazo-')
+                    client.devices.update(device)
 
 
 def main():
