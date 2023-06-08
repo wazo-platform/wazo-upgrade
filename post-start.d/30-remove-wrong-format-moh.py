@@ -58,6 +58,9 @@ def find_moh_files(confd_client):
     all_moh = confd_client.moh.list(recurse=True)["items"]
 
     for moh in all_moh:
+        if moh["name"] == "default":
+            # NOTE(afournier): we do not want to touch the system-provided MOH class
+            continue
         if moh["mode"] != "files":
             continue
         for moh_file in moh["files"]:
@@ -103,7 +106,7 @@ def validate_wav_files(confd_client, files):
         try:
             validate_wav_file(wav_file)
         except InvalidWAVFileException as e:
-            print(f'Invalid file "{wav_file}": {e.message}')
+            logger.debug('Invalid file "%s": %s', wav_file, e.message)
             invalid_files.append(wav_file)
     return invalid_files
 
