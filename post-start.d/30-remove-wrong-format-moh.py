@@ -14,7 +14,7 @@ from wazo_confd_client import Client as ConfdClient
 from xivo.chain_map import ChainMap
 from xivo.config_helper import read_config_file_hierarchy, parse_config_file
 
-SENTINEL = "/var/lib/wazo-upgrade/30-remove-wrong-format-moh"
+SENTINEL = "/var/lib/wazo-upgrade/remove-wrong-format-moh"
 _DEFAULT_CONFIG = {
     "config_file": "/etc/wazo-upgrade/config.yml",
     "auth": {"key_file": "/var/lib/wazo-auth-keys/wazo-upgrade-key.yml"},
