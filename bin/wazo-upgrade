@@ -30,16 +30,16 @@ check_wazo_mirror_is_available()
 # This is only needed with APT < 1.9.11 (i.e. Debian Buster)
 # Debian Bullseye introduced -o DPkg::Lock::Timeout= that does the same thing
 wait_for_lock(){
-	  WAIT_TIMEOUT=15
-	  WAIT_INTERVAL=1
-	  while fuser /var/lib/dpkg/lock-frontend > /dev/null 2>&1; do
-		    sleep ${WAIT_INTERVAL}
-		    WAIT_TIMEOUT=$((WAIT_TIMEOUT - WAIT_INTERVAL))
-		    if [ "$WAIT_TIMEOUT" -eq 0 ]; then
-			      echo "Could not get dpkg lock"
-			      return 1
-		    fi
-	  done
+    WAIT_TIMEOUT=15
+    WAIT_INTERVAL=1
+    while fuser /var/lib/dpkg/lock-frontend > /dev/null 2>&1; do
+        sleep ${WAIT_INTERVAL}
+        WAIT_TIMEOUT=$((WAIT_TIMEOUT - WAIT_INTERVAL))
+        if [ "$WAIT_TIMEOUT" -eq 0 ]; then
+            echo "Could not get dpkg lock"
+            return 1
+        fi
+    done
 }
 
 run_upgrade()
