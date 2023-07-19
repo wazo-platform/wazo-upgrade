@@ -94,7 +94,7 @@ def validate_wav_file(wav_file):
                     "Audio file should have bit depth of no more than 16 bits",
                     wav_file["filename"],
                 )
-    except wave.Error as e:
+    except Exception as e:
         raise InvalidWAVFileException(
             f'Cannot read WAV file: "{e}"', wav_file=wav_file["filename"]
         )
