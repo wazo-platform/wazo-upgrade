@@ -18,7 +18,7 @@ is_package_purgeable() {
     [ "$?" -eq 0 -a "$output" != 'unknown ok not-installed' ]
 }
 
-renamed_packages=""
+renamed_packages="xivo-certs"
 
 removed_packages=""
 
