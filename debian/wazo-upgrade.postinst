@@ -25,6 +25,7 @@ case "$1" in
         if [[ -z "${previous_version}" ]]; then
             # Create sentinel file to avoid running script on new install
             touch /var/lib/wazo-upgrade/remove-wrong-format-moh
+            touch /var/lib/wazo-upgrade/rename-sync-cron
         fi
     ;;
 
