@@ -13,9 +13,8 @@ if [ -e ${SENTINEL} ]; then
     exit 0
 fi
 
-if [ ! -e ${CRON_FILENAME} ]; then
-    exit 0
+if [ -e ${CRON_FILENAME} ]; then
+    sed -i 's/xivo-sync/wazo-sync/g' $CRON_FILENAME
 fi
 
-sed -i 's/xivo-sync/wazo-sync/g' $CRON_FILENAME
 touch $SENTINEL
