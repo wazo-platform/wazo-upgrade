@@ -20,6 +20,7 @@ case "$1" in
         rm -f /var/lib/wazo-upgrade/move-admins-to-group
         rm -f /var/lib/wazo-upgrade/replace-provd-py2-plugins
         rm -f /var/lib/wazo-upgrade/install-ha-sentinel
+        rm -f /var/lib/wazo-upgrade/remove-asterisk-agid-localhost
 
         previous_version="$2"
         if [[ -z "${previous_version}" ]]; then
