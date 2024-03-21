@@ -28,7 +28,6 @@ case "$1" in
             touch /var/lib/wazo-upgrade/remove-wrong-format-moh
             touch /var/lib/wazo-upgrade/rename-sync-cron
             touch /var/lib/wazo-upgrade/migration-provd-db-data
-            touch /var/lib/wazo-upgrade/migration-provd-db-cleanup
         fi
     ;;
 
