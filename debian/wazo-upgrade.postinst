@@ -30,6 +30,8 @@ case "$1" in
             touch /var/lib/wazo-upgrade/rename-sync-cron
             touch /var/lib/wazo-upgrade/dird-user-sync-tenant
             touch /var/lib/wazo-upgrade/remove-bullseye-backports
+            touch /var/lib/wazo-upgrade/migration-provd-db-data
+            touch /var/lib/wazo-upgrade/migration-provd-db-cleanup
         fi
     ;;
 
