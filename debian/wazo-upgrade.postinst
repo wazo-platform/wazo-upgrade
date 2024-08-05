@@ -27,6 +27,7 @@ case "$1" in
             # Create sentinel file to avoid running script on new install
             touch /var/lib/wazo-upgrade/remove-wrong-format-moh
             touch /var/lib/wazo-upgrade/rename-sync-cron
+            touch /var/lib/wazo-upgrade/migrate-saml-configuration-to-database
         fi
     ;;
 
