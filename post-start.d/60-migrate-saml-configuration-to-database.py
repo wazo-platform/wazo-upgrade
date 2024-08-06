@@ -112,24 +112,16 @@ def main():
     token_data = auth_client.token.new(expiration=600)
     auth_client.set_token(token_data["token"])
 
-    try:
-        saml_config = extract_saml_configuration()
-        if saml_config:
-            saml_config_with_domain = add_uuids_from_domain(
-                auth_client,
-                saml_config
-            )
-            create_saml_config_in_db(auth_client, saml_config_with_domain)
-
-        with open(SENTINEL, "w") as f:
-            f.write("")
-
-    except Exception as e:
-        msg = f"Failed to migrate SAML configuration to database because of {e}"
-        logger.exception(
-            f"Failed to migrate SAML configuration to database because of {e}"
+    saml_config = extract_saml_configuration()
+    if saml_config:
+        saml_config_with_domain = add_uuids_from_domain(
+            auth_client,
+            saml_config
         )
-        print(msg)
+        create_saml_config_in_db(auth_client, saml_config_with_domain)
+
+    with open(SENTINEL, "w") as f:
+        f.write("")
 
 
 if __name__ == "__main__":
