@@ -52,7 +52,7 @@ def extract_saml_configuration():
             {"config_file": WAZO_AUTH_CONFIG_FILE}
         )
     )
-    return wazo_auth_config["saml"]
+    return wazo_auth_config.get('saml')
 
 
 def get_domain_uuid(auth_client, domain_name, tenant_uuid):
@@ -112,11 +112,12 @@ def main():
 
     try:
         saml_config = extract_saml_configuration()
-        saml_config_with_domain = add_uuids_from_domain(
-            auth_client,
-            saml_config
-        )
-        create_saml_config_in_db(auth_client, saml_config_with_domain)
+        if saml_config:
+            saml_config_with_domain = add_uuids_from_domain(
+                auth_client,
+                saml_config
+            )
+            create_saml_config_in_db(auth_client, saml_config_with_domain)
 
         with open(SENTINEL, "w") as f:
             f.write("")
