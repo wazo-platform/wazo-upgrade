@@ -10,8 +10,10 @@ from typing import Any
 
 from wazo_auth_client import Client as AuthClient
 from xivo.chain_map import AccumulatingListChainMap, ChainMap
-from xivo.config_helper import (parse_config_file, read_config_file_hierarchy,
-                                read_config_file_hierarchy_accumulating_list)
+from xivo.config_helper import (
+    parse_config_file, read_config_file_hierarchy,
+    read_config_file_hierarchy_accumulating_list,
+)
 
 SENTINEL = "/var/lib/wazo-upgrade/migrate-saml-configuration-to-database"
 
@@ -69,7 +71,7 @@ def add_uuids_from_domain(client, saml_config):
             tenant_uuid = tenant["items"][0]["uuid"]
             domain_uuid = get_domain_uuid(
                 client,
-                domain, 
+                domain,
                 tenant_uuid
             )
             saml_config["domains"][domain]["tenant_uuid"] = tenant_uuid
