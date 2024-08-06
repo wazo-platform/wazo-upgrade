@@ -10,8 +10,10 @@ from typing import Any
 
 from wazo_auth_client import Client as AuthClient
 from xivo.chain_map import AccumulatingListChainMap, ChainMap
-from xivo.config_helper import (parse_config_file, read_config_file_hierarchy,
-                                read_config_file_hierarchy_accumulating_list)
+from xivo.config_helper import (
+    parse_config_file, read_config_file_hierarchy,
+    read_config_file_hierarchy_accumulating_list,
+)
 
 SENTINEL = "/var/lib/wazo-upgrade/migrate-saml-configuration-to-database"
 
@@ -52,7 +54,7 @@ def extract_saml_configuration():
             {"config_file": WAZO_AUTH_CONFIG_FILE}
         )
     )
-    return wazo_auth_config["saml"]
+    return wazo_auth_config.get('saml')
 
 
 def get_domain_uuid(auth_client, domain_name, tenant_uuid):
@@ -69,7 +71,7 @@ def add_uuids_from_domain(client, saml_config):
             tenant_uuid = tenant["items"][0]["uuid"]
             domain_uuid = get_domain_uuid(
                 client,
-                domain, 
+                domain,
                 tenant_uuid
             )
             saml_config["domains"][domain]["tenant_uuid"] = tenant_uuid
@@ -110,23 +112,16 @@ def main():
     token_data = auth_client.token.new(expiration=600)
     auth_client.set_token(token_data["token"])
 
-    try:
-        saml_config = extract_saml_configuration()
+    saml_config = extract_saml_configuration()
+    if saml_config:
         saml_config_with_domain = add_uuids_from_domain(
             auth_client,
             saml_config
         )
         create_saml_config_in_db(auth_client, saml_config_with_domain)
 
-        with open(SENTINEL, "w") as f:
-            f.write("")
-
-    except Exception as e:
-        msg = f"Failed to migrate SAML configuration to database because of {e}"
-        logger.exception(
-            f"Failed to migrate SAML configuration to database because of {e}"
-        )
-        print(msg)
+    with open(SENTINEL, "w") as f:
+        f.write("")
 
 
 if __name__ == "__main__":
