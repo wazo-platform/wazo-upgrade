@@ -9,25 +9,25 @@ case "$1" in
     configure)
         # Removing sentinel files from previous debian migration
         rm -f /var/lib/wazo-upgrade/dump-dird-sources
+        rm -f /var/lib/wazo-upgrade/install-ha-sentinel
         rm -f /var/lib/wazo-upgrade/migration-call-log-index
         rm -f /var/lib/wazo-upgrade/migration-call-log-tables
+        rm -f /var/lib/wazo-upgrade/move-admins-to-group
         rm -f /var/lib/wazo-upgrade/provd-reconfigure-all-devices
         rm -f /var/lib/wazo-upgrade/remove-dahdi-packages
         rm -f /var/lib/wazo-upgrade/remove-installation-gpg-key
         rm -f /var/lib/wazo-upgrade/remove-nginx-symlinks
+        rm -f /var/lib/wazo-upgrade/replace-provd-py2-plugins
         rm -f /var/lib/wazo-upgrade/restrict-postgres-hba
         rm -f /var/lib/wazo-upgrade/set-mobile-hints
-        rm -f /var/lib/wazo-upgrade/move-admins-to-group
-        rm -f /var/lib/wazo-upgrade/replace-provd-py2-plugins
-        rm -f /var/lib/wazo-upgrade/install-ha-sentinel
-        rm -f /var/lib/wazo-upgrade/remove-asterisk-agid-localhost
 
         previous_version="$2"
         if [[ -z "${previous_version}" ]]; then
             # Create sentinel file to avoid running script on new install
+            touch /var/lib/wazo-upgrade/migrate-saml-configuration-to-database
+            touch /var/lib/wazo-upgrade/remove-asterisk-agid-localhost
             touch /var/lib/wazo-upgrade/remove-wrong-format-moh
             touch /var/lib/wazo-upgrade/rename-sync-cron
-            touch /var/lib/wazo-upgrade/migrate-saml-configuration-to-database
         fi
     ;;
 
