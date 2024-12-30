@@ -20,7 +20,7 @@ is_package_purgeable() {
 
 renamed_packages="xivo-certs xivo-sync"
 
-removed_packages=""
+removed_packages="xivo-swagger-doc"
 
 for package in $renamed_packages $removed_packages; do
     if is_package_purgeable $package; then
