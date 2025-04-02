@@ -11,5 +11,5 @@ if [[ -f $SENTINEL ]]; then
     exit
 fi
 TOKEN=$(wazo-auth-cli token create)
-wazo-confd-cli --token $TOKEN user list -c uuid -c tenant_uuid --recurse -fjson --noindent | wazo-dird-user-sync
+wazo-confd-cli --token $TOKEN user list -c uuid -c tenant_uuid -c country --recurse -fjson --noindent | wazo-dird-user-sync
 touch $SENTINEL
