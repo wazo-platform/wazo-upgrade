@@ -28,6 +28,7 @@ case "$1" in
             touch /var/lib/wazo-upgrade/remove-asterisk-agid-localhost
             touch /var/lib/wazo-upgrade/remove-wrong-format-moh
             touch /var/lib/wazo-upgrade/rename-sync-cron
+            touch /var/lib/wazo-upgrade/dird-user-sync-tenant
         fi
     ;;
 
