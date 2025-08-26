@@ -1,10 +1,12 @@
 #!/bin/bash
-# Copyright 2011-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2011-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 PATH=/bin:/usr/bin:/sbin:/usr/sbin
 lib_directory="/usr/share/wazo-upgrade"
 : ${WAZO_CONFD_PORT:='9486'}
+
+APT_OPTIONS='-o Dpkg::Options::="--force-confnew" -o DPkg::Lock::Timeout=15'
 
 # force all debian upgrade to non interactive mode
 export DEBIAN_FRONTEND=noninteractive
@@ -58,22 +60,8 @@ post_start() {
 	differed_action post-start
 }
 
-wait_for_lock(){
-	WAIT_TIMEOUT=15
-	WAIT_INTERVAL=1
-	while fuser /var/lib/dpkg/lock > /dev/null 2>&1; do
-		sleep ${WAIT_INTERVAL}
-		WAIT_TIMEOUT=$((WAIT_TIMEOUT - WAIT_INTERVAL))
-		if [ "$WAIT_TIMEOUT" -eq 0 ]; then
-			echo "Could not get dpkg lock"
-			return 1
-		fi
-	done
-}
-
 execute() {
 	cmd=$*
-	wait_for_lock
 	if [ $? -ne 0 ]; then
 		start_wazo
 		fatal_error
@@ -104,10 +92,10 @@ upgrade() {
 	stop_wazo
 	post_stop
 	echo "Upgrading wazo..."
-	execute apt-get install -o Dpkg::Options::="--force-confnew" -y postgresql-13
-	execute apt-get install -o Dpkg::Options::="--force-confnew" -y wazo-platform
-	execute apt-get install -o Dpkg::Options::="--force-confnew" -y xivo-config
-	execute apt-get install -o Dpkg::Options::="--force-confnew" -y rabbitmq-server
+	execute apt-get install $APT_OPTIONS -y postgresql-13
+	execute apt-get install $APT_OPTIONS -y wazo-platform
+	execute apt-get install $APT_OPTIONS -y xivo-config
+	execute apt-get install $APT_OPTIONS -y rabbitmq-server
 	execute apt-mark auto postgresql-13 xivo-config rabbitmq-server
 	execute apt-get dist-upgrade -y
 	execute apt-get autoremove -y
