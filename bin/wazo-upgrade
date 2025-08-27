@@ -33,7 +33,7 @@ run_upgrade()
     check_debian_mirror_is_available || return 1
     check_wazo_mirror_is_available || return 1
     echo "Upgrading wazo-upgrade"
-    apt-get install -y wazo-upgrade
+    apt-get install -o DPkg::Lock::Timeout=15 -y wazo-upgrade
 
     /usr/bin/real-wazo-upgrade "$@"
 }
@@ -42,11 +42,11 @@ append_log_start()
 {
     logfile=$1
     cat >> $logfile <<-EOF
-	
+
 	===========================================
 	wazo-upgrade started at $(date +$DATEFORMAT)
 	===========================================
-	
+
 	EOF
 }
 
@@ -54,11 +54,11 @@ append_log_end()
 {
     logfile=$1
     cat >> $logfile <<-EOF
-	
+
 	===========================================
 	wazo-upgrade stopped at $(date +$DATEFORMAT)
 	===========================================
-	
+
 	EOF
 }
 

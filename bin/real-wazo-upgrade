@@ -6,7 +6,7 @@ PATH=/bin:/usr/bin:/sbin:/usr/sbin
 lib_directory="/usr/share/wazo-upgrade"
 : ${WAZO_CONFD_PORT:='9486'}
 
-APT_OPTIONS='-o Dpkg::Options::="--force-confnew" -o DPkg::Lock::Timeout=15'
+APT_OPTIONS='-o DPkg::Lock::Timeout=15'
 
 # force all debian upgrade to non interactive mode
 export DEBIAN_FRONTEND=noninteractive
@@ -92,13 +92,13 @@ upgrade() {
 	stop_wazo
 	post_stop
 	echo "Upgrading wazo..."
-	execute apt-get install $APT_OPTIONS -y postgresql-13
-	execute apt-get install $APT_OPTIONS -y wazo-platform
-	execute apt-get install $APT_OPTIONS -y xivo-config
-	execute apt-get install $APT_OPTIONS -y rabbitmq-server
-	execute apt-mark auto postgresql-13 xivo-config rabbitmq-server
-	execute apt-get dist-upgrade -y
-	execute apt-get autoremove -y
+	execute apt-get install $APT_OPTIONS -o Dpkg::Options::="--force-confnew" -y postgresql-13
+	execute apt-get install $APT_OPTIONS -o Dpkg::Options::="--force-confnew" -y wazo-platform
+	execute apt-get install $APT_OPTIONS -o Dpkg::Options::="--force-confnew" -y xivo-config
+	execute apt-get install $APT_OPTIONS -o Dpkg::Options::="--force-confnew" -y rabbitmq-server
+	execute apt-mark auto $APT_OPTIONS postgresql-13 xivo-config rabbitmq-server
+	execute apt-get dist-upgrade $APT_OPTIONS -y
+	execute apt-get autoremove $APT_OPTIONS -y
 	pre_start
 	start_wazo
 	post_start
@@ -281,11 +281,11 @@ display_asterisk_notice() {
 }
 
 wazo_version_installed() {
-	echo "$(LANG='C' apt-cache policy wazo-platform | grep Installed | grep -oE '[0-9]{2}\.[0-9]+(\.[0-9]+)?' | head -n1)"
+	echo "$(LANG='C' apt-cache policy $APT_OPTIONS wazo-platform | grep Installed | grep -oE '[0-9]{2}\.[0-9]+(\.[0-9]+)?' | head -n1)"
 }
 
 wazo_version_candidate() {
-	echo "$(LANG='C' apt-cache policy wazo-platform | grep Candidate | grep -oE '[0-9]{2}\.[0-9]+(\.[0-9]+)?' | head -n1)"
+	echo "$(LANG='C' apt-cache policy $APT_OPTIONS wazo-platform | grep Candidate | grep -oE '[0-9]{2}\.[0-9]+(\.[0-9]+)?' | head -n1)"
 }
 
 check_wizard_has_been_run() {
@@ -343,5 +343,5 @@ check_wizard_has_been_run
 if [ $download_only -eq 0 ]; then
 	upgrading_system
 else
-	apt-get -y -d dist-upgrade
+	apt-get -y -d dist-upgrade $APT_OPTIONS
 fi
