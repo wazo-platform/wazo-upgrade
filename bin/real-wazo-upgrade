@@ -92,11 +92,11 @@ upgrade() {
 	stop_wazo
 	post_stop
 	echo "Upgrading wazo..."
-	execute apt-get install $APT_OPTIONS -o Dpkg::Options::="--force-confnew" -y postgresql-13
+	execute apt-get install $APT_OPTIONS -o Dpkg::Options::="--force-confnew" -y postgresql-15
 	execute apt-get install $APT_OPTIONS -o Dpkg::Options::="--force-confnew" -y wazo-platform
 	execute apt-get install $APT_OPTIONS -o Dpkg::Options::="--force-confnew" -y xivo-config
 	execute apt-get install $APT_OPTIONS -o Dpkg::Options::="--force-confnew" -y rabbitmq-server
-	execute apt-mark auto $APT_OPTIONS postgresql-13 xivo-config rabbitmq-server
+	execute apt-mark auto $APT_OPTIONS postgresql-15 xivo-config rabbitmq-server
 	execute apt-get dist-upgrade $APT_OPTIONS -y
 	execute apt-get autoremove $APT_OPTIONS -y
 	pre_start
