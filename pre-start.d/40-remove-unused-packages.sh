@@ -30,11 +30,8 @@ done
 
 # purge postgresql-XX packages
 if is_package_installed wazo-dbms; then
-    if is_package_purgeable postgresql-plpython-11; then
-        apt-get purge -y postgresql-plpython-11
-    fi
-    if is_package_purgeable postgresql-11; then
-        apt-get purge -y postgresql-11 postgresql-client-11 postgresql-contrib-11
+    if is_package_purgeable postgresql-13; then
+        apt-get purge -y postgresql-13 postgresql-client-13 postgresql-contrib-13
         systemctl restart postgresql.service
     fi
 fi
