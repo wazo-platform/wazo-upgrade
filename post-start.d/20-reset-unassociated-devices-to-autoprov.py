@@ -31,6 +31,22 @@ def _load_key_file(config):
                      'password': key_file['service_key']}}
 
 
+def _paginate(callback, limit=1000, **kwargs):
+    result = callback(limit=limit, offset=0, **kwargs)
+    total = result['total']
+    items = result['items']
+    offset = len(items)
+    while offset < total:
+        new_items = callback(limit=limit, offset=offset, **kwargs)['items']
+        if not new_items:
+            break
+        items.extend(new_items)
+        offset += len(new_items)
+    if len(items) != total:
+        logger.warning('Expected %s lines, got %s', total, len(items))
+    return items
+
+
 def is_slave(confd_client):
     ha_config = confd_client.ha.get()
     return ha_config['node_type'] == 'slave'
@@ -53,7 +69,7 @@ if is_slave(confd_client):
 logger.debug('Fetching wrongly configured devices...')
 
 devices = provd_client.devices.list()['devices']
-lines = confd_client.lines.list(recurse=True)['items']
+lines = _paginate(confd_client.lines.list, recurse=True)
 
 configured_device_ids = {device['id']
                          for device in devices
