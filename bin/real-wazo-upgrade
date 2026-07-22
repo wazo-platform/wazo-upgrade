@@ -180,6 +180,24 @@ wazo_version_candidate() {
 	echo "$(LANG='C' apt-cache policy $APT_OPTIONS wazo-platform | grep Candidate | grep -oE '[0-9]{2}\.[0-9]+(\.[0-9]+)?' | head -n1)"
 }
 
+check_database_migration_is_enabled() {
+	for package in xivo-manage-db wazo-auth; do
+		db_skip=$(debconf-show "$package" 2>/dev/null | grep "$package/db-skip:" | awk '{print $NF}')
+		if [ "$db_skip" = 'true' ]; then
+			cat <<-EOF
+			ERROR: database migrations are disabled ($package/db-skip is "true").
+
+			To re-enable them, run:
+
+			    echo "$package $package/db-skip boolean false" | debconf-set-selections
+
+			then run wazo-upgrade again.
+			EOF
+			exit 1
+		fi
+	done
+}
+
 check_wizard_has_been_run() {
 
 	if ! is_wazo_configured; then
@@ -230,6 +248,7 @@ done
 download_only="${download_only:-"0"}"
 force="${force:-"0"}"
 
+check_database_migration_is_enabled
 check_wizard_has_been_run
 
 if [ $download_only -eq 0 ]; then
