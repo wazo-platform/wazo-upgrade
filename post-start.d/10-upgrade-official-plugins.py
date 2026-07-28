@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
-# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
+
+import requests
 import urllib3
 
 from wazo_auth_client import Client as AuthClient
@@ -47,10 +49,14 @@ def main():
         for version in plugin['versions']:
             if version['upgradable'] is True:
                 logger.info('Upgrading plugin %s ...', plugin['name'])
-                plugind_client.plugins.install(method='market',
-                                               options={'namespace': 'official',
-                                                        'name': plugin['name'],
-                                                        'version': version['version']})
+                try:
+                    plugind_client.plugins.install(method='market',
+                                                   options={'namespace': 'official',
+                                                            'name': plugin['name'],
+                                                            'version': version['version']})
+                except requests.RequestException as e:
+                    # wazo-plugind installs asynchronously: only the request is checked
+                    logger.error('Failed to upgrade plugin %s: %s', plugin['name'], e)
                 break
 
 

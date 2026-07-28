@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-# Copyright 2018-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
+
 import requests
 
 from wazo_auth_client import Client as AuthClient
@@ -85,9 +86,9 @@ for device_id in wrongly_configured_device_ids:
     logger.info('Resetting device {}'.format(device_id))
     try:
         confd_client.devices.autoprov(device_id)
-    except requests.HTTPError as e:
-        logger.error(e)
-
-    confd_client.devices.synchronize(device_id)
+        confd_client.devices.synchronize(device_id)
+    except requests.RequestException as e:
+        # an unreachable phone must not prevent resetting the others
+        logger.error('Failed to reset device %s: %s', device_id, e)
 
 logger.debug('Done.')
