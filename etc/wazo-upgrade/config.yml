@@ -16,8 +16,7 @@ amid:
 
 auth:
   host: localhost
-  port: 9497
-  prefix: null
+  port: 80
   https: false
 
 bus:
