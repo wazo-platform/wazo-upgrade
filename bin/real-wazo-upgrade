@@ -3,8 +3,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 PATH=/bin:/usr/bin:/sbin:/usr/sbin
-lib_directory="/usr/share/wazo-upgrade"
-upgrade_incomplete_file="/var/lib/wazo-upgrade/upgrade-incomplete"
+: ${lib_directory:="/usr/share/wazo-upgrade"}
+: ${upgrade_incomplete_file:="/var/lib/wazo-upgrade/upgrade-incomplete"}
 : ${WAZO_CONFD_PORT:='9486'}
 
 APT_OPTIONS='-o DPkg::Lock::Timeout=15'
@@ -272,34 +272,41 @@ usage() {
 	EOF
 }
 
-while getopts :dfh opt
-do
-	case ${opt} in
-		d) download_only=1;;
-		f) force=1;;
-		h)
-			usage
-			exit 0
-		;;
-		'?')
-			echo "${0} : option ${OPTARG} is not valid" >&2
-			usage
-			exit -1
-		;;
-	esac
-done
-download_only="${download_only:-"0"}"
-force="${force:-"0"}"
+main() {
+	while getopts :dfh opt
+	do
+		case ${opt} in
+			d) download_only=1;;
+			f) force=1;;
+			h)
+				usage
+				exit 0
+			;;
+			'?')
+				echo "${0} : option ${OPTARG} is not valid" >&2
+				usage
+				exit -1
+			;;
+		esac
+	done
+	download_only="${download_only:-"0"}"
+	force="${force:-"0"}"
 
-# Set before the current upgrade re-creates the marker file
-resuming_failed_upgrade=0
-[ -f "$upgrade_incomplete_file" ] && resuming_failed_upgrade=1
+	# Set before the current upgrade re-creates the marker file
+	resuming_failed_upgrade=0
+	[ -f "$upgrade_incomplete_file" ] && resuming_failed_upgrade=1
 
-check_database_migration_is_enabled
-check_wizard_has_been_run
+	check_database_migration_is_enabled
+	check_wizard_has_been_run
 
-if [ $download_only -eq 0 ]; then
-	upgrading_system
-else
-	apt-get -y -d dist-upgrade $APT_OPTIONS
+	if [ $download_only -eq 0 ]; then
+		upgrading_system
+	else
+		apt-get -y -d dist-upgrade $APT_OPTIONS
+	fi
+}
+
+# Allows sourcing this file (e.g. from bats tests) without running main-line logic
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+	main "$@"
 fi

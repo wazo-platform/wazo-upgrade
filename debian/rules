@@ -5,4 +5,11 @@
 # export DH_VERBOSE=1
 
 %:
-	dh $@ 
+	dh $@
+
+override_dh_auto_test:
+ifeq (,$(filter nocheck,$(DEB_BUILD_OPTIONS)))
+	bats -r test
+else
+	@echo "Skipping tests (DEB_BUILD_OPTIONS=nocheck)"
+endif

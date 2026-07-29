@@ -2,7 +2,8 @@
 
 PATH=/bin:/usr/bin:/sbin:/usr/sbin
 
-LOGFILE="/var/log/wazo-upgrade.log"
+: ${LOGFILE:="/var/log/wazo-upgrade.log"}
+: ${REAL_WAZO_UPGRADE:="/usr/bin/real-wazo-upgrade"}
 DATEFORMAT="%Y-%m-%d_%H:%M:%S"
 
 check_package_is_available()
@@ -35,7 +36,7 @@ run_upgrade()
     echo "Upgrading wazo-upgrade"
     apt-get install -o DPkg::Lock::Timeout=15 -y wazo-upgrade
 
-    /usr/bin/real-wazo-upgrade "$@"
+    "$REAL_WAZO_UPGRADE" "$@"
 }
 
 append_log_start()
@@ -75,4 +76,11 @@ log_and_upgrade()
     return $status
 }
 
-log_and_upgrade "$@"
+main() {
+    log_and_upgrade "$@"
+}
+
+# Allows sourcing this file (e.g. from bats tests) without running main-line logic
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    main "$@"
+fi
