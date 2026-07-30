@@ -6,7 +6,8 @@ set -e
 set -u  # fail if variable is undefined
 set -o pipefail  # fail if command before pipe fails
 
-SENTINEL="/var/lib/wazo-upgrade/rename-rest-api-max-threads"
+: ${SENTINEL:="/var/lib/wazo-upgrade/rename-rest-api-max-threads"}
+: ${ETC_DIR:="/etc"}
 [ -f "$SENTINEL" ] && exit 0
 
 # rest_api.max_threads changed meaning: it used to be a fixed thread count
@@ -18,7 +19,7 @@ SERVICES="wazo-agentd wazo-amid wazo-auth wazo-calld wazo-call-logd \
 wazo-chatd wazo-confd wazo-dird wazo-phoned wazo-webhookd"
 
 for service in $SERVICES; do
-    conf_dir="/etc/${service}/conf.d"
+    conf_dir="${ETC_DIR}/${service}/conf.d"
     [ -d "$conf_dir" ] || continue
     for config_file in "$conf_dir"/*.yml; do
         [ -f "$config_file" ] || continue

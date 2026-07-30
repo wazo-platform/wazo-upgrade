@@ -4,12 +4,15 @@
 
 set -e
 
+: ${ASTERISK_MODULES_DIR:="/usr/lib/asterisk/modules"}
+: ${ASTERISK_MD5SUMS_FILE:="/var/lib/dpkg/info/asterisk.md5sums"}
+
 list_installed_modules() {
-	find /usr/lib/asterisk/modules -name '*.so' -type f -printf '%f\n'
+	find "$ASTERISK_MODULES_DIR" -name '*.so' -type f -printf '%f\n'
 }
 
 list_standard_modules() {
-	grep 'modules' /var/lib/dpkg/info/asterisk.md5sums | cut -c 60-
+	grep 'modules' "$ASTERISK_MD5SUMS_FILE" | cut -c 60-
 	echo 'chan_sccp.so'
 	echo 'res_amqp.so'
 	echo 'res_ari_amqp.so'

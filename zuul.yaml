@@ -1,3 +1,17 @@
+- job:
+    name: wazo-upgrade-bats
+    description: Run the wazo-upgrade bats test suite
+    pre-run: zuul.d/bats-pre-run.yaml
+    run: zuul.d/bats-run.yaml
+
 - project:
     templates:
       - debian-packaging-bookworm
+    wazo-check:
+      jobs:
+        - wazo-upgrade-bats:
+            nodeset: vm-debian-12-m1s
+    wazo-gate:
+      jobs:
+        - wazo-upgrade-bats:
+            nodeset: vm-debian-12-m1s

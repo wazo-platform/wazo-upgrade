@@ -5,6 +5,22 @@
 * branch `master`: builds package for Wazo current (distribution
   wazo-dev-bookworm/pelican-bookworm)
 
+## Testing
+
+Unit tests for the upgrade tooling and scripts live in `tests/` and use
+[bats](https://bats-core.readthedocs.io/):
+
+```shell
+apt install bats jq
+bats -r tests/
+```
+
+Tests source or execute the scripts with paths and system commands
+redirected to a per-test temporary directory (helpers in
+`tests/test_helper.bash`); no root, no Wazo installation, no vendored
+libraries needed. CI runs the suite through the `wazo-upgrade-bats` Zuul
+job.
+
 ## Upgrade scripts
 
 * `pre-stop` and `post-stop` scripts must be compatible with the previous
