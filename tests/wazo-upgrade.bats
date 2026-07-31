@@ -92,7 +92,7 @@ stub_apt_cache_madison_with_package() {
 
 	[ "$status" -eq 0 ]
 	grep -q 'install.*wazo-upgrade' "$STUB_DIR/apt-get.calls"
-	grep -q -- '-f' "$STUB_DIR/real-wazo-upgrade.calls"
+	grep -q ' -f$' "$STUB_DIR/real-wazo-upgrade.calls"
 }
 
 @test "append_log_start appends a start banner to the logfile" {

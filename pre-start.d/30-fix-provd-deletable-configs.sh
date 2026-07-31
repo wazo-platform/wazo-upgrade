@@ -6,7 +6,7 @@ set -e
 set -u
 set -o pipefail
 
-: ${CONFIGS_DIR:="/var/lib/wazo-provd/jsondb/configs"}
+CONFIGS_DIR="${WAZO_UPGRADE_CONFIGS_DIR:-/var/lib/wazo-provd/jsondb/configs}"
 
 # Configs created by the wazo-confd wizard that must remain non-deletable.
 WIZARD_CONFIGS="base default defaultconfigdevice autoprov"

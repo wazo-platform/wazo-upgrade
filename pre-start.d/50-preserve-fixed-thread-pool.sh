@@ -6,8 +6,8 @@ set -e
 set -u  # fail if variable is undefined
 set -o pipefail  # fail if command before pipe fails
 
-: ${SENTINEL:="/var/lib/wazo-upgrade/rename-rest-api-max-threads"}
-: ${ETC_DIR:="/etc"}
+SENTINEL="${WAZO_UPGRADE_SENTINEL:-/var/lib/wazo-upgrade/rename-rest-api-max-threads}"
+ETC_DIR="${WAZO_UPGRADE_ETC_DIR:-/etc}"
 [ -f "$SENTINEL" ] && exit 0
 
 # rest_api.max_threads changed meaning: it used to be a fixed thread count

@@ -5,8 +5,10 @@
 load ../test_helper
 
 setup() {
-	export ETC_DIR="$BATS_TEST_TMPDIR/etc"
-	export SENTINEL="$BATS_TEST_TMPDIR/var/lib/wazo-upgrade/rename-rest-api-max-threads"
+	export WAZO_UPGRADE_ETC_DIR="$BATS_TEST_TMPDIR/etc"
+	export WAZO_UPGRADE_SENTINEL="$BATS_TEST_TMPDIR/var/lib/wazo-upgrade/rename-rest-api-max-threads"
+	ETC_DIR="$WAZO_UPGRADE_ETC_DIR"
+	SENTINEL="$WAZO_UPGRADE_SENTINEL"
 	mkdir -p "$ETC_DIR" "$(dirname "$SENTINEL")"
 	SCRIPT="$REPO_ROOT/pre-start.d/50-preserve-fixed-thread-pool.sh"
 }
