@@ -203,6 +203,48 @@ setup() {
 	[[ "$output" == *'resuming=0'* ]]
 }
 
+@test "main -f skips the confirmation prompt" {
+	check_database_migration_is_enabled() { :; }
+	check_wizard_has_been_run() { :; }
+	upgrade() { echo 'upgrade started'; }
+	stub apt-cache 0
+	stub dpkg-query 0 '8:22.1.0'
+	stub dpkg 1
+
+	# 'n' on stdin: only a skipped prompt lets the upgrade start
+	run main -f <<< 'n'
+
+	[ "$status" -eq 0 ]
+	[[ "$output" == *'upgrade started'* ]]
+}
+
+@test "main without -f aborts when the answer is not yes" {
+	check_database_migration_is_enabled() { :; }
+	check_wizard_has_been_run() { :; }
+	upgrade() { echo 'upgrade started'; }
+	stub apt-cache 0
+	stub dpkg-query 0 '8:22.1.0'
+	stub dpkg 1
+
+	run main <<< 'n'
+
+	[ "$status" -eq 0 ]
+	[[ "$output" != *'upgrade started'* ]]
+}
+
+@test "main -d only downloads packages" {
+	check_database_migration_is_enabled() { :; }
+	check_wizard_has_been_run() { :; }
+	upgrading_system() { echo 'upgrading_system called'; }
+	stub apt-get 0
+
+	run main -d
+
+	[ "$status" -eq 0 ]
+	[[ "$output" != *'upgrading_system called'* ]]
+	grep -q -- '-y -d dist-upgrade' "$STUB_DIR/apt-get.calls"
+}
+
 @test "display_previous_upgrade_notice warns when resuming a failed upgrade" {
 	resuming_failed_upgrade=1
 
@@ -255,6 +297,26 @@ setup() {
 	[ "$status" -eq 0 ]
 	[ -z "$output" ]
 	[ ! -f "$STUB_DIR/mv.calls" ]
+}
+
+@test "upgrade runs every step in order, conffile check before pre-start" {
+	stub_upgrade_environment
+	make_phase_script pre-start 10-ok.sh
+
+	upgrade
+
+	[ "$(recorded_calls)" = "$(printf '%s\n' \
+		'stop_wazo' \
+		'execute apt-get install' \
+		'execute apt-get install' \
+		'execute apt-get install' \
+		'execute apt-get install' \
+		'execute apt-mark auto' \
+		'execute apt-get dist-upgrade' \
+		'execute apt-get autoremove' \
+		'wazo-check-conffiles' \
+		'10-ok.sh' \
+		'start_wazo')" ]
 }
 
 @test "upgrade removes the incomplete marker on success" {

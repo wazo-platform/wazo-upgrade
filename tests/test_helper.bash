@@ -66,10 +66,10 @@ stub_call_count() {
 # Replaces every step of upgrade() that touches the system; tests re-stub
 # the pieces they exercise
 stub_upgrade_environment() {
-	execute() { :; }
+	execute() { echo "execute $1 $2" >> "$calls_file"; }
 	stop_wazo() { echo stop_wazo >> "$calls_file"; }
 	start_wazo() { echo start_wazo >> "$calls_file"; }
-	wazo-check-conffiles() { :; }
+	wazo-check-conffiles() { echo wazo-check-conffiles >> "$calls_file"; }
 	wazo_version_installed() { echo '26.09'; }
 	wazo_version_candidate() { echo '26.10'; }
 }
