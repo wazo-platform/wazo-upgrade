@@ -112,6 +112,151 @@ setup() {
 	[[ "$output" == *"usage: wazo-upgrade"* ]]
 }
 
+@test "check_database_migration_is_enabled aborts when xivo-manage-db/db-skip is true" {
+	stub debconf-show 0 '* xivo-manage-db/db-skip: true'
+
+	run check_database_migration_is_enabled
+
+	[ "$status" -eq 1 ]
+	[[ "$output" == *'ERROR: database migrations are disabled (xivo-manage-db/db-skip is "true")'* ]]
+}
+
+@test "check_database_migration_is_enabled aborts when wazo-auth/db-skip is true" {
+	stub debconf-show 0 '* wazo-auth/db-skip: true'
+
+	run check_database_migration_is_enabled
+
+	[ "$status" -eq 1 ]
+	[[ "$output" == *'(wazo-auth/db-skip is "true")'* ]]
+}
+
+@test "check_database_migration_is_enabled passes when db-skip is false" {
+	stub debconf-show 0 '* xivo-manage-db/db-skip: false'
+
+	run check_database_migration_is_enabled
+
+	[ "$status" -eq 0 ]
+	[ -z "$output" ]
+}
+
+@test "check_wizard_has_been_run is skipped when resuming a failed upgrade" {
+	resuming_failed_upgrade=1
+	stub systemctl 1
+
+	run check_wizard_has_been_run
+
+	[ "$status" -eq 0 ]
+	[ ! -f "$STUB_DIR/systemctl.calls" ]
+}
+
+@test "check_wizard_has_been_run aborts when wazo-confd is not running" {
+	resuming_failed_upgrade=0
+	stub systemctl 1
+
+	run check_wizard_has_been_run
+
+	[ "$status" -eq 1 ]
+	[[ "$output" == *'wazo-confd is not running'* ]]
+}
+
+@test "check_wizard_has_been_run passes when the wizard has been run" {
+	resuming_failed_upgrade=0
+	stub systemctl 0
+	stub curl 0 '{"configured": true}'
+
+	run check_wizard_has_been_run
+
+	[ "$status" -eq 0 ]
+}
+
+@test "check_wizard_has_been_run aborts when the wizard has not been run" {
+	resuming_failed_upgrade=0
+	stub systemctl 0
+	stub curl 0 '{"configured": false}'
+
+	run check_wizard_has_been_run
+
+	[ "$status" -eq 1 ]
+	[[ "$output" == *'You must configure Wazo'* ]]
+}
+
+@test "main flags a resumed upgrade when the incomplete marker exists" {
+	check_database_migration_is_enabled() { :; }
+	check_wizard_has_been_run() { :; }
+	upgrading_system() { echo "resuming=$resuming_failed_upgrade"; }
+	touch "$upgrade_incomplete_file"
+
+	run main -f
+
+	[ "$status" -eq 0 ]
+	[[ "$output" == *'resuming=1'* ]]
+}
+
+@test "main does not flag a resumed upgrade without the incomplete marker" {
+	check_database_migration_is_enabled() { :; }
+	check_wizard_has_been_run() { :; }
+	upgrading_system() { echo "resuming=$resuming_failed_upgrade"; }
+
+	run main -f
+
+	[ "$status" -eq 0 ]
+	[[ "$output" == *'resuming=0'* ]]
+}
+
+@test "display_previous_upgrade_notice warns when resuming a failed upgrade" {
+	resuming_failed_upgrade=1
+
+	run display_previous_upgrade_notice
+
+	[[ "$output" == *'the previous upgrade did not complete'* ]]
+}
+
+@test "display_previous_upgrade_notice prints nothing on a normal upgrade" {
+	resuming_failed_upgrade=0
+
+	run display_previous_upgrade_notice
+
+	[ -z "$output" ]
+}
+
+@test "display_asterisk_notice moves custom modules to /tmp and warns" {
+	stub dpkg-query 0 '8:19.2.0'
+	stub dpkg 0
+	stub wazo-asterisk-custom-modules 0 'codec_g729a.so'
+	stub mv 0
+
+	run display_asterisk_notice
+
+	[ "$status" -eq 0 ]
+	[[ "$output" == *'Asterisk will be upgraded from version 19 to 20'* ]]
+	[[ "$output" == *'WARNING: custom Asterisk modules detected'* ]]
+	grep -q 'mv /usr/lib/asterisk/modules/codec_g729a.so /tmp' "$STUB_DIR/mv.calls"
+}
+
+@test "display_asterisk_notice does not warn without custom modules" {
+	stub dpkg-query 0 '8:19.2.0'
+	stub dpkg 0
+	stub wazo-asterisk-custom-modules 0
+
+	run display_asterisk_notice
+
+	[ "$status" -eq 0 ]
+	[[ "$output" == *'Asterisk will be upgraded'* ]]
+	[[ "$output" != *'custom Asterisk modules detected'* ]]
+}
+
+@test "display_asterisk_notice prints nothing when asterisk is already newer" {
+	stub dpkg-query 0 '8:22.1.0'
+	stub dpkg 1
+	stub mv 0
+
+	run display_asterisk_notice
+
+	[ "$status" -eq 0 ]
+	[ -z "$output" ]
+	[ ! -f "$STUB_DIR/mv.calls" ]
+}
+
 @test "upgrade removes the incomplete marker on success" {
 	stub_upgrade_environment
 
