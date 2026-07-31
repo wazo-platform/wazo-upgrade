@@ -53,7 +53,7 @@ Consequences for script authors:
   * use only `-` in the scripts name, not `_`
   * always keep file extension
 * Shell scripts should have the following options (pure shell script
-  doesn't accept `-o` option):
+  (`#!/bin/sh`) doesn't accept `-o` option):
 
   ```shell
   set -e
