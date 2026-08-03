@@ -100,6 +100,29 @@ setup() {
 	[[ "$output" != *WARNING* ]]
 }
 
+@test "execute restarts wazo and aborts when the command fails" {
+	stub apt-get 1
+	stub wazo-service 0
+
+	run execute apt-get dist-upgrade
+
+	[ "$status" -ne 0 ]
+	[[ "$output" == *'An error occurred during the upgrade'* ]]
+	grep -q 'apt-get dist-upgrade' "$STUB_DIR/apt-get.calls"
+	grep -q 'wazo-service enable' "$STUB_DIR/wazo-service.calls"
+	grep -q 'wazo-service restart' "$STUB_DIR/wazo-service.calls"
+}
+
+@test "execute does not restart wazo when the command succeeds" {
+	stub apt-get 0
+	stub wazo-service 0
+
+	run execute apt-get dist-upgrade
+
+	[ "$status" -eq 0 ]
+	[ ! -f "$STUB_DIR/wazo-service.calls" ]
+}
+
 @test "executing the script directly still reaches main" {
 	# The other tests source the script, which only proves main() is
 	# suppressed on source; this proves the other half of the guard
