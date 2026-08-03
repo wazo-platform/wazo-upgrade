@@ -5,11 +5,21 @@
 # test file's nesting (e.g. tests/pre-start.d/*.bats)
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
+# Points every absolute path of the scripts into a fake root, pre-creating
+# the directories any Debian system guarantees
+fake_root_setup() {
+	export WAZO_UPGRADE_ROOT="$BATS_TEST_TMPDIR/root"
+	mkdir -p \
+		"$WAZO_UPGRADE_ROOT/etc/systemd" \
+		"$WAZO_UPGRADE_ROOT/tmp" \
+		"$WAZO_UPGRADE_ROOT/var/lib/dpkg/info" \
+		"$WAZO_UPGRADE_ROOT/var/lib/wazo-upgrade" \
+		"$WAZO_UPGRADE_ROOT/var/log"
+}
+
 source_real_wazo_upgrade() {
+	fake_root_setup
 	source "$REPO_ROOT/bin/real-wazo-upgrade"
-	lib_directory="$BATS_TEST_TMPDIR/lib"
-	upgrade_incomplete_file="$BATS_TEST_TMPDIR/upgrade-incomplete"
-	asterisk_modules_directory="$BATS_TEST_TMPDIR/asterisk-modules"
 	calls_file="$BATS_TEST_TMPDIR/calls"
 }
 

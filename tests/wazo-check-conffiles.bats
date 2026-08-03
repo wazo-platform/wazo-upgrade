@@ -5,11 +5,10 @@
 load test_helper
 
 setup() {
+	fake_root_setup
 	mkdir -p "$BATS_TEST_TMPDIR/etc/xivo"
 
 	source "$REPO_ROOT/bin/wazo-check-conffiles"
-	XIVO_CONFIG_CONFFILES_LIST="$BATS_TEST_TMPDIR/conffiles_list"
-	SYSTEMD_SYSTEM_CONF="$BATS_TEST_TMPDIR/system.conf"
 	: > "$XIVO_CONFIG_CONFFILES_LIST"
 	: > "$SYSTEMD_SYSTEM_CONF"
 }

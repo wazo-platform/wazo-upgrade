@@ -1,6 +1,6 @@
 #!/bin/bash
 
-LOGFILE="/var/log/wazo-upgrade.log"
+LOGFILE="${WAZO_UPGRADE_ROOT:-}/var/log/wazo-upgrade.log"
 DATEFORMAT="%Y-%m-%d_%H:%M:%S"
 REAL_WAZO_UPGRADE="/usr/bin/real-wazo-upgrade"
 

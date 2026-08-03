@@ -1,8 +1,8 @@
 #!/bin/bash
 
 DPKG_OLD_SUFFIX=".dpkg-old"
-XIVO_CONFIG_CONFFILES_LIST="/var/lib/dpkg/info/xivo-config.conffiles"
-SYSTEMD_SYSTEM_CONF="/etc/systemd/system.conf"
+XIVO_CONFIG_CONFFILES_LIST="${WAZO_UPGRADE_ROOT:-}/var/lib/dpkg/info/xivo-config.conffiles"
+SYSTEMD_SYSTEM_CONF="${WAZO_UPGRADE_ROOT:-}/etc/systemd/system.conf"
 
 
 # Example:

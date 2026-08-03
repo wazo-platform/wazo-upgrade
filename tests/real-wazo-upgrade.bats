@@ -298,16 +298,15 @@ setup() {
 
 @test "move_custom_asterisk_modules moves each module to /tmp" {
 	mkdir -p "$asterisk_modules_directory"
-	touch "$asterisk_modules_directory/codec_bats_test.so" \
-		"$asterisk_modules_directory/res_bats_test.so"
+	touch "$asterisk_modules_directory/codec_g729a.so" \
+		"$asterisk_modules_directory/res_custom.so"
 
-	move_custom_asterisk_modules 'codec_bats_test.so res_bats_test.so'
+	move_custom_asterisk_modules 'codec_g729a.so res_custom.so'
 
-	[ ! -e "$asterisk_modules_directory/codec_bats_test.so" ]
-	[ ! -e "$asterisk_modules_directory/res_bats_test.so" ]
-	[ -f /tmp/codec_bats_test.so ]
-	[ -f /tmp/res_bats_test.so ]
-	rm -f /tmp/codec_bats_test.so /tmp/res_bats_test.so
+	[ ! -e "$asterisk_modules_directory/codec_g729a.so" ]
+	[ ! -e "$asterisk_modules_directory/res_custom.so" ]
+	[ -f "$WAZO_UPGRADE_ROOT/tmp/codec_g729a.so" ]
+	[ -f "$WAZO_UPGRADE_ROOT/tmp/res_custom.so" ]
 }
 
 @test "upgrade runs every step in order, conffile check before pre-start" {

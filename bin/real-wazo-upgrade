@@ -2,9 +2,10 @@
 # Copyright 2011-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-lib_directory="/usr/share/wazo-upgrade"
-upgrade_incomplete_file="/var/lib/wazo-upgrade/upgrade-incomplete"
-asterisk_modules_directory="/usr/lib/asterisk/modules"
+# WAZO_UPGRADE_ROOT prefixes every absolute path; empty in production
+lib_directory="${WAZO_UPGRADE_ROOT:-}/usr/share/wazo-upgrade"
+upgrade_incomplete_file="${WAZO_UPGRADE_ROOT:-}/var/lib/wazo-upgrade/upgrade-incomplete"
+asterisk_modules_directory="${WAZO_UPGRADE_ROOT:-}/usr/lib/asterisk/modules"
 : ${WAZO_CONFD_PORT:='9486'}
 
 APT_OPTIONS='-o DPkg::Lock::Timeout=15'
@@ -219,7 +220,7 @@ display_asterisk_notice() {
 
 move_custom_asterisk_modules() {
 	for module in $1; do
-		mv "$asterisk_modules_directory/$module" /tmp
+		mv "$asterisk_modules_directory/$module" "${WAZO_UPGRADE_ROOT:-}/tmp"
 	done
 }
 

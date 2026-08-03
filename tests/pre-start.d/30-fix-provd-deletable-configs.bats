@@ -5,8 +5,8 @@
 load ../test_helper
 
 setup() {
-	export WAZO_UPGRADE_CONFIGS_DIR="$BATS_TEST_TMPDIR/configs"
-	CONFIGS_DIR="$WAZO_UPGRADE_CONFIGS_DIR"
+	fake_root_setup
+	CONFIGS_DIR="$WAZO_UPGRADE_ROOT/var/lib/wazo-provd/jsondb/configs"
 	mkdir -p "$CONFIGS_DIR"
 	SCRIPT="$REPO_ROOT/pre-start.d/30-fix-provd-deletable-configs.sh"
 }
@@ -59,7 +59,7 @@ setup() {
 }
 
 @test "does nothing when the configs directory itself does not exist" {
-	export WAZO_UPGRADE_CONFIGS_DIR="$BATS_TEST_TMPDIR/does-not-exist"
+	rmdir "$CONFIGS_DIR"
 
 	run "$SCRIPT"
 
