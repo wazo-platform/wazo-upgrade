@@ -7,9 +7,8 @@ load test_helper
 setup() {
 	stub_path_setup
 	source "$REPO_ROOT/bin/wazo-upgrade"
-	# wazo-upgrade hard-resets PATH and assigns LOGFILE/REAL_WAZO_UPGRADE at
-	# the top: override them only after sourcing
-	PATH="$STUB_DIR:$PATH"
+	# LOGFILE and REAL_WAZO_UPGRADE are assigned at the top of the script:
+	# override them only after sourcing
 	LOGFILE="$BATS_TEST_TMPDIR/wazo-upgrade.log"
 	REAL_WAZO_UPGRADE="$STUB_DIR/real-wazo-upgrade"
 }

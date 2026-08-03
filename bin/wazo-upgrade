@@ -1,7 +1,5 @@
 #!/bin/bash
 
-PATH=/bin:/usr/bin:/sbin:/usr/sbin
-
 LOGFILE="/var/log/wazo-upgrade.log"
 DATEFORMAT="%Y-%m-%d_%H:%M:%S"
 REAL_WAZO_UPGRADE="/usr/bin/real-wazo-upgrade"
@@ -76,7 +74,8 @@ log_and_upgrade()
     return $status
 }
 
-# Allows the tests to source this file without starting an upgrade
+# Allows the tests to source this file without side effects
 if [ "${BASH_SOURCE[0]}" = "$0" ]; then
+    PATH=/bin:/usr/bin:/sbin:/usr/sbin
     log_and_upgrade "$@"
 fi

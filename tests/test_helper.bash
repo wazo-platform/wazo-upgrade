@@ -31,7 +31,6 @@ recorded_calls() {
 }
 
 # Exported: hand-written stub scripts run as child processes and need it too.
-# Call again (or re-prepend PATH) after sourcing a script that resets PATH.
 stub_path_setup() {
 	export STUB_DIR="$BATS_TEST_TMPDIR/stubs"
 	mkdir -p "$STUB_DIR"

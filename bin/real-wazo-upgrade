@@ -2,7 +2,6 @@
 # Copyright 2011-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-PATH=/bin:/usr/bin:/sbin:/usr/sbin
 lib_directory="/usr/share/wazo-upgrade"
 upgrade_incomplete_file="/var/lib/wazo-upgrade/upgrade-incomplete"
 : ${WAZO_CONFD_PORT:='9486'}
@@ -312,7 +311,8 @@ main() {
 	fi
 }
 
-# Allows tests to source this file without starting an upgrade
+# Allows tests to source this file without side effects
 if [ "${BASH_SOURCE[0]}" = "$0" ]; then
+	PATH=/bin:/usr/bin:/sbin:/usr/sbin
 	main "$@"
 fi

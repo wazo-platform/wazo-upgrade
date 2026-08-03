@@ -7,9 +7,6 @@ load test_helper
 setup() {
 	stub_path_setup
 	source_real_wazo_upgrade
-	# real-wazo-upgrade hard-resets PATH to trusted system dirs; re-prepend
-	# the stub dir now that sourcing is done
-	PATH="$STUB_DIR:$PATH"
 }
 
 @test "run_upgrade_scripts runs scripts in lexical order" {
