@@ -94,10 +94,6 @@ post_start() {
 
 execute() {
 	cmd=$*
-	if [ $? -ne 0 ]; then
-		start_wazo
-		fatal_error
-	fi
 	$cmd
 	if [ $? -ne 0 ]; then
 		start_wazo
