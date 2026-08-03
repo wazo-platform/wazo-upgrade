@@ -9,6 +9,7 @@ source_real_wazo_upgrade() {
 	source "$REPO_ROOT/bin/real-wazo-upgrade"
 	lib_directory="$BATS_TEST_TMPDIR/lib"
 	upgrade_incomplete_file="$BATS_TEST_TMPDIR/upgrade-incomplete"
+	asterisk_modules_directory="$BATS_TEST_TMPDIR/asterisk-modules"
 	calls_file="$BATS_TEST_TMPDIR/calls"
 }
 

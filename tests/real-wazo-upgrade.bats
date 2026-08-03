@@ -258,18 +258,18 @@ setup() {
 	[ -z "$output" ]
 }
 
-@test "display_asterisk_notice moves custom modules to /tmp and warns" {
+@test "display_asterisk_notice moves custom modules and warns" {
 	stub dpkg-query 0 '8:19.2.0'
 	stub dpkg 0
 	stub wazo-asterisk-custom-modules 0 'codec_g729a.so'
-	stub mv 0
+	move_custom_asterisk_modules() { echo "move $1" >> "$calls_file"; }
 
 	run display_asterisk_notice
 
 	[ "$status" -eq 0 ]
 	[[ "$output" == *'Asterisk will be upgraded from version 19 to 20'* ]]
 	[[ "$output" == *'WARNING: custom Asterisk modules detected'* ]]
-	grep -q 'mv /usr/lib/asterisk/modules/codec_g729a.so /tmp' "$STUB_DIR/mv.calls"
+	[ "$(recorded_calls)" = 'move codec_g729a.so' ]
 }
 
 @test "display_asterisk_notice does not warn without custom modules" {
@@ -287,13 +287,27 @@ setup() {
 @test "display_asterisk_notice prints nothing when asterisk is already newer" {
 	stub dpkg-query 0 '8:22.1.0'
 	stub dpkg 1
-	stub mv 0
+	move_custom_asterisk_modules() { echo "move $1" >> "$calls_file"; }
 
 	run display_asterisk_notice
 
 	[ "$status" -eq 0 ]
 	[ -z "$output" ]
-	[ ! -f "$STUB_DIR/mv.calls" ]
+	[ -z "$(recorded_calls)" ]
+}
+
+@test "move_custom_asterisk_modules moves each module to /tmp" {
+	mkdir -p "$asterisk_modules_directory"
+	touch "$asterisk_modules_directory/codec_bats_test.so" \
+		"$asterisk_modules_directory/res_bats_test.so"
+
+	move_custom_asterisk_modules 'codec_bats_test.so res_bats_test.so'
+
+	[ ! -e "$asterisk_modules_directory/codec_bats_test.so" ]
+	[ ! -e "$asterisk_modules_directory/res_bats_test.so" ]
+	[ -f /tmp/codec_bats_test.so ]
+	[ -f /tmp/res_bats_test.so ]
+	rm -f /tmp/codec_bats_test.so /tmp/res_bats_test.so
 }
 
 @test "upgrade runs every step in order, conffile check before pre-start" {

@@ -4,6 +4,7 @@
 
 lib_directory="/usr/share/wazo-upgrade"
 upgrade_incomplete_file="/var/lib/wazo-upgrade/upgrade-incomplete"
+asterisk_modules_directory="/usr/lib/asterisk/modules"
 : ${WAZO_CONFD_PORT:='9486'}
 
 APT_OPTIONS='-o DPkg::Lock::Timeout=15'
@@ -200,9 +201,7 @@ display_asterisk_notice() {
 
 		custom_modules=$(wazo-asterisk-custom-modules)
 		if [ -n "$custom_modules" ]; then
-			for module in $custom_modules; do
-				mv "/usr/lib/asterisk/modules/$module" /tmp
-			done
+			move_custom_asterisk_modules "$custom_modules"
 			cat <<-EOF
 			WARNING: custom Asterisk modules detected:
 
@@ -216,6 +215,12 @@ display_asterisk_notice() {
 		EOF
 		fi
 	fi
+}
+
+move_custom_asterisk_modules() {
+	for module in $1; do
+		mv "$asterisk_modules_directory/$module" /tmp
+	done
 }
 
 wazo_version_installed() {
