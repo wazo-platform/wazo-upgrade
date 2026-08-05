@@ -111,8 +111,10 @@ stop_wazo() {
 }
 
 start_wazo() {
-	wazo-service enable
-	wazo-service restart
+	local status=0
+	wazo-service enable || status=$?
+	wazo-service restart || status=$?
+	return $status
 }
 
 upgrade() {
