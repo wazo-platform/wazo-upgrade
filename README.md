@@ -26,7 +26,14 @@ A script exiting with a non-zero status aborts the upgrade, except in the
   already upgraded and services are running.
 
 An aborted upgrade makes `wazo-upgrade` exit with a non-zero status. Services
-that fail to start abort it too.
+that fail to start abort it too. The exit status tells which phase failed:
+
+| failure | exit status |
+|---------|-------------|
+| `pre-stop` script, or any other fatal error | 1 |
+| `post-stop` script | 2 |
+| `pre-start` script | 3 |
+| `post-start` script (upgrade completed, not aborted) | 4 |
 
 A marker file (`/var/lib/wazo-upgrade/upgrade-incomplete`) exists from the
 beginning of an upgrade until the services are successfully started. While it
