@@ -1,9 +1,10 @@
 #!/bin/bash
-# Copyright 2011-2025 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2011-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 PATH=/bin:/usr/bin:/sbin:/usr/sbin
 lib_directory="/usr/share/wazo-upgrade"
+upgrade_incomplete_file="/var/lib/wazo-upgrade/upgrade-incomplete"
 : ${WAZO_CONFD_PORT:='9486'}
 
 APT_OPTIONS='-o DPkg::Lock::Timeout=15'
@@ -12,52 +13,83 @@ APT_OPTIONS='-o DPkg::Lock::Timeout=15'
 export DEBIAN_FRONTEND=noninteractive
 export APT_LISTCHANGES_FRONTEND=none
 
+# Exit statuses: 1 pre-stop or any other fatal error, 2 post-stop,
+# 3 pre-start, 4 post-start (non-aborting)
 fatal_error() {
 	message=$1
+	exit_status=${2:-1}
 	echo "******************* ERROR *************************"
 	echo "An error occurred during the upgrade."
 	echo "Please check /var/log/wazo-upgrade.log for details."
 	[ -n "$message" ] && echo -e "Error: $message"
 	echo "******************* ERROR *************************"
-	exit -1
+	exit "$exit_status"
 }
 
 is_package_installed() {
 	[ "$(dpkg-query -W -f '${Status}' "$1" 2>/dev/null)" = 'install ok installed' ]
 }
 
-differed_action() {
+# Sets $failed_script and returns non-zero on the first script failure
+run_upgrade_scripts() {
 	local state=$1
+	failed_script=''
 	shopt -qs nullglob  # avoid failing when action directory has no scripts
 	for script in "$lib_directory/$state.d"/*; do
 		echo "Executing upgrade script $script..."
-		$script
-	done
-	shopt -qu nullglob
-}
-
-pre_stop() {
-	shopt -qs nullglob  # avoid failing when pre-stop directory has no scripts
-	for script in "$lib_directory/pre-stop.d"/*; do
-		echo "Executing upgrade script $script..."
-		$script
-		if [ $? -ne 0 ]; then
-			fatal_error "Failed to execute $script\nPlease, fix this issue before re-executing wazo-upgrade"
+		if ! $script; then
+			failed_script=$script
+			break
 		fi
 	done
 	shopt -qu nullglob
+	[ -z "$failed_script" ]
+}
+
+pre_stop() {
+	if ! run_upgrade_scripts pre-stop; then
+		fatal_error "Failed to execute $failed_script\nPlease, fix this issue before re-executing wazo-upgrade" 1
+	fi
 }
 
 post_stop() {
-	differed_action post-stop
+	if ! run_upgrade_scripts post-stop; then
+		start_wazo
+		fatal_error "Failed to execute $failed_script\nPlease, fix this issue then re-execute wazo-upgrade to complete the upgrade" 2
+	fi
 }
 
+# A stopped Wazo is a worse outage than a partially upgraded one
 pre_start() {
-	differed_action pre-start
+	if ! run_upgrade_scripts pre-start; then
+		start_wazo
+		fatal_error "Failed to execute $failed_script\nThe system is only partially upgraded.\nPlease, fix this issue then re-execute wazo-upgrade to complete the upgrade" 3
+	fi
 }
 
+# The system is already upgraded and running: report failures without aborting
 post_start() {
-	differed_action post-start
+	local failed_scripts=''
+	local status
+	shopt -qs nullglob  # avoid failing when post-start directory has no scripts
+	for script in "$lib_directory/post-start.d"/*; do
+		echo "Executing upgrade script $script..."
+		$script
+		status=$?
+		if [ $status -ne 0 ]; then
+			echo -e "\t**Error** running $script: non-zero exit status $status"
+			failed_scripts="$failed_scripts $script"
+		fi
+	done
+	shopt -qu nullglob
+	if [ -n "$failed_scripts" ]; then
+		echo "****************** WARNING ************************"
+		echo -e "Failed to execute the following scripts:$failed_scripts"
+		echo "The system has been upgraded and Wazo services are running."
+		echo "Please check /var/log/wazo-upgrade.log for details."
+		echo "****************** WARNING ************************"
+		exit 4
+	fi
 }
 
 execute() {
@@ -79,8 +111,10 @@ stop_wazo() {
 }
 
 start_wazo() {
-	wazo-service enable
-	wazo-service restart
+	local status=0
+	wazo-service enable || status=$?
+	wazo-service restart || status=$?
+	return $status
 }
 
 upgrade() {
@@ -88,6 +122,7 @@ upgrade() {
 	export WAZO_VERSION_CANDIDATE=$(wazo_version_candidate)
 	export XIVO_VERSION_INSTALLED=$WAZO_VERSION_INSTALLED
 	export XIVO_VERSION_CANDIDATE=$WAZO_VERSION_CANDIDATE
+	touch "$upgrade_incomplete_file"
 	pre_stop
 	stop_wazo
 	post_stop
@@ -99,10 +134,14 @@ upgrade() {
 	execute apt-mark auto $APT_OPTIONS postgresql-15 xivo-config rabbitmq-server
 	execute apt-get dist-upgrade $APT_OPTIONS -y
 	execute apt-get autoremove $APT_OPTIONS -y
-	pre_start
-	start_wazo
-	post_start
 	wazo-check-conffiles
+	pre_start
+	# The marker file is kept while Wazo is down to allow a retry
+	if ! start_wazo; then
+		fatal_error "Wazo services failed to start\nPlease, fix this issue then re-execute wazo-upgrade to complete the upgrade"
+	fi
+	rm -f "$upgrade_incomplete_file"
+	post_start
 }
 
 display_wazo_version() {
@@ -114,8 +153,20 @@ debian_version_installed() {
 	cut -d. -f1 /etc/debian_version
 }
 
+display_previous_upgrade_notice() {
+	if [ "$resuming_failed_upgrade" -eq 1 ]; then
+		cat <<-EOF
+
+		WARNING: the previous upgrade did not complete. Upgrade scripts will be
+		re-executed during this upgrade.
+
+		EOF
+	fi
+}
+
 upgrading_system() {
 	display_wazo_version
+	display_previous_upgrade_notice
 	display_asterisk_notice
 	if [ $force -eq 0 ]; then
 		read -p 'Would you like to upgrade your system (all services will be restarted) [Y/n]? ' answer
@@ -199,6 +250,8 @@ check_database_migration_is_enabled() {
 }
 
 check_wizard_has_been_run() {
+	# The check cannot run with Wazo stopped, and the wizard was run before
+	[ "$resuming_failed_upgrade" -eq 1 ] && return
 
 	if ! is_wazo_configured; then
   		echo "ERROR: You must configure Wazo by running the wizard (POST /api/confd/1.1/wizard) before using wazo-upgrade"
@@ -241,12 +294,16 @@ do
 		'?')
 			echo "${0} : option ${OPTARG} is not valid" >&2
 			usage
-			exit -1
+			exit 1
 		;;
 	esac
 done
 download_only="${download_only:-"0"}"
 force="${force:-"0"}"
+
+# Set before the current upgrade re-creates the marker file
+resuming_failed_upgrade=0
+[ -f "$upgrade_incomplete_file" ] && resuming_failed_upgrade=1
 
 check_database_migration_is_enabled
 check_wizard_has_been_run

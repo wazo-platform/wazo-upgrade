@@ -64,9 +64,15 @@ append_log_end()
 
 log_and_upgrade()
 {
+    local status
+
     append_log_start $LOGFILE
+    set -o pipefail  # report the upgrade status, not the one of tee
     run_upgrade "$@" |& tee -a $LOGFILE
+    status=$?
+    set +o pipefail
     append_log_end $LOGFILE
+    return $status
 }
 
 log_and_upgrade "$@"
