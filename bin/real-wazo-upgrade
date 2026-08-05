@@ -67,10 +67,14 @@ pre_start() {
 # The system is already upgraded and running: report failures without aborting
 post_start() {
 	local failed_scripts=''
+	local status
 	shopt -qs nullglob  # avoid failing when post-start directory has no scripts
 	for script in "$lib_directory/post-start.d"/*; do
 		echo "Executing upgrade script $script..."
-		if ! $script; then
+		$script
+		status=$?
+		if [ $status -ne 0 ]; then
+			echo -e "\t**Error** running $script: non-zero exit status $status"
 			failed_scripts="$failed_scripts $script"
 		fi
 	done
