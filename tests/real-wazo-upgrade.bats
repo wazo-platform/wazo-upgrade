@@ -47,7 +47,7 @@ setup() {
 
 	run pre_stop
 
-	[ "$status" -ne 0 ]
+	[ "$status" -eq 1 ]
 	[[ "$output" == *"Failed to execute"* ]]
 	[[ "$output" == *10-fail.sh* ]]
 	[ ! -f "$STUB_DIR/wazo-service.calls" ]
@@ -59,7 +59,7 @@ setup() {
 
 	run post_stop
 
-	[ "$status" -ne 0 ]
+	[ "$status" -eq 2 ]
 	[[ "$output" == *"Failed to execute"* ]]
 	grep -q 'wazo-service enable' "$STUB_DIR/wazo-service.calls"
 	grep -q 'wazo-service restart' "$STUB_DIR/wazo-service.calls"
@@ -71,24 +71,32 @@ setup() {
 
 	run pre_start
 
-	[ "$status" -ne 0 ]
+	[ "$status" -eq 3 ]
 	[[ "$output" == *"The system is only partially upgraded"* ]]
 	grep -q 'wazo-service enable' "$STUB_DIR/wazo-service.calls"
 	grep -q 'wazo-service restart' "$STUB_DIR/wazo-service.calls"
 }
 
-@test "post_start runs every script even after a failure" {
+@test "post_start runs every script even after a failure and exits 4" {
 	make_phase_script post-start 10-fail.sh 1
 	make_phase_script post-start 20-after.sh
 
 	run post_start
 
-	[ "$status" -eq 0 ]
+	[ "$status" -eq 4 ]
 	[[ "$(recorded_calls)" == *20-after.sh* ]]
 	# only the failing script is named on the summary line
 	local summary
 	summary=$(grep 'Failed to execute the following scripts:' <<< "$output")
 	[ "$summary" = "Failed to execute the following scripts: $lib_directory/post-start.d/10-fail.sh" ]
+}
+
+@test "post_start reports each failure with its exit status as it occurs" {
+	make_phase_script post-start 10-fail.sh 3
+
+	run post_start
+
+	[[ "$output" == *"**Error** running $lib_directory/post-start.d/10-fail.sh: non-zero exit status 3"* ]]
 }
 
 @test "post_start prints nothing when every script succeeds" {
@@ -121,6 +129,31 @@ setup() {
 
 	[ "$status" -eq 0 ]
 	[ ! -f "$STUB_DIR/wazo-service.calls" ]
+}
+
+@test "start_wazo fails when enable fails, but still restarts the services" {
+	cat > "$STUB_DIR/wazo-service" <<-EOF
+	#!/bin/bash
+	echo "\$0 \$*" >> "$STUB_DIR/wazo-service.calls"
+	[ "\$1" = enable ] && exit 1
+	exit 0
+	EOF
+	chmod +x "$STUB_DIR/wazo-service"
+
+	run start_wazo
+
+	[ "$status" -ne 0 ]
+	grep -q 'wazo-service restart' "$STUB_DIR/wazo-service.calls"
+}
+
+@test "start_wazo succeeds when enable and restart both succeed" {
+	stub wazo-service 0
+
+	run start_wazo
+
+	[ "$status" -eq 0 ]
+	grep -q 'wazo-service enable' "$STUB_DIR/wazo-service.calls"
+	grep -q 'wazo-service restart' "$STUB_DIR/wazo-service.calls"
 }
 
 @test "executing the script directly still reaches main" {
@@ -378,4 +411,14 @@ setup() {
 
 	[ "$status" -ne 0 ]
 	[ -f "$upgrade_incomplete_file" ]
+}
+
+@test "upgrade removes the incomplete marker even when a post-start script fails" {
+	stub_upgrade_environment
+	make_phase_script post-start 10-fail.sh 1
+
+	run upgrade
+
+	[ "$status" -eq 4 ]
+	[ ! -f "$upgrade_incomplete_file" ]
 }
