@@ -54,12 +54,15 @@ that fail to start abort it too. The exit status tells which phase failed:
 | `pre-start` script | 3 |
 | `post-start` script (upgrade completed, not aborted) | 4 |
 
-A marker file (`/var/lib/wazo-upgrade/upgrade-incomplete`) exists from the
-beginning of an upgrade until the services are successfully started. While it
-exists, `wazo-upgrade` warns about the incomplete upgrade at startup and skips
-the wizard check. Services are restarted before aborting, but a failed start
-or an interrupted upgrade leaves Wazo stopped, and that check exits when
-`wazo-confd` is not running, which would block the retry.
+`wazo-upgrade` creates a marker file
+(`/var/lib/wazo-upgrade/upgrade-incomplete`) when an upgrade starts. It removes
+the file only when the upgrade completes. If the upgrade aborts, the file
+stays. Most aborts restart the services first, but they do not remove the file.
+The file shows that the last upgrade did not complete. It does not show that
+Wazo is down. When the file exists, `wazo-upgrade` prints a warning and skips
+the wizard check. That check stops the upgrade when `wazo-confd` is not
+running. An aborted upgrade can leave Wazo stopped, and the check would then
+prevent a retry.
 
 Consequences for script authors:
 
