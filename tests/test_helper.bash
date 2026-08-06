@@ -1,6 +1,8 @@
 # Copyright 2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+bats_require_minimum_version 1.4.0
+
 # Resolved from this file's own location: BATS_TEST_DIRNAME varies with the
 # test file's nesting (e.g. tests/pre-start.d/*.bats)
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"

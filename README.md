@@ -15,6 +15,9 @@ apt install bats jq
 bats -r tests/
 ```
 
+The suite needs bats 1.4 or later (it writes into `BATS_TEST_TMPDIR`) and
+`tests/test_helper.bash` enforces it. Debian 12 ships 1.8.2.
+
 Tests source or execute the scripts with paths and system commands
 redirected to a per-test temporary directory (helpers in
 `tests/test_helper.bash`); no root, no Wazo installation, no vendored
