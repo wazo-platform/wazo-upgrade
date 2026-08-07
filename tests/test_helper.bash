@@ -8,12 +8,16 @@ bats_require_minimum_version 1.4.0
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 # Points every absolute path of the scripts into a fake root, pre-creating
-# the directories any Debian system guarantees
+# the directories a Debian system and the wazo-upgrade package guarantee
 fake_root_setup() {
 	export WAZO_UPGRADE_ROOT="$BATS_TEST_TMPDIR/root"
 	mkdir -p \
 		"$WAZO_UPGRADE_ROOT/etc/systemd" \
 		"$WAZO_UPGRADE_ROOT/tmp" \
+		"$WAZO_UPGRADE_ROOT/usr/share/wazo-upgrade/pre-stop.d" \
+		"$WAZO_UPGRADE_ROOT/usr/share/wazo-upgrade/post-stop.d" \
+		"$WAZO_UPGRADE_ROOT/usr/share/wazo-upgrade/pre-start.d" \
+		"$WAZO_UPGRADE_ROOT/usr/share/wazo-upgrade/post-start.d" \
 		"$WAZO_UPGRADE_ROOT/var/lib/dpkg/info" \
 		"$WAZO_UPGRADE_ROOT/var/lib/wazo-upgrade" \
 		"$WAZO_UPGRADE_ROOT/var/log"

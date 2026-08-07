@@ -32,13 +32,17 @@ setup() {
 }
 
 @test "run_upgrade_scripts succeeds when the phase directory is empty" {
-	mkdir -p "$lib_directory/pre-start.d"
-
 	run_upgrade_scripts pre-start
 }
 
-@test "run_upgrade_scripts succeeds when the phase directory is missing" {
-	run_upgrade_scripts pre-start
+@test "run_upgrade_scripts fails when the phase directory is missing" {
+	rmdir "$lib_directory/pre-start.d"
+
+	local result=0
+	run_upgrade_scripts pre-start || result=$?
+
+	[ "$result" -ne 0 ]
+	[ "$failed_script" = "$lib_directory/pre-start.d" ]
 }
 
 @test "pre_stop failure aborts without restarting wazo" {
@@ -97,6 +101,15 @@ setup() {
 	run post_start
 
 	[[ "$output" == *"**Error** running $lib_directory/post-start.d/10-fail.sh: non-zero exit status 3"* ]]
+}
+
+@test "post_start reports a missing phase directory and exits 4" {
+	rmdir "$lib_directory/post-start.d"
+
+	run post_start
+
+	[ "$status" -eq 4 ]
+	[[ "$output" == *"Failed to execute the following scripts: $lib_directory/post-start.d"* ]]
 }
 
 @test "post_start prints nothing when every script succeeds" {

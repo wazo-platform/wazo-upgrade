@@ -34,9 +34,14 @@ is_package_installed() {
 # Sets $failed_script and returns non-zero on the first script failure
 run_upgrade_scripts() {
 	local state=$1
+	local directory="$lib_directory/$state.d"
 	failed_script=''
+	if [ ! -d "$directory" ]; then
+		failed_script=$directory
+		return 1
+	fi
 	shopt -qs nullglob  # avoid failing when action directory has no scripts
-	for script in "$lib_directory/$state.d"/*; do
+	for script in "$directory"/*; do
 		echo "Executing upgrade script $script..."
 		if ! $script; then
 			failed_script=$script
@@ -70,10 +75,12 @@ pre_start() {
 
 # The system is already upgraded and running: report failures without aborting
 post_start() {
+	local directory="$lib_directory/post-start.d"
 	local failed_scripts=''
 	local status
+	[ -d "$directory" ] || failed_scripts=" $directory"
 	shopt -qs nullglob  # avoid failing when post-start directory has no scripts
-	for script in "$lib_directory/post-start.d"/*; do
+	for script in "$directory"/*; do
 		echo "Executing upgrade script $script..."
 		$script
 		status=$?
