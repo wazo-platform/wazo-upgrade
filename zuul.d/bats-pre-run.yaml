@@ -1,0 +1,11 @@
+---
+- hosts: all
+  tasks:
+    - name: Install test dependencies
+      become: yes
+      apt:
+        name:
+          - bats
+          - jq
+        state: present
+        update_cache: yes

@@ -1,6 +1,8 @@
 #!/bin/bash
 
 DPKG_OLD_SUFFIX=".dpkg-old"
+XIVO_CONFIG_CONFFILES_LIST="${WAZO_UPGRADE_ROOT:-}/var/lib/dpkg/info/xivo-config.conffiles"
+SYSTEMD_SYSTEM_CONF="${WAZO_UPGRADE_ROOT:-}/etc/systemd/system.conf"
 
 
 # Example:
@@ -10,7 +12,7 @@ DPKG_OLD_SUFFIX=".dpkg-old"
 IGNORE_LIST=""
 
 list_modified_conffiles() {
-    for conffile in $(sort /var/lib/dpkg/info/xivo-config.conffiles) /etc/systemd/system.conf; do
+    for conffile in $(sort "$XIVO_CONFIG_CONFFILES_LIST") "$SYSTEMD_SYSTEM_CONF"; do
         conffile_old="${conffile}${DPKG_OLD_SUFFIX}"
         if [ -f "$conffile_old" ]; then
             if is_conffile_old_ignored "$conffile_old"; then
@@ -43,7 +45,14 @@ display_warning_msg() {
 	EOF
 }
 
-modified_conffiles=$(list_modified_conffiles)
-if [ -n "$modified_conffiles" ]; then
-    display_warning_msg "$modified_conffiles"
+main() {
+    modified_conffiles=$(list_modified_conffiles)
+    if [ -n "$modified_conffiles" ]; then
+        display_warning_msg "$modified_conffiles"
+    fi
+}
+
+# Allows the tests to source this file without running the check
+if [ "${BASH_SOURCE[0]}" = "$0" ]; then
+    main "$@"
 fi

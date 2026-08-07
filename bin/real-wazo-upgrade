@@ -2,9 +2,10 @@
 # Copyright 2011-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-PATH=/bin:/usr/bin:/sbin:/usr/sbin
-lib_directory="/usr/share/wazo-upgrade"
-upgrade_incomplete_file="/var/lib/wazo-upgrade/upgrade-incomplete"
+# WAZO_UPGRADE_ROOT prefixes every absolute path; empty in production
+lib_directory="${WAZO_UPGRADE_ROOT:-}/usr/share/wazo-upgrade"
+upgrade_incomplete_file="${WAZO_UPGRADE_ROOT:-}/var/lib/wazo-upgrade/upgrade-incomplete"
+asterisk_modules_directory="${WAZO_UPGRADE_ROOT:-}/usr/lib/asterisk/modules"
 : ${WAZO_CONFD_PORT:='9486'}
 
 APT_OPTIONS='-o DPkg::Lock::Timeout=15'
@@ -33,9 +34,14 @@ is_package_installed() {
 # Sets $failed_script and returns non-zero on the first script failure
 run_upgrade_scripts() {
 	local state=$1
+	local directory="$lib_directory/$state.d"
 	failed_script=''
+	if [ ! -d "$directory" ]; then
+		failed_script=$directory
+		return 1
+	fi
 	shopt -qs nullglob  # avoid failing when action directory has no scripts
-	for script in "$lib_directory/$state.d"/*; do
+	for script in "$directory"/*; do
 		echo "Executing upgrade script $script..."
 		if ! $script; then
 			failed_script=$script
@@ -69,10 +75,12 @@ pre_start() {
 
 # The system is already upgraded and running: report failures without aborting
 post_start() {
+	local directory="$lib_directory/post-start.d"
 	local failed_scripts=''
 	local status
+	[ -d "$directory" ] || failed_scripts=" $directory"
 	shopt -qs nullglob  # avoid failing when post-start directory has no scripts
-	for script in "$lib_directory/post-start.d"/*; do
+	for script in "$directory"/*; do
 		echo "Executing upgrade script $script..."
 		$script
 		status=$?
@@ -94,10 +102,6 @@ post_start() {
 
 execute() {
 	cmd=$*
-	if [ $? -ne 0 ]; then
-		start_wazo
-		fatal_error
-	fi
 	$cmd
 	if [ $? -ne 0 ]; then
 		start_wazo
@@ -106,8 +110,10 @@ execute() {
 }
 
 stop_wazo() {
-	wazo-service stop
-	wazo-service disable
+	local status=0
+	wazo-service stop || status=$?
+	wazo-service disable || status=$?
+	return $status
 }
 
 start_wazo() {
@@ -124,7 +130,10 @@ upgrade() {
 	export XIVO_VERSION_CANDIDATE=$WAZO_VERSION_CANDIDATE
 	touch "$upgrade_incomplete_file"
 	pre_stop
-	stop_wazo
+	if ! stop_wazo; then
+		start_wazo
+		fatal_error "Wazo services failed to stop\nPlease, fix this issue then re-execute wazo-upgrade"
+	fi
 	post_stop
 	echo "Upgrading wazo..."
 	execute apt-get install $APT_OPTIONS -o Dpkg::Options::="--force-confnew" -y postgresql-15
@@ -205,9 +214,7 @@ display_asterisk_notice() {
 
 		custom_modules=$(wazo-asterisk-custom-modules)
 		if [ -n "$custom_modules" ]; then
-			for module in $custom_modules; do
-				mv "/usr/lib/asterisk/modules/$module" /tmp
-			done
+			move_custom_asterisk_modules "$custom_modules"
 			cat <<-EOF
 			WARNING: custom Asterisk modules detected:
 
@@ -221,6 +228,12 @@ display_asterisk_notice() {
 		EOF
 		fi
 	fi
+}
+
+move_custom_asterisk_modules() {
+	for module in $1; do
+		mv "$asterisk_modules_directory/$module" "${WAZO_UPGRADE_ROOT:-}/tmp"
+	done
 }
 
 wazo_version_installed() {
@@ -282,34 +295,42 @@ usage() {
 	EOF
 }
 
-while getopts :dfh opt
-do
-	case ${opt} in
-		d) download_only=1;;
-		f) force=1;;
-		h)
-			usage
-			exit 0
-		;;
-		'?')
-			echo "${0} : option ${OPTARG} is not valid" >&2
-			usage
-			exit 1
-		;;
-	esac
-done
-download_only="${download_only:-"0"}"
-force="${force:-"0"}"
+main() {
+	while getopts :dfh opt
+	do
+		case ${opt} in
+			d) download_only=1;;
+			f) force=1;;
+			h)
+				usage
+				exit 0
+			;;
+			'?')
+				echo "${0} : option ${OPTARG} is not valid" >&2
+				usage
+				exit 1
+			;;
+		esac
+	done
+	download_only="${download_only:-"0"}"
+	force="${force:-"0"}"
 
-# Set before the current upgrade re-creates the marker file
-resuming_failed_upgrade=0
-[ -f "$upgrade_incomplete_file" ] && resuming_failed_upgrade=1
+	# Set before the current upgrade re-creates the marker file
+	resuming_failed_upgrade=0
+	[ -f "$upgrade_incomplete_file" ] && resuming_failed_upgrade=1
 
-check_database_migration_is_enabled
-check_wizard_has_been_run
+	check_database_migration_is_enabled
+	check_wizard_has_been_run
 
-if [ $download_only -eq 0 ]; then
-	upgrading_system
-else
-	apt-get -y -d dist-upgrade $APT_OPTIONS
+	if [ $download_only -eq 0 ]; then
+		upgrading_system
+	else
+		apt-get -y -d dist-upgrade $APT_OPTIONS
+	fi
+}
+
+# Allows tests to source this file without side effects
+if [ "${BASH_SOURCE[0]}" = "$0" ]; then
+	PATH=/bin:/usr/bin:/sbin:/usr/sbin
+	main "$@"
 fi

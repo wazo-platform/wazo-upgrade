@@ -5,6 +5,25 @@
 * branch `master`: builds package for Wazo current (distribution
   wazo-dev-bookworm/pelican-bookworm)
 
+## Testing
+
+Unit tests for the upgrade tooling and scripts live in `tests/` and use
+[bats](https://bats-core.readthedocs.io/):
+
+```shell
+apt install bats jq
+bats -r tests/
+```
+
+The suite needs bats 1.4 or later (it writes into `BATS_TEST_TMPDIR`) and
+`tests/test_helper.bash` enforces it. Debian 12 ships 1.8.2.
+
+Tests source or execute the scripts with paths and system commands
+redirected to a per-test temporary directory (helpers in
+`tests/test_helper.bash`); no root, no Wazo installation, no vendored
+libraries needed. CI runs the suite through the `wazo-upgrade-bats` Zuul
+job.
+
 ## Upgrade scripts
 
 * `pre-stop` and `post-stop` scripts must be compatible with the previous
@@ -35,12 +54,15 @@ that fail to start abort it too. The exit status tells which phase failed:
 | `pre-start` script | 3 |
 | `post-start` script (upgrade completed, not aborted) | 4 |
 
-A marker file (`/var/lib/wazo-upgrade/upgrade-incomplete`) exists from the
-beginning of an upgrade until the services are successfully started. While it
-exists, `wazo-upgrade` warns about the incomplete upgrade at startup and skips
-the wizard check. Services are restarted before aborting, but a failed start
-or an interrupted upgrade leaves Wazo stopped, and that check exits when
-`wazo-confd` is not running, which would block the retry.
+`wazo-upgrade` creates a marker file
+(`/var/lib/wazo-upgrade/upgrade-incomplete`) when an upgrade starts. It removes
+the file only when the upgrade completes. If the upgrade aborts, the file
+stays. Most aborts restart the services first, but they do not remove the file.
+The file shows that the last upgrade did not complete. It does not show that
+Wazo is down. When the file exists, `wazo-upgrade` prints a warning and skips
+the wizard check. That check stops the upgrade when `wazo-confd` is not
+running. An aborted upgrade can leave Wazo stopped, and the check would then
+prevent a retry.
 
 Consequences for script authors:
 
@@ -54,7 +76,8 @@ Consequences for script authors:
   exit as fatal, apart from `post-start`.
 * `post-start` scripts run against a live system: failures that are routine
   (an unreachable phone, an offline plugin repository) must be logged and
-  contained per item rather than propagated.
+  contained per item rather than propagated, then reported by a non-zero exit
+  at the end so the phase lists the script as failed.
 * Naming conventions:
   * prefix scripts with two digits
   * use only `-` in the scripts name, not `_`
