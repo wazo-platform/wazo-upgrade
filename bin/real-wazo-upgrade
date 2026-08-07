@@ -103,8 +103,10 @@ execute() {
 }
 
 stop_wazo() {
-	wazo-service stop
-	wazo-service disable
+	local status=0
+	wazo-service stop || status=$?
+	wazo-service disable || status=$?
+	return $status
 }
 
 start_wazo() {
@@ -121,7 +123,10 @@ upgrade() {
 	export XIVO_VERSION_CANDIDATE=$WAZO_VERSION_CANDIDATE
 	touch "$upgrade_incomplete_file"
 	pre_stop
-	stop_wazo
+	if ! stop_wazo; then
+		start_wazo
+		fatal_error "Wazo services failed to stop\nPlease, fix this issue then re-execute wazo-upgrade"
+	fi
 	post_stop
 	echo "Upgrading wazo..."
 	execute apt-get install $APT_OPTIONS -o Dpkg::Options::="--force-confnew" -y postgresql-15

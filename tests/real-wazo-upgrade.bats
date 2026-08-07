@@ -156,6 +156,31 @@ setup() {
 	grep -q 'wazo-service restart' "$STUB_DIR/wazo-service.calls"
 }
 
+@test "stop_wazo fails when stop fails, but still disables the services" {
+	cat > "$STUB_DIR/wazo-service" <<-EOF
+	#!/bin/bash
+	echo "\$0 \$*" >> "$STUB_DIR/wazo-service.calls"
+	[ "\$1" = stop ] && exit 1
+	exit 0
+	EOF
+	chmod +x "$STUB_DIR/wazo-service"
+
+	run stop_wazo
+
+	[ "$status" -ne 0 ]
+	grep -q 'wazo-service disable' "$STUB_DIR/wazo-service.calls"
+}
+
+@test "stop_wazo succeeds when stop and disable both succeed" {
+	stub wazo-service 0
+
+	run stop_wazo
+
+	[ "$status" -eq 0 ]
+	grep -q 'wazo-service stop' "$STUB_DIR/wazo-service.calls"
+	grep -q 'wazo-service disable' "$STUB_DIR/wazo-service.calls"
+}
+
 @test "executing the script directly still reaches main" {
 	# The other tests source the script, which only proves main() is
 	# suppressed on source; this proves the other half of the guard
@@ -383,6 +408,18 @@ setup() {
 		'wazo-check-conffiles' \
 		'10-ok.sh' \
 		'start_wazo')" ]
+}
+
+@test "upgrade restarts wazo and aborts before dist-upgrade when the services fail to stop" {
+	stub_upgrade_environment
+	stop_wazo() { echo stop_wazo >> "$calls_file"; return 1; }
+
+	run upgrade
+
+	[ "$status" -ne 0 ]
+	[[ "$output" == *'Wazo services failed to stop'* ]]
+	[ "$(recorded_calls)" = "$(printf '%s\n' 'stop_wazo' 'start_wazo')" ]
+	[ -f "$upgrade_incomplete_file" ]
 }
 
 @test "upgrade removes the incomplete marker on success" {
