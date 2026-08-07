@@ -82,13 +82,18 @@ wrongly_configured_device_ids = configured_device_ids - associated_device_ids
 
 logger.debug('Resetting wrongly configured devices to autoprov...')
 
+failed = False
 for device_id in wrongly_configured_device_ids:
     logger.info('Resetting device {}'.format(device_id))
     try:
         confd_client.devices.autoprov(device_id)
         confd_client.devices.synchronize(device_id)
-    except requests.RequestException as e:
+    except requests.HTTPError as e:
         # an unreachable phone must not prevent resetting the others
         logger.error('Failed to reset device %s: %s', device_id, e)
+        failed = True
 
 logger.debug('Done.')
+
+if failed:
+    exit(1)

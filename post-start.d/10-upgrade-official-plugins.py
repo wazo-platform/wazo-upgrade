@@ -44,6 +44,7 @@ def main():
     plugind_client = PlugindClient(**config['plugind'])
     plugind_client.set_token(token_data['token'])
 
+    failed = False
     plugin_list = plugind_client.market.list(namespace='official', installed=True)
     for plugin in plugin_list['items']:
         for version in plugin['versions']:
@@ -54,10 +55,13 @@ def main():
                                                    options={'namespace': 'official',
                                                             'name': plugin['name'],
                                                             'version': version['version']})
-                except requests.RequestException as e:
-                    # wazo-plugind installs asynchronously: only the request is checked
+                except requests.HTTPError as e:
                     logger.error('Failed to upgrade plugin %s: %s', plugin['name'], e)
+                    failed = True
                 break
+
+    if failed:
+        exit(1)
 
 
 if __name__ == '__main__':

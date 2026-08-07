@@ -76,7 +76,8 @@ Consequences for script authors:
   exit as fatal, apart from `post-start`.
 * `post-start` scripts run against a live system: failures that are routine
   (an unreachable phone, an offline plugin repository) must be logged and
-  contained per item rather than propagated.
+  contained per item rather than propagated, then reported by a non-zero exit
+  at the end so the phase lists the script as failed.
 * Naming conventions:
   * prefix scripts with two digits
   * use only `-` in the scripts name, not `_`
