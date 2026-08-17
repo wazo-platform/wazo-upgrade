@@ -20,6 +20,7 @@ case "$1" in
             # Create sentinel file to avoid running script on new install
             # touch /var/lib/wazo-upgrade/sentinel-file
             touch /var/lib/wazo-upgrade/rename-rest-api-max-threads
+            touch /var/lib/wazo-upgrade/dird-favorite-uuid-migration
         fi
     ;;
 
