@@ -1,0 +1,3 @@
+# the bats suite imports the python stand-ins under tests/
+__pycache__/
+*.pyc
