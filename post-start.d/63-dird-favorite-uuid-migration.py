@@ -12,6 +12,10 @@ wazo-dird ships the migration as a view plugin that is disabled by default.
 This script enables it through conf.d, calls it once, then removes the
 configuration and restarts wazo-dird, so the endpoint is reachable only for
 the duration of the migration.
+
+A favorite of a user confd no longer knows cannot be rewritten, and wazo-dird
+reads user uuids only once this has run, so the migration deletes it. Each one
+is logged with its contact id.
 """
 
 import argparse
@@ -99,20 +103,22 @@ def _migration_plugin(dird_config: Any) -> Iterator[None]:
 def _log_report(report: dict[str, Any]) -> None:
     logger.info(
         '%s favorite(s) migrated, %s already migrated, %s deduplicated, '
-        '%s unresolved, %s source(s) failed',
+        '%s dropped, %s source(s) failed',
         report['migrated'],
         report['already_migrated'],
         report['deduplicated'],
-        report['unresolved'],
+        report['dropped'],
         report['failed_sources'],
     )
     for source in report['sources']:
-        for unresolved in source['unresolved']:
+        for dropped in source['dropped']:
+            # wazo-dird reads user uuids only from here on, so a favorite that
+            # matches no confd user cannot be kept; log it to leave a trace
             logger.warning(
-                '%s: favorite %s of user %s matches no confd user, kept as is',
+                '%s: favorite %s of user %s matches no confd user, deleted',
                 source['source_name'],
-                unresolved['contact_id'],
-                unresolved['user_uuid'],
+                dropped['contact_id'],
+                dropped['user_uuid'],
             )
         if source['error']:
             logger.error('%s: not migrated: %s', source['source_name'], source['error'])
