@@ -19,7 +19,6 @@ is logged with its contact id.
 """
 
 import argparse
-import json
 import logging
 import os
 import sys
@@ -158,7 +157,7 @@ def migrate_favorites() -> None:
             )
             sys.exit(2)
 
-        report = json.loads(result.text)
+        report = result.json()
         _log_report(report)
 
         if report['failed_sources']:
