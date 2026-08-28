@@ -33,20 +33,14 @@ from wazo_auth_client import Client as AuthClient
 from xivo.chain_map import ChainMap
 from xivo.config_helper import parse_config_file, read_config_file_hierarchy
 
-# the bats suite points every absolute path into a fake root, like the shell
-# scripts of this repository already do
-_ROOT = os.getenv('WAZO_UPGRADE_ROOT', '')
-
-SENTINEL = f'{_ROOT}/var/lib/wazo-upgrade/dird-favorite-uuid-migration'
+SENTINEL = '/var/lib/wazo-upgrade/dird-favorite-uuid-migration'
 
 _DEFAULT_CONFIG = {
-    'config_file': f'{_ROOT}/etc/wazo-upgrade/config.yml',
-    'auth': {'key_file': f'{_ROOT}/var/lib/wazo-auth-keys/wazo-upgrade-key.yml'},
+    'config_file': '/etc/wazo-upgrade/config.yml',
+    'auth': {'key_file': '/var/lib/wazo-auth-keys/wazo-upgrade-key.yml'},
 }
 
-_CONFIG_FILENAME = (
-    f'{_ROOT}/etc/wazo-dird/conf.d/20-wazo-upgrade-favorite-migration.yml'
-)
+_CONFIG_FILENAME = '/etc/wazo-dird/conf.d/20-wazo-upgrade-favorite-migration.yml'
 _CONFIG_FILE = '''\
 enabled_plugins:
   views:

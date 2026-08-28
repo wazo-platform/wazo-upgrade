@@ -7,7 +7,5 @@
         name:
           - bats
           - jq
-          # the dird favorite migration script talks HTTP to a mock wazo-dird
-          - python3-requests
         state: present
         update_cache: yes
