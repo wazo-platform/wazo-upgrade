@@ -46,7 +46,9 @@ _DEFAULT_CONFIG = {
     'dird': {'host': 'localhost', 'port': 9489, 'version': '0.1'},
 }
 
-_CONFIG_FILENAME = f'{_ROOT}/etc/wazo-dird/conf.d/999-wazo-favorite-migration.yml'
+_CONFIG_FILENAME = (
+    f'{_ROOT}/etc/wazo-dird/conf.d/20-wazo-upgrade-favorite-migration.yml'
+)
 _CONFIG_FILE = '''\
 enabled_plugins:
   views:

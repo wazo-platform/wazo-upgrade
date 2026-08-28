@@ -16,7 +16,7 @@ setup() {
 
 	script="$REPO_ROOT/post-start.d/63-dird-favorite-uuid-migration.py"
 	sentinel="$WAZO_UPGRADE_ROOT/var/lib/wazo-upgrade/dird-favorite-uuid-migration"
-	conf_file="$WAZO_UPGRADE_ROOT/etc/wazo-dird/conf.d/999-wazo-favorite-migration.yml"
+	conf_file="$WAZO_UPGRADE_ROOT/etc/wazo-dird/conf.d/20-wazo-upgrade-favorite-migration.yml"
 
 	dird_calls="$BATS_TEST_TMPDIR/dird-calls"
 	dird_status="$BATS_TEST_TMPDIR/dird-status"
