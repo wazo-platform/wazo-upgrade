@@ -128,7 +128,7 @@ def _log_report(report: dict[str, Any]) -> None:
     for source in report['sources']:
         for dropped in source['dropped']:
             logger.warning(
-                '%s: favorite %s of user %s matches no confd user, deleted',
+                '%s: favorite (ID: %s) of user %s matches no confd user, deleted',
                 source['source_name'],
                 dropped['contact_id'],
                 dropped['user_uuid'],
