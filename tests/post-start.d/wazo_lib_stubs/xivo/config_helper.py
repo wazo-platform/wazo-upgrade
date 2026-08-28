@@ -17,6 +17,8 @@ def read_config_file_hierarchy(default: dict[str, Any]) -> dict[str, Any]:
             'host': '127.0.0.1',
             'port': int(os.environ['FAKE_DIRD_PORT']),
             'version': '0.1',
+            'prefix': None,
+            'https': False,
         }
     }
 

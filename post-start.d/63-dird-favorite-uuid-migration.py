@@ -43,7 +43,6 @@ SENTINEL = f'{_ROOT}/var/lib/wazo-upgrade/dird-favorite-uuid-migration'
 _DEFAULT_CONFIG = {
     'config_file': f'{_ROOT}/etc/wazo-upgrade/config.yml',
     'auth': {'key_file': f'{_ROOT}/var/lib/wazo-auth-keys/wazo-upgrade-key.yml'},
-    'dird': {'host': 'localhost', 'port': 9489, 'version': '0.1'},
 }
 
 _CONFIG_FILENAME = (
@@ -75,8 +74,17 @@ def _load_key_file(config: Any) -> dict[str, Any]:
     }
 
 
+def _dird_url(dird_config: Any, resource: str) -> str:
+    scheme = 'https' if dird_config['https'] else 'http'
+    prefix = dird_config['prefix'] or ''
+    return (
+        f'{scheme}://{dird_config["host"]}:{dird_config["port"]}'
+        f'{prefix}/{dird_config["version"]}/{resource}'
+    )
+
+
 def _wait_for_dird(dird_config: Any) -> None:
-    url = 'http://{host}:{port}/{version}/status'.format(**dird_config)
+    url = _dird_url(dird_config, 'status')
     for _ in range(30):
         try:
             requests.get(url, timeout=1)
@@ -138,9 +146,7 @@ def migrate_favorites() -> None:
     token = auth_client.token.new(expiration=5 * 60)['token']
 
     with _migration_plugin(config['dird']):
-        url = 'http://{host}:{port}/{version}/favorite_migration'.format(
-            **config['dird']
-        )
+        url = _dird_url(config['dird'], 'favorite_migration')
         result = requests.post(url, headers={'X-Auth-Token': token})
 
         if result.status_code != 200:
