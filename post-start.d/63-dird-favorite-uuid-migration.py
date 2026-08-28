@@ -77,9 +77,11 @@ def _wait_for_dird(dird_config: Any) -> None:
     url = 'http://{host}:{port}/{version}/status'.format(**dird_config)
     for _ in range(30):
         try:
-            requests.get(url)
+            requests.get(url, timeout=1)
             return
-        except requests.exceptions.ConnectionError:
+        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
+            # a wazo-dird that hung on startup accepts the connection and
+            # never answers, which only a timeout tells apart from a slow one
             time.sleep(1.0)
 
     logger.error('Could not connect to wazo-dird, aborting')
