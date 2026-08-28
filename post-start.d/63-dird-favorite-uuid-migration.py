@@ -127,8 +127,6 @@ def _log_report(report: dict[str, Any]) -> None:
     )
     for source in report['sources']:
         for dropped in source['dropped']:
-            # wazo-dird reads user uuids only from here on, so a favorite that
-            # matches no confd user cannot be kept; log it to leave a trace
             logger.warning(
                 '%s: favorite %s of user %s matches no confd user, deleted',
                 source['source_name'],
