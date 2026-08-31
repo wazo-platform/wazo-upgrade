@@ -97,10 +97,9 @@ def _wait_for_dird(dird_config: Any) -> None:
 def _migration_plugin(dird_config: Any) -> Iterator[None]:
     with open(_CONFIG_FILENAME, 'w') as f:
         f.write(_CONFIG_FILE)
-    run(['systemctl', 'restart', 'wazo-dird'])
-    _wait_for_dird(dird_config)
-
     try:
+        run(['systemctl', 'restart', 'wazo-dird'])
+        _wait_for_dird(dird_config)
         yield
     finally:
         try:
