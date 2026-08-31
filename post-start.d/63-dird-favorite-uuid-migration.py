@@ -78,12 +78,15 @@ def _dird_url(dird_config: Any, resource: str) -> str:
 
 def _wait_for_dird(dird_config: Any) -> None:
     url = _dird_url(dird_config, 'status')
-    for i in range(30):
+    for i in range(1, 31):
         try:
             requests.get(url, timeout=1)
             return
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
-            logger.warning('wazo-dird not responding after %d attempts, retrying', i)
+            if i > 10:
+                logger.warning(
+                    'wazo-dird has not come back up since restart (attempt %d/30)', i
+                )
             time.sleep(1.0)
 
     logger.error('Could not connect to wazo-dird, aborting')
