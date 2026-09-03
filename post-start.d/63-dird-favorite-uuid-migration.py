@@ -15,7 +15,8 @@ the duration of the migration.
 
 A favorite of a user confd no longer knows cannot be rewritten, and wazo-dird
 reads user uuids only once this has run, so the migration deletes it. Each one
-is logged with its contact id.
+is logged with its contact id. Favorites of a source whose tenant no longer
+exists are deleted for the same reason and logged per source.
 """
 
 import argparse
@@ -113,14 +114,22 @@ def _migration_plugin(dird_config: Any) -> Iterator[None]:
 def _log_report(report: dict[str, Any]) -> None:
     logger.info(
         '%s favorite(s) migrated, %s already migrated, %s deduplicated, '
-        '%s dropped, %s source(s) failed',
+        '%s dropped, %s source(s) of a deleted tenant, %s source(s) failed',
         report['migrated'],
         report['already_migrated'],
         report['deduplicated'],
         report['dropped'],
+        report['orphan_sources'],
         report['failed_sources'],
     )
     for source in report['sources']:
+        if source['tenant_deleted']:
+            logger.warning(
+                '%s: tenant no longer exists, %s favorite(s) deleted',
+                source['source_name'],
+                len(source['dropped']),
+            )
+            continue
         for dropped in source['dropped']:
             logger.warning(
                 '%s: favorite (ID: %s) of user %s matches no confd user, deleted',
@@ -135,7 +144,7 @@ def _log_report(report: dict[str, Any]) -> None:
 def migrate_favorites() -> None:
     config = load_config()
     auth_client = AuthClient(**config['auth'])
-    token = auth_client.token.new(expiration=5 * 60)['token']
+    token = auth_client.token.new(expiration=60 * 60)['token']
 
     with _migration_plugin(config['dird']):
         url = _dird_url(config['dird'], 'favorite_migration')
