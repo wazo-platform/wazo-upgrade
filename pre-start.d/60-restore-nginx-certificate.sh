@@ -44,4 +44,4 @@ if ! nginx -t; then
     exit 0
 fi
 rm -f "$backup"
-systemctl try-reload-or-restart nginx
+systemctl try-reload-or-restart nginx || echo "WARNING: could not reload nginx, run 'systemctl reload nginx' to apply the restored certificate"

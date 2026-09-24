@@ -52,6 +52,18 @@ write_custom_site_old() {
 	grep -q 'try-reload-or-restart nginx' "$STUB_DIR/systemctl.calls"
 }
 
+@test "keeps the restored certificate and warns when nginx fails to reload" {
+	stub systemctl 1
+	write_default_site
+	write_custom_site_old
+
+	run "$SCRIPT"
+
+	[ "$status" -eq 0 ]
+	[[ "$output" == *"WARNING: could not reload nginx"* ]]
+	grep -qx '    ssl_certificate /etc/letsencrypt/live/wazo.example.com/fullchain.pem;' "$SITE"
+}
+
 @test "does nothing when there is no .dpkg-old site" {
 	write_default_site
 	local before
