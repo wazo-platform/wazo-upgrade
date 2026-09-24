@@ -41,6 +41,15 @@ setup() {
 	[ "$output" = "$SYSTEMD_SYSTEM_CONF" ]
 }
 
+@test "list_modified_conffiles also checks the wazo nginx site" {
+	touch "${NGINX_WAZO_SITE}.dpkg-old"
+
+	run list_modified_conffiles
+
+	[ "$status" -eq 0 ]
+	[ "$output" = "$NGINX_WAZO_SITE" ]
+}
+
 @test "list_modified_conffiles removes an ignored .dpkg-old and does not report it" {
 	echo "$BATS_TEST_TMPDIR/etc/xivo/ring.conf" > "$XIVO_CONFIG_CONFFILES_LIST"
 	echo -n 'stale backup' > "$BATS_TEST_TMPDIR/etc/xivo/ring.conf.dpkg-old"

@@ -12,6 +12,7 @@ REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 fake_root_setup() {
 	export WAZO_UPGRADE_ROOT="$BATS_TEST_TMPDIR/root"
 	mkdir -p \
+		"$WAZO_UPGRADE_ROOT/etc/nginx/sites-available" \
 		"$WAZO_UPGRADE_ROOT/etc/systemd" \
 		"$WAZO_UPGRADE_ROOT/tmp" \
 		"$WAZO_UPGRADE_ROOT/usr/share/wazo-upgrade/pre-stop.d" \

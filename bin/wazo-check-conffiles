@@ -3,6 +3,7 @@
 DPKG_OLD_SUFFIX=".dpkg-old"
 XIVO_CONFIG_CONFFILES_LIST="${WAZO_UPGRADE_ROOT:-}/var/lib/dpkg/info/xivo-config.conffiles"
 SYSTEMD_SYSTEM_CONF="${WAZO_UPGRADE_ROOT:-}/etc/systemd/system.conf"
+NGINX_WAZO_SITE="${WAZO_UPGRADE_ROOT:-}/etc/nginx/sites-available/wazo"
 
 
 # Example:
@@ -12,7 +13,7 @@ SYSTEMD_SYSTEM_CONF="${WAZO_UPGRADE_ROOT:-}/etc/systemd/system.conf"
 IGNORE_LIST=""
 
 list_modified_conffiles() {
-    for conffile in $(sort "$XIVO_CONFIG_CONFFILES_LIST") "$SYSTEMD_SYSTEM_CONF"; do
+    for conffile in $(sort "$XIVO_CONFIG_CONFFILES_LIST") "$SYSTEMD_SYSTEM_CONF" "$NGINX_WAZO_SITE"; do
         conffile_old="${conffile}${DPKG_OLD_SUFFIX}"
         if [ -f "$conffile_old" ]; then
             if is_conffile_old_ignored "$conffile_old"; then

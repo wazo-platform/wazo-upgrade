@@ -415,6 +415,7 @@ setup() {
 		'execute apt-get install' \
 		'execute apt-get install' \
 		'execute apt-get install' \
+		'execute apt-get install' \
 		'execute apt-mark auto' \
 		'execute apt-get dist-upgrade' \
 		'execute apt-get autoremove' \
