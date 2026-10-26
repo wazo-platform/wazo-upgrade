@@ -17,6 +17,8 @@ setup() {
 	for service in $SERVICES; do
 		mkdir -p "$WAZO_UPGRADE_ROOT/etc/$service/conf.d"
 	done
+	mkdir -p "$WAZO_UPGRADE_ROOT/etc/asterisk"
+	ASTERISK_DROP_IN="$WAZO_UPGRADE_ROOT/etc/asterisk/prometheus.d/50-enable-metrics.conf"
 	stub wazo-plugind-cli 0
 }
 
@@ -164,4 +166,33 @@ plugin_not_installed() {
 	[ "$status" -eq 0 ]
 	[ "$(drop_in_count)" -eq 9 ]
 	[ ! -e "$WAZO_UPGRADE_ROOT/etc/wazo-chatd" ]
+}
+
+@test "enables the Asterisk metrics when the plugin was installed" {
+	plugin_installed
+
+	run "$SCRIPT"
+
+	[ "$status" -eq 0 ]
+	[ "$(grep -v '^;' "$ASTERISK_DROP_IN")" = "$(printf '[general](+)\nenabled = yes')" ]
+}
+
+@test "enables no Asterisk metrics when the plugin was not installed" {
+	plugin_not_installed
+
+	run "$SCRIPT"
+
+	[ "$status" -eq 0 ]
+	[ ! -e "$ASTERISK_DROP_IN" ]
+}
+
+@test "skips the Asterisk metrics when Asterisk is not configured" {
+	plugin_installed
+	rm -r "$WAZO_UPGRADE_ROOT/etc/asterisk"
+
+	run "$SCRIPT"
+
+	[ "$status" -eq 0 ]
+	[ ! -e "$WAZO_UPGRADE_ROOT/etc/asterisk" ]
+	[ "$(drop_in_count)" -eq 10 ]
 }
