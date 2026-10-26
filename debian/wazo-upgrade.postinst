@@ -21,6 +21,7 @@ case "$1" in
             # touch /var/lib/wazo-upgrade/sentinel-file
             touch /var/lib/wazo-upgrade/rename-rest-api-max-threads
             touch /var/lib/wazo-upgrade/dird-favorite-uuid-migration
+            touch /var/lib/wazo-upgrade/remove-prometheus-exporter-plugin
         fi
     ;;
 
