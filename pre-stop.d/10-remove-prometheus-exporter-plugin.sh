@@ -29,6 +29,15 @@ enable_metrics_plugin() {
     } > "${conf_dir}/50-enable-metrics.yml"
 }
 
+enable_asterisk_metrics() {
+    [ -d "${ETC_DIR}/asterisk" ] || return 0
+    echo 'Enabling the Asterisk metrics'
+    # Created before the wazo-asterisk-config version that includes this directory
+    mkdir -p "${ETC_DIR}/asterisk/prometheus.d"
+    printf '; Created by wazo-upgrade: replaces the wazo-prometheus-exporter plugin\n[general](+)\nenabled = yes\n' \
+        > "${ETC_DIR}/asterisk/prometheus.d/50-enable-metrics.conf"
+}
+
 # From 26.11, services ship their own plugin with the same `metrics` name
 if dpkg --compare-versions "${WAZO_VERSION_CANDIDATE:?is not set}" lt 26.11; then
     exit 0
@@ -39,6 +48,7 @@ if [ "$(dpkg-query -W -f '${Status}' "$PACKAGE" 2>/dev/null)" = 'install ok inst
     for service in $SERVICES; do
         enable_metrics_plugin "$service"
     done
+    enable_asterisk_metrics
     echo "Uninstalling the $PLUGIN plugin"
     wazo-plugind-cli uninstall "$PLUGIN"
 fi
