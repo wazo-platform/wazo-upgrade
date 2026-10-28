@@ -32,7 +32,7 @@ def _load_key_file(config):
                      'password': key_file['service_key']}}
 
 
-def _paginate(callback, limit=1000, **kwargs):
+def _paginate(callback, limit=200, **kwargs):
     result = callback(limit=limit, offset=0, **kwargs)
     total = result['total']
     items = result['items']
@@ -55,12 +55,13 @@ def is_slave(confd_client):
 
 config = load_config()
 auth_client = AuthClient(**config['auth'])
-token_data = auth_client.token.new(expiration=300)
+token_data = auth_client.token.new(expiration=60 * 60)
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger('reset_unassociated_devices_to_autoprov')
 
-confd_client = ConfdClient(token=token_data['token'], **config['confd'])
+confd_config = {'timeout': 60, **config['confd']}
+confd_client = ConfdClient(token=token_data['token'], **confd_config)
 provd_client = ProvdClient(token=token_data['token'], **config['provd'])
 
 if is_slave(confd_client):
