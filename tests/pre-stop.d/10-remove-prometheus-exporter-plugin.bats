@@ -19,7 +19,7 @@ setup() {
 	done
 	mkdir -p "$WAZO_UPGRADE_ROOT/etc/asterisk"
 	ASTERISK_DROP_IN="$WAZO_UPGRADE_ROOT/etc/asterisk/prometheus.d/50-enable-metrics.conf"
-	stub wazo-plugind-cli 0
+	stub apt-get 0
 }
 
 drop_in() {
@@ -38,15 +38,14 @@ plugin_not_installed() {
 	stub dpkg-query 1
 }
 
-@test "uninstalls the plugin through wazo-plugind and writes the sentinel" {
+@test "purges the plugin package and writes the sentinel" {
 	plugin_installed
 
 	run "$SCRIPT"
 
 	[ "$status" -eq 0 ]
 	grep -q "dpkg-query -W -f \${Status} $PACKAGE" "$STUB_DIR/dpkg-query.calls"
-	grep -q 'wazo-plugind-cli uninstall wazoplatform/wazo-prometheus-exporter' \
-		"$STUB_DIR/wazo-plugind-cli.calls"
+	grep -q "purge -y $PACKAGE" "$STUB_DIR/apt-get.calls"
 	[ -f "$SENTINEL" ]
 }
 
@@ -56,13 +55,13 @@ plugin_not_installed() {
 	run "$SCRIPT"
 
 	[ "$status" -eq 0 ]
-	[ "$(stub_call_count wazo-plugind-cli)" -eq 0 ]
+	[ "$(stub_call_count apt-get)" -eq 0 ]
 	[ -f "$SENTINEL" ]
 }
 
 @test "fails and writes no sentinel when the uninstall fails" {
 	plugin_installed
-	stub wazo-plugind-cli 1
+	stub apt-get 1
 
 	run "$SCRIPT"
 
@@ -77,7 +76,7 @@ plugin_not_installed() {
 	run "$SCRIPT"
 
 	[ "$status" -eq 0 ]
-	[ "$(stub_call_count wazo-plugind-cli)" -eq 0 ]
+	[ "$(stub_call_count apt-get)" -eq 0 ]
 	[ ! -f "$SENTINEL" ]
 }
 
@@ -88,7 +87,7 @@ plugin_not_installed() {
 	run "$SCRIPT"
 
 	[ "$status" -eq 0 ]
-	[ "$(stub_call_count wazo-plugind-cli)" -eq 1 ]
+	[ "$(stub_call_count apt-get)" -eq 1 ]
 	[ -f "$SENTINEL" ]
 }
 
@@ -100,7 +99,7 @@ plugin_not_installed() {
 
 	[ "$status" -eq 0 ]
 	[ "$(stub_call_count dpkg-query)" -eq 0 ]
-	[ "$(stub_call_count wazo-plugind-cli)" -eq 0 ]
+	[ "$(stub_call_count apt-get)" -eq 0 ]
 }
 
 @test "fails when the target version is unknown" {
@@ -110,7 +109,7 @@ plugin_not_installed() {
 	run "$SCRIPT"
 
 	[ "$status" -ne 0 ]
-	[ "$(stub_call_count wazo-plugind-cli)" -eq 0 ]
+	[ "$(stub_call_count apt-get)" -eq 0 ]
 	[ ! -f "$SENTINEL" ]
 }
 
@@ -129,7 +128,7 @@ plugin_not_installed() {
 
 @test "keeps the drop-ins when the uninstall fails, for the retry" {
 	plugin_installed
-	stub wazo-plugind-cli 1
+	stub apt-get 1
 
 	run "$SCRIPT"
 
