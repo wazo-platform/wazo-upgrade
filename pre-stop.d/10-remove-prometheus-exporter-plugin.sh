@@ -8,6 +8,7 @@ set -o pipefail  # fail if command before pipe fails
 
 SENTINEL="${WAZO_UPGRADE_ROOT:-}/var/lib/wazo-upgrade/remove-prometheus-exporter-plugin"
 ETC_DIR="${WAZO_UPGRADE_ROOT:-}/etc"
+PLUGIN='wazoplatform/wazo-prometheus-exporter'
 PACKAGE='wazo-plugind-wazo-prometheus-exporter-wazoplatform'
 SERVICES="wazo-agentd wazo-amid wazo-auth wazo-calld wazo-call-logd \
 wazo-chatd wazo-confd wazo-dird wazo-phoned wazo-webhookd"
@@ -48,9 +49,9 @@ if [ "$(dpkg-query -W -f '${Status}' "$PACKAGE" 2>/dev/null)" = 'install ok inst
         enable_metrics_plugin "$service"
     done
     enable_asterisk_metrics
-    echo "Removing the $PACKAGE package"
-    # Not wazo-plugind-cli: its `uninstall` argument is not accepted before 26.08
-    apt-get purge -y "$PACKAGE"
+    echo "Uninstalling the $PLUGIN plugin"
+    # -c is the syntax every wazo-plugind-cli version accepts
+    wazo-plugind-cli -c "uninstall $PLUGIN"
 fi
 
 touch "$SENTINEL"
