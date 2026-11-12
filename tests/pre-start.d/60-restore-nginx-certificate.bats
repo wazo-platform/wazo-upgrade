@@ -52,6 +52,31 @@ write_custom_site_old() {
 	grep -q 'try-reload-or-restart nginx' "$STUB_DIR/systemctl.calls"
 }
 
+@test "restores the certificate of a server block certbot added after the default one" {
+	write_default_site
+	cat > "$SITE.dpkg-old" <<-EOF
+	server {
+	    listen 443 default_server ssl;
+	    ssl_certificate /usr/share/wazo-certs/server.crt;
+	    ssl_certificate_key /usr/share/wazo-certs/server.key;
+	}
+
+	server {
+	    listen 443 ssl;
+	    server_name wazo.example.com; # managed by Certbot
+	    ssl_certificate /etc/letsencrypt/live/wazo.example.com/fullchain.pem; # managed by Certbot
+	    ssl_certificate_key /etc/letsencrypt/live/wazo.example.com/privkey.pem; # managed by Certbot
+	}
+	EOF
+
+	run "$SCRIPT"
+
+	[ "$status" -eq 0 ]
+	[[ "$output" == *"Restoring the nginx certificate"* ]]
+	grep -qx '    ssl_certificate /etc/letsencrypt/live/wazo.example.com/fullchain.pem;' "$SITE"
+	grep -qx '    ssl_certificate_key /etc/letsencrypt/live/wazo.example.com/privkey.pem;' "$SITE"
+}
+
 @test "keeps the restored certificate and warns when nginx fails to reload" {
 	stub systemctl 1
 	write_default_site
