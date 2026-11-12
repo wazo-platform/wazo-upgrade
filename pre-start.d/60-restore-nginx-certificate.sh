@@ -16,6 +16,14 @@ directive_value() {
     sed -n -E "/^[[:space:]]*${directive}[[:space:]]/{s/^[[:space:]]*${directive}[[:space:]]+([^;[:space:]]+);.*/\1/p;q}" "$file"
 }
 
+first_non_default_directive_value() {
+    local directive=$1 default=$2 file=$3
+    local value
+    value="$(sed -n -E "s/^[[:space:]]*${directive}[[:space:]]+([^;[:space:]]+);.*/\1/p" "$file" \
+        | grep -vxF -m 1 "$default" || true)"
+    echo "${value:-$(directive_value "$directive" "$file")}"
+}
+
 replace_directive_value() {
     local directive=$1 value=$2 file=$3
     sed -i -E "s|^([[:space:]]*${directive}[[:space:]]+)[^;]+;|\1${value};|" "$file"
@@ -25,8 +33,8 @@ replace_directive_value() {
 [ "$(directive_value ssl_certificate "$SITE")" = "$DEFAULT_CERTIFICATE" ] || exit 0
 [ "$(directive_value ssl_certificate_key "$SITE")" = "$DEFAULT_KEY" ] || exit 0
 
-old_certificate="$(directive_value ssl_certificate "$SITE_OLD")"
-old_key="$(directive_value ssl_certificate_key "$SITE_OLD")"
+old_certificate="$(first_non_default_directive_value ssl_certificate "$DEFAULT_CERTIFICATE" "$SITE_OLD")"
+old_key="$(first_non_default_directive_value ssl_certificate_key "$DEFAULT_KEY" "$SITE_OLD")"
 [ -n "$old_certificate" ] && [ -n "$old_key" ] || exit 0
 [ "$old_certificate" != "$DEFAULT_CERTIFICATE" ] || [ "$old_key" != "$DEFAULT_KEY" ] || exit 0
 [ -f "${WAZO_UPGRADE_ROOT:-}${old_certificate}" ] && [ -f "${WAZO_UPGRADE_ROOT:-}${old_key}" ] || exit 0
