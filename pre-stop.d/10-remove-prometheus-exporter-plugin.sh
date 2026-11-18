@@ -38,8 +38,8 @@ enable_asterisk_metrics() {
         > "${ETC_DIR}/asterisk/prometheus.d/50-enable-metrics.conf"
 }
 
-# From 26.11, services ship their own plugin with the same `metrics` name
-if dpkg --compare-versions "${WAZO_VERSION_CANDIDATE:?is not set}" lt 26.11; then
+# From 26.12, services ship their own plugin with the same `metrics` name
+if dpkg --compare-versions "${WAZO_VERSION_CANDIDATE:?is not set}" lt 26.12; then
     exit 0
 fi
 

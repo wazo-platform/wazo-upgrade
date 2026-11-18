@@ -13,7 +13,7 @@ setup() {
 	stub_path_setup
 	SCRIPT="$REPO_ROOT/pre-stop.d/10-remove-prometheus-exporter-plugin.sh"
 	SENTINEL="$WAZO_UPGRADE_ROOT/var/lib/wazo-upgrade/remove-prometheus-exporter-plugin"
-	export WAZO_VERSION_CANDIDATE='26.11'
+	export WAZO_VERSION_CANDIDATE='26.12'
 	for service in $SERVICES; do
 		mkdir -p "$WAZO_UPGRADE_ROOT/etc/$service/conf.d"
 	done
@@ -70,9 +70,9 @@ plugin_not_installed() {
 	[ ! -f "$SENTINEL" ]
 }
 
-@test "keeps the plugin when upgrading to a version before 26.11" {
+@test "keeps the plugin when upgrading to a version before 26.12" {
 	plugin_installed
-	export WAZO_VERSION_CANDIDATE='26.10'
+	export WAZO_VERSION_CANDIDATE='26.11'
 
 	run "$SCRIPT"
 
@@ -81,7 +81,7 @@ plugin_not_installed() {
 	[ ! -f "$SENTINEL" ]
 }
 
-@test "removes the plugin when upgrading past 26.11" {
+@test "removes the plugin when upgrading past 26.12" {
 	plugin_installed
 	export WAZO_VERSION_CANDIDATE='27.01'
 
@@ -147,9 +147,9 @@ plugin_not_installed() {
 	[ "$(drop_in_count)" -eq 0 ]
 }
 
-@test "enables nothing when upgrading to a version before 26.11" {
+@test "enables nothing when upgrading to a version before 26.12" {
 	plugin_installed
-	export WAZO_VERSION_CANDIDATE='26.10'
+	export WAZO_VERSION_CANDIDATE='26.11'
 
 	run "$SCRIPT"
 
